@@ -832,6 +832,7 @@ export default {
 
         async selectEwallet(option) {
             this.selectedEwalletOption = option;
+            this.paymentStore.stopPaymentPolling();
 
             if (this.discountedSubtotal <= 0) {
                 this.showError('Total due must be greater than 0');
@@ -857,9 +858,9 @@ export default {
                     this.discountedSubtotal,
                     option,
                     {
-                        name: this.customer_name,
-                        email: '', // if available
-                        phone: '', // if available
+                        name: 'Walk-in Customer',
+                        email: 'kentanthony070495@gmail.com', // if available
+                        phone: '+639515886456', // if available
                     }
                 );
 
