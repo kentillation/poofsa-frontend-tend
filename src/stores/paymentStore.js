@@ -15,6 +15,38 @@ export const usePaymentStore = defineStore("payment", {
   }),
 
   actions: {
+    async startWalletPaymentStore(amountInCentavos, wallet, billing) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        // 1️⃣ Create intent
+        const intent = await this.createPaymentIntentStore(amountInCentavos);
+
+        // 2️⃣ Attach wallet (CONFIRM)
+        const response = await this.attachPaymentMethodStore(wallet, billing);
+
+        const redirectUrl = response?.next_action?.redirect?.url;
+
+        if (!redirectUrl) {
+          throw new Error("Missing redirect URL from PayMongo");
+        }
+
+        return {
+          payment_intent_id: intent.payment_intent_id,
+          redirect_url: redirectUrl,
+        };
+      } catch (error) {
+        this.error =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to start wallet payment";
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     // Existing method for creating payment intent
     async createPaymentIntentStore(amountInCentavos) {
       this.loading = true;
@@ -61,13 +93,14 @@ export const usePaymentStore = defineStore("payment", {
     },
 
     // New method for generating QR code
-    async generateQrStore(amount, wallet, referenceNumber) {
+    async generateQrPhStore(amount, referenceNumber) {
       this.loading = true;
       this.error = null;
+
       try {
         const response = await EWALLET_PAYMENT_API.generateQrApi(
           amount,
-          wallet,
+          "qrph",
           referenceNumber
         );
         this.qrData = response;
@@ -76,13 +109,12 @@ export const usePaymentStore = defineStore("payment", {
         this.error =
           error?.response?.data?.message ||
           error?.message ||
-          "Failed to generate QR code";
+          "Failed to generate QRPh";
         throw error;
       } finally {
         this.loading = false;
       }
     },
-
     // New method for checking payment status
     async checkPaymentStatusStore(paymentIntentId) {
       this.loading = true;
@@ -175,12 +207,10 @@ export const usePaymentStore = defineStore("payment", {
       return state.qrData?.qr_image || state.qrData?.qr_image_url;
     },
 
-    paymentIntentId: (state) => {
-      return (
-        state.qrData?.payment_intent_id ||
-        state.paymentIntent?.payment_intent_id
-      );
-    },
+    paymentIntentId: (state) =>
+    state.paymentIntent?.payment_intent_id ||
+    state.qrData?.payment_intent_id ||
+    null,
 
     // Existing getter for payment mode options
     paymentModeItems: (state) => {

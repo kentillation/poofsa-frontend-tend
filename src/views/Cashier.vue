@@ -830,18 +830,40 @@ export default {
             });
         },
 
-        selectEwallet(option) {
+        async selectEwallet(option) {
             this.selectedEwalletOption = option;
 
-            if (option === 'qrph') {
-                if (this.discountedSubtotal < 20) {
-                    this.showError('QRPh payments require a minimum of ₱20');
-                    return;
-                }
+            if (this.discountedSubtotal <= 0) {
+                this.showError('Total due must be greater than 0');
+                return;
+            }
 
-                this.generateQrForEwallet(); // polling starts INSIDE
+            const refNumber = await this.generateReferenceNumber();
+
+            if (option === 'qrph') {
+                // QRPH flow
+                await this.paymentStore.generateQrPhStore(this.discountedSubtotal, refNumber);
+                this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                this.paymentIntentId = this.paymentStore.paymentIntentId;
+
+                // Start polling
+                this.paymentStore.startPaymentPolling(this.paymentIntentId, (status) => {
+                    this.handlePaymentStatusChange(status);
+                });
+
             } else {
-                this.startWalletRedirect(option);
+                // GCash / PayMaya
+                const result = await this.paymentStore.startWalletPaymentStore(
+                    this.discountedSubtotal,
+                    option,
+                    {
+                        name: this.customer_name,
+                        email: '', // if available
+                        phone: '', // if available
+                    }
+                );
+
+                window.location.href = result.redirect_url;
             }
         },
 
@@ -854,7 +876,7 @@ export default {
                 this.loadingStore.show("Redirecting to payment...");
                 this.paymentStore.resetPaymentState();
                 const refNumber = await this.generateReferenceNumber();
-                const result = await this.paymentStore.generateQrStore(
+                const result = await this.paymentStore.generateQrPhStore(
                     this.discountedSubtotal,
                     wallet,
                     refNumber
