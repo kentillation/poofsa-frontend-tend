@@ -63,7 +63,8 @@
                                 <template v-slot:item.product_name="{ item }">
                                     <div class="d-flex align-center justify-space-between">
                                         <span>
-                                            {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{ item.quantity }}</span>
+                                            {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{
+                                                item.quantity }}</span>
                                         <span>&nbsp;&nbsp;₱{{ item.product_price }}</span>
                                     </div>
                                 </template>
@@ -137,10 +138,12 @@
                             </div>
 
                             <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id"
-                                    :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
-                                    label="Mode of payment" variant="outlined" density="compact" />
-                                <v-btn @click="eWalletDialog = true" :disabled="isEwalletEvidenceDisabled" prepend-icon="mdi-qrcode" height="37" color="green" class="me-2 mt-2">Generate QR</v-btn>
+                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" :items="paymentModeItems"
+                                    item-title="paymentmode_label" item-value="paymentmode_id" label="Mode of payment"
+                                    variant="outlined" density="compact" />
+                                <v-btn @click="eWalletDialog = true" :disabled="isEwalletEvidenceDisabled"
+                                    prepend-icon="mdi-qrcode" height="37" color="green" class="me-2 mt-2">Generate
+                                    QR</v-btn>
                             </div>
 
                             <div class="payment-section">
@@ -165,14 +168,13 @@
                                     Reset
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
-                                    append-icon="mdi-send" type="submit" :loading="loading"
-                                    :disabled="!isFormValid || 
-                                    loading || 
-                                    (payment_mode_id === 2 && !eWalletPaid) ||
-                                    Number(customer_cash) < subTotal ||
-                                    Number(customer_change) < 0 || 
-                                    Number(customer_charge) === 0.00 || 
-                                    subTotal <= 0">
+                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid ||
+                                        loading ||
+                                        (payment_mode_id === 2 && !eWalletPaid) ||
+                                        Number(customer_cash) < subTotal ||
+                                        Number(customer_change) < 0 ||
+                                        Number(customer_charge) === 0.00 ||
+                                        subTotal <= 0">
                                     Submit
                                 </v-btn>
                             </div>
@@ -241,21 +243,83 @@
                 </v-card>
             </v-dialog>
 
-            <v-dialog v-model="eWalletDialog" width="500" height="500" class="rounded-10">
-                <v-btn @click="eWalletDialog = false" color="#0090b6" class="position-absolute" size="small"
-                    style="top: -17px; left: -17px; z-index: 10;" icon>
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-card class="d-flex align-center justify-center pa-6">
-                    <h5 class="text-center my-3">Generate QR-code from the following</h5>
-                    <v-btn @click="selectEwallet('gcash')" v-model="gcash" color="blue" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >GCash</v-btn>
-                    <v-btn @click="selectEwallet('paymaya')" v-model="paymaya" color="green" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >Maya</v-btn>
-                    <v-btn @click="selectEwallet('qrph')" v-model="qrph" color="red" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >QRPh</v-btn>
-                    <h3>Total Due: ₱ {{ discountedSubtotal }}</h3>
-                    <div v-if="eWalletImgSrc" class="text-center mt-4">
-                        <v-img :src="eWalletImgSrc" width="200" height="200"></v-img>
+            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog">
+                <v-card class="d-flex flex-column align-center pa-6">
+                    <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
+                        style="top: -17px; left: -17px; z-index: 10;" icon>
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+
+                    <h5 class="text-center my-3">Select e-Wallet Payment Method</h5>
+
+                    <div class="d-flex flex-column w-100 mb-4" style="gap: 10px;">
+
+                        <v-btn @click="selectEwallet('gcash')" 
+                            :disabled="selectedEwalletOption === 'gcash' || paymentStore.loading"
+                            :loading="paymentStore.loading && selectedEwalletOption === 'gcash'"
+                            class="ewallet-btn gcash w-100" 
+                            color="#0090b6"
+                            height="48">
+                            <v-icon start>mdi-cellphone</v-icon>
+                            GCash
+                            <v-icon v-if="selectedEwalletOption === 'gcash'" end>mdi-check</v-icon>
+                        </v-btn>
+
+                        <v-btn @click="selectEwallet('paymaya')" 
+                            :disabled="selectedEwalletOption === 'paymaya' || paymentStore.loading"
+                            :loading="paymentStore.loading && selectedEwalletOption === 'paymaya'"
+                            class="ewallet-btn paymaya w-100" 
+                            height="48">
+                            <v-icon start>mdi-credit-card</v-icon>
+                            Maya (PayMaya)
+                            <v-icon v-if="selectedEwalletOption === 'paymaya'" end>mdi-check</v-icon>
+                        </v-btn>
+
+                        <v-btn @click="selectEwallet('qrph')" 
+                            :disabled="selectedEwalletOption === 'qrph' || paymentStore.loading"
+                            :loading="paymentStore.loading && selectedEwalletOption === 'qrph'"
+                            class="ewallet-btn qrph w-100" 
+                            height="48">
+                            <v-icon start>mdi-qrcode</v-icon>
+                            QRPh
+                            <v-icon v-if="selectedEwalletOption === 'qrph'" end>mdi-check</v-icon>
+                        </v-btn>
                     </div>
-                    <v-card v-else class="border" width="200" height="200"></v-card>
+
+                    <div v-if="selectedEwalletOption" class="qr-container text-center mt-1">
+                        <h4 class="mb-2">Total Due: ₱ {{ discountedSubtotal.toFixed(2) }}</h4>
+
+                        <div v-if="eWalletImgSrc" class="mb-3">
+                            <p class="mb-2">Scan QR Code to Pay</p>
+                            <v-img :src="eWalletImgSrc" width="150" height="150" class="qr-image mx-auto"></v-img>
+                            <p class="text-caption text-grey mt-2">
+                                Powered by {{ selectedEwalletOption.toUpperCase() }}
+                            </p>
+                        </div>
+
+                        <div v-else class="border d-flex align-center justify-center"
+                            style="width: 200px; height: 200px;">
+                            <p class="text-grey">QR will appear here</p>
+                        </div>
+
+                        <div v-if="eWalletPaid" class="payment-status success mt-2">
+                            <v-icon color="green" class="me-2">mdi-check-circle</v-icon>
+                            Payment Successful!
+                        </div>
+                        <div v-else-if="selectedEwalletOption && eWalletImgSrc" class="payment-status pending mt-2">
+                            <v-progress-circular indeterminate size="20" width="2" class="me-2"></v-progress-circular>
+                            Waiting for payment...
+                        </div>
+                    </div>
+
+                    <!-- Show payment status -->
+                    <div v-if="paymentStore.paymentStatus" class="mt-2">
+                        <v-chip :color="paymentStore.isPaymentSuccessful ? 'green' : 
+                                        paymentStore.isPaymentFailed ? 'red' : 'orange'"
+                                class="mb-2">
+                            Status: {{ paymentStore.paymentStatus.status }}
+                        </v-chip>
+                    </div>
                 </v-card>
             </v-dialog>
         </v-form>
@@ -313,6 +377,9 @@ export default {
             // Payment
             eWalletDialog: false,
             selectedEwalletOption: '',
+            eWalletPaid: false,
+            paymentIntentId: null,
+            paymentPollInterval: null,
             isFormValid: false,
             referenceNumber: '',
             total_quantity: '',
@@ -391,6 +458,9 @@ export default {
     beforeUnmount() {
         if (this.idImgSrc) {
             URL.revokeObjectURL(this.idImgSrc);
+        }
+        if (this.paymentPollInterval) {
+            clearInterval(this.paymentPollInterval);
         }
         echo.leave('newOrderChannel');
     },
@@ -776,35 +846,82 @@ export default {
         },
 
         async generateQrForEwallet() {
-            if (!this.selectedEwalletOption) return;
+            if (!this.selectedEwalletOption) {
+                this.showError('Please select an e-Wallet option');
+                return;
+            }
+
+            if (this.discountedSubtotal <= 0) {
+                this.showError('Total due must be greater than 0');
+                return;
+            }
+
             try {
-                const amountInCentavos = Math.round(this.discountedSubtotal * 100);
-                const res = await this.$api.post('/paymongo/generate-qr', {
-                    amount: amountInCentavos,
-                    wallet: this.selectedEwalletOption,
-                });
-                this.eWalletImgSrc = res.data.qr_url;
-                this.pollEwalletPayment(res.data.payment_intent_id);
+                this.loadingStore.show("Generating QR code...");
+                this.paymentStore.resetPaymentState();
+                const refNumber = await this.generateReferenceNumber();
+                await this.paymentStore.generateQrStore(
+                    this.discountedSubtotal,
+                    this.selectedEwalletOption,
+                    refNumber
+                );
+                this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                this.paymentIntentId = this.paymentStore.paymentIntentId;
+                this.startPaymentPolling();
             } catch (error) {
-                console.error(error);
-                this.showAlert('Failed to generate e-Wallet QR. Try again.');
+                console.error('QR generation error:', error);
+                this.showError(this.paymentStore.error || 'Failed to generate QR code');
+            } finally {
+                this.loadingStore.hide();
             }
         },
 
-        pollEwalletPayment(paymentIntentId) {
+        startPaymentPolling() {
+            if (!this.paymentIntentId) return;
+            this.paymentStore.startPaymentPolling(this.paymentIntentId, (status) => {
+                this.handlePaymentStatusChange(status);
+            });
+        },
+
+        handlePaymentStatusChange(status) {
+            switch (status.status) {
+                case 'succeeded':
+                    this.eWalletPaid = true;
+                    this.showSuccess('Payment received successfully!');
+                    setTimeout(() => {
+                        this.eWalletDialog = false;
+                    }, 2000);
+                    break;
+
+                case 'failed':
+                case 'cancelled':
+                    this.eWalletPaid = false;
+                    this.showError('Payment failed. Please try again.');
+                    break;
+
+                case 'processing':
+                    console.log('Payment processing...');
+                    break;
+
+                case 'error':
+                    this.eWalletPaid = false;
+                    this.showError('Error checking payment status. Please try again.');
+                    break;
+
+                default:
+                    break;
+            }
+        },
+
+        closeEwalletDialog() {
+            if (this.paymentPollInterval) {
+                clearInterval(this.paymentPollInterval);
+            }
+            this.eWalletDialog = false;
+            this.selectedEwalletOption = '';
+            this.eWalletImgSrc = null;
             this.eWalletPaid = false;
-            const interval = setInterval(async () => {
-                try {
-                    const res = await this.$api.get(`/paymongo/payment-intents/${paymentIntentId}`);
-                    if (res.data.status === 'succeeded') {
-                        clearInterval(interval);
-                        this.eWalletPaid = true;
-                        this.showSuccess('Payment received!');
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            }, 3000);
+            this.paymentIntentId = null;
         },
 
         async submitForm() {
@@ -813,6 +930,13 @@ export default {
                 if (!this.$refs.transactionForm.validate()) {
                     this.loadingStore.hide();
                     return;
+                }
+                if (Number(this.payment_mode_id) === 2) {
+                    if (!this.eWalletPaid) {
+                        this.showError('Please complete e-Wallet payment first');
+                        this.loadingStore.hide();
+                        return;
+                    }
                 }
                 let refNumber = typeof this.newRefNumber === "function" || typeof this.newRefNumber?.then === "function"
                     ? await this.newRefNumber
@@ -1071,6 +1195,67 @@ export default {
 
 .v-input__details {
     display: none;
+}
+
+/* QR Dialog Styles */
+.qr-dialog .v-card {
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+.qr-container {
+    background: white;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.qr-image {
+    border: 2px solid #0090b6;
+    border-radius: 10px;
+    padding: 10px;
+    background: white;
+}
+
+.ewallet-btn {
+    text-transform: none !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.ewallet-btn.gcash {
+    background: linear-gradient(135deg, #00435c 0%, #0090b6 100%) !important;
+    color: white !important;
+}
+
+.ewallet-btn.paymaya {
+    background: linear-gradient(135deg, #005a39 0%, #008d5a 100%) !important;
+    color: white !important;
+}
+
+.ewallet-btn.qrph {
+    background: linear-gradient(135deg, #690200 0%, #c62828 100%) !important;
+    color: white !important;
+}
+
+.payment-status {
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.payment-status.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.payment-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .refresh {
