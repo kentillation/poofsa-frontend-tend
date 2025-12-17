@@ -25,7 +25,7 @@ export const EWALLET_PAYMENT_API = {
         }
     },
 
-    async attachPaymentMethod(paymentIntentId, methodType, billing) {
+    async attachPaymentMethodApi(paymentIntentId, methodType, billing) {
         try {
             const authToken = localStorage.getItem('auth_token');
             if (!authToken) throw new Error('No authentication token found');

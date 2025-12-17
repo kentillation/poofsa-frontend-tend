@@ -43,7 +43,7 @@ export const usePaymentStore = defineStore('payment', {
         },
 
         
-        async attachPaymentMethod(methodType, billing) {
+        async attachPaymentMethodStore(methodType, billing) {
             this.loading = true;
             this.error = null;
             try {
@@ -51,7 +51,7 @@ export const usePaymentStore = defineStore('payment', {
                     throw new Error('No payment intent available. Please create one first.');
                 }
 
-                const response = await EWALLET_PAYMENT_API.attachPaymentMethod(
+                const response = await EWALLET_PAYMENT_API.attachPaymentMethodApi(
                     this.paymentIntent.payment_intent_id,
                     methodType,
                     billing

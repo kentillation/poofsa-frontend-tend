@@ -853,7 +853,7 @@ export default {
                 await this.paymentStore.createPaymentIntentStore(amount);
 
                 // Step 2: Attach e-Wallet
-                const result = await this.paymentStore.attachPaymentMethod(this.selectedEwalletOption, {
+                const result = await this.paymentStore.attachPaymentMethodStore(this.selectedEwalletOption, {
                     name: 'Juan Dela Cruz',
                     email: 'juan@example.com',
                     phone: '+639171234567'
@@ -861,7 +861,7 @@ export default {
                 console.log('Payment method attached:', result);
 
                 // Step 3: Redirect to e-Wallet checkout
-                this.redirectUrl = this.paymentStore.attachPaymentMethod?.next_action?.redirect?.url || '';
+                this.redirectUrl = this.paymentStore.attachPaymentMethodStore?.next_action?.redirect?.url || '';
                 this.redirectUrl = this.redirectUrl.replace(/^"|"$/g, '');
                 if (this.redirectUrl) {
                     window.open(this.redirectUrl, '_blank');
