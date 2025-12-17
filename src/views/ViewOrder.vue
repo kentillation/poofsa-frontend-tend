@@ -10,7 +10,7 @@
             <v-container class="pa-5">
                 <div class="centered">
                     <img v-if="imgSrc" :src="imgSrc" loading="lazy" width="120" height="120" alt="Order QR Code">
-                    <v-skeleton-loader v-else type="button" width="120" height="120" class="bg-grey-lighten-1"></v-skeleton-loader>
+                    <v-skeleton-loader v-else type="image" width="157" height="157" class="bg-grey-lighten-1 pa-1"></v-skeleton-loader>
                     <span>Scan this QR Code to track order</span><br />
                     <h3>Table #: {{ this.tableNumber }}</h3>
                 </div>
