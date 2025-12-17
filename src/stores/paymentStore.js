@@ -1,4 +1,3 @@
-// src/stores/paymentStore.js
 import { defineStore } from "pinia";
 import { EWALLET_PAYMENT_API } from "@/api/paymentApi";
 
@@ -20,10 +19,8 @@ export const usePaymentStore = defineStore("payment", {
       this.error = null;
 
       try {
-        // 1️⃣ Create intent
         const intent = await this.createPaymentIntentStore(amountInCentavos);
 
-        // 2️⃣ Attach wallet (CONFIRM)
         const response = await this.attachPaymentMethodStore(wallet, billing);
 
         const redirectUrl = response?.next_action?.redirect?.url;
@@ -47,7 +44,6 @@ export const usePaymentStore = defineStore("payment", {
       }
     },
 
-    // Existing method for creating payment intent
     async createPaymentIntentStore(amountInCentavos) {
       this.loading = true;
       this.error = null;
@@ -65,7 +61,6 @@ export const usePaymentStore = defineStore("payment", {
       }
     },
 
-    // Existing method for attaching payment method
     async attachPaymentMethodStore(methodType, billing) {
       this.loading = true;
       this.error = null;
@@ -92,7 +87,6 @@ export const usePaymentStore = defineStore("payment", {
       }
     },
 
-    // New method for generating QR code
     async generateQrPhStore(amount, referenceNumber) {
       this.loading = true;
       this.error = null;
@@ -115,7 +109,7 @@ export const usePaymentStore = defineStore("payment", {
         this.loading = false;
       }
     },
-    // New method for checking payment status
+
     async checkPaymentStatusStore(paymentIntentId) {
       this.loading = true;
       this.error = null;
@@ -146,12 +140,10 @@ export const usePaymentStore = defineStore("payment", {
         try {
           const status = await this.checkPaymentStatusStore(paymentIntentId);
 
-          // Call the callback function with the new status
           if (onStatusChange && typeof onStatusChange === "function") {
             onStatusChange(status);
           }
 
-          // Stop polling if payment is finalized
           if (
             ["succeeded", "failed", "cancelled", "error"].includes(
               status.status
@@ -161,12 +153,10 @@ export const usePaymentStore = defineStore("payment", {
           }
         } catch (error) {
           console.error("Payment polling error:", error);
-          // Don't stop polling on transient errors
         }
       }, 3000);
     },
 
-    // New method for stopping payment polling
     stopPaymentPolling() {
       if (this.paymentPollInterval) {
         clearInterval(this.paymentPollInterval);
@@ -174,7 +164,6 @@ export const usePaymentStore = defineStore("payment", {
       }
     },
 
-    // New method for resetting payment state
     resetPaymentState() {
       this.qrData = null;
       this.paymentStatus = null;
@@ -212,7 +201,6 @@ export const usePaymentStore = defineStore("payment", {
     state.qrData?.payment_intent_id ||
     null,
 
-    // Existing getter for payment mode options
     paymentModeItems: (state) => {
       if (state.paymentModeOptions.length === 0) {
         return [
