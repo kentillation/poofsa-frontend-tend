@@ -23,7 +23,7 @@ export const usePaymentStore = defineStore("payment", {
 
         const response = await this.attachPaymentMethodStore(wallet, billing);
 
-        const redirectUrl = response?.next_action?.redirect?.url;
+        const redirectUrl = response.redirect_url;
 
         if (!redirectUrl) {
           throw new Error("Missing redirect URL from PayMongo");
