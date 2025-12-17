@@ -244,12 +244,11 @@
             </v-dialog>
 
             <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog">
+                <v-btn @click="eWalletDialog = false" color="#0090b6" class="position-absolute" size="small"
+                    style="top: -17px; left: -17px; z-index: 10;" icon>
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
-                    <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
-                        style="top: -17px; left: -17px; z-index: 10;" icon>
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-
                     <h5 class="text-center my-3">Select e-Wallet Payment Method</h5>
 
                     <div class="d-flex flex-column w-100 mb-4" style="gap: 10px;">
@@ -271,7 +270,7 @@
                             class="ewallet-btn paymaya w-100" 
                             height="48">
                             <v-icon start>mdi-credit-card</v-icon>
-                            Maya (PayMaya)
+                            Maya
                             <v-icon v-if="selectedEwalletOption === 'paymaya'" end>mdi-check</v-icon>
                         </v-btn>
 
@@ -284,11 +283,11 @@
                             QRPh
                             <v-icon v-if="selectedEwalletOption === 'qrph'" end>mdi-check</v-icon>
                         </v-btn>
+
+                        <h4 class="text-center">Total Due: ₱ {{ discountedSubtotal.toFixed(2) }}</h4>
                     </div>
 
                     <div v-if="selectedEwalletOption" class="qr-container text-center mt-1">
-                        <h4 class="mb-2">Total Due: ₱ {{ discountedSubtotal.toFixed(2) }}</h4>
-
                         <div v-if="eWalletImgSrc" class="mb-3">
                             <p class="mb-2">Scan QR Code to Pay</p>
                             <v-img :src="eWalletImgSrc" width="150" height="150" class="qr-image mx-auto"></v-img>
