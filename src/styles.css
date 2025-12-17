@@ -6,6 +6,10 @@ h2, h3, h4, h5, p, .v-list-item {
     color: #0090b6;
 }
 
+.v-btn {
+    text-transform: none;
+}
+
 .v-list-item {
     border-radius: 30px;
 }

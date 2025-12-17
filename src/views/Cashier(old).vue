@@ -62,8 +62,8 @@
                                 height="400px">
                                 <template v-slot:item.product_name="{ item }">
                                     <div class="d-flex align-center justify-space-between">
-                                        <span>
-                                            {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{ item.quantity }}</span>
+                                        <span>{{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{
+            item.quantity }}</span>
                                         <span>&nbsp;&nbsp;₱{{ item.product_price }}</span>
                                     </div>
                                 </template>
@@ -136,11 +136,21 @@
                                 </span>
                             </div>
 
-                            <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id"
+                            <div class="payment-section">
+                                <v-autocomplete class="payment-section-item me-2 mt-2" v-model="payment_mode_id"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" variant="outlined" density="compact" />
-                                <v-btn @click="eWalletDialog = true" :disabled="isEwalletEvidenceDisabled" prepend-icon="mdi-qrcode" height="37" color="green" class="me-2 mt-2">Generate QR</v-btn>
+
+                                <v-file-input class="payment-section-item me-2" v-model="ewallet_image_file"
+                                    label="Attach receipt" variant="outlined" density="compact" prepend-icon=""
+                                    capture="environment" accept="image/*" @change="previewEWalletImage"
+                                    :disabled="isEwalletEvidenceDisabled" chips>
+                                </v-file-input>
+
+                                <span class="mt-2">
+                                    <img v-if="eWalletImgSrc" :src="eWalletImgSrc" width="160" height="220"
+                                        style="border: 1px solid #ccc ;border-radius: 10px;" alt="e-Wallet Evidence" />
+                                </span>
                             </div>
 
                             <div class="payment-section">
@@ -166,8 +176,8 @@
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
                                     append-icon="mdi-send" type="submit" :loading="loading"
-                                    :disabled="!isFormValid || loading || Number(customer_cash) < subTotal ||
-                                     Number(customer_change) < 0 || Number(customer_charge) === 0.00 || subTotal <= 0">
+                                    :disabled="!isFormValid || loading ||
+            Number(customer_cash) < subTotal || Number(customer_change) < 0 || Number(customer_charge) === 0.00 || subTotal <= 0">
                                     Submit
                                 </v-btn>
                             </div>
@@ -235,23 +245,6 @@
                     </v-sheet>
                 </v-card>
             </v-dialog>
-
-            <v-dialog v-model="eWalletDialog" width="500" height="500" class="rounded-10">
-                <v-btn @click="eWalletDialog = false" color="#0090b6" class="position-absolute" size="small"
-                    style="top: -17px; left: -17px; z-index: 10;" icon>
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-card class="d-flex align-center justify-center pa-6">
-                    <h5 class="text-center my-3">Generate QR-code from the following</h5>
-                    <v-btn @click="generateGCashQrCode" v-model="GCashQrCode" color="blue" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >GCash</v-btn>
-                    <v-btn @click="generateMayaQrCode" v-model="MayaQrCode" color="green" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >Maya</v-btn>
-                    <v-btn @click="generateQRPhQrCode" v-model="QRPhQrCode" color="red" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >QRPh</v-btn>
-                    <h3>Total Due: ₱ {{ discountedSubtotal }}</h3>
-                    <v-card class="border" width="200" height="200">
-                        <!-- Display QRcode here -->
-                    </v-card>
-                </v-card>
-            </v-dialog>
         </v-form>
         <Snackbar ref="snackbarRef" />
         <Alert ref="alertRef" />
@@ -305,10 +298,6 @@ export default {
             progressCircular: false,
 
             // Payment
-            eWalletDialog: false,
-            GCashQrCode: '',
-            MayaQrCode: '',
-            QRPhQrCode: '',
             isFormValid: false,
             referenceNumber: '',
             total_quantity: '',
@@ -323,6 +312,7 @@ export default {
             id_image_file: null,
             idImgSrc: null,
             payment_mode_id: 1,
+            ewallet_image_file: null,
             eWalletImgSrc: null,
             table_number: '',
             customer_name: '-',
@@ -385,6 +375,9 @@ export default {
     },
 
     beforeUnmount() {
+        if (this.eWalletImgSrc) {
+            URL.revokeObjectURL(this.eWalletImgSrc);
+        }
         if (this.idImgSrc) {
             URL.revokeObjectURL(this.idImgSrc);
         }
@@ -473,12 +466,12 @@ export default {
             return Number(this.order_type_id) === 1;
         },
 
-        isIdEvidenceDisabled() {
-            return Number(this.customer_discount) === 0;
-        },
-
         isEwalletEvidenceDisabled() {
             return Number(this.payment_mode_id) !== 2;
+        },
+
+        isIdEvidenceDisabled() {
+            return Number(this.customer_discount) === 0;
         },
 
         newRefNumber() {
@@ -719,6 +712,18 @@ export default {
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         },
 
+        previewEWalletImage() {
+            if (this.ewallet_image_file && this.ewallet_image_file instanceof File) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.eWalletImgSrc = e.target.result;
+                };
+                reader.readAsDataURL(this.ewallet_image_file);
+            } else {
+                this.eWalletImgSrc = null;
+            }
+        },
+
         previewIdImage() {
             if (this.id_image_file && this.id_image_file instanceof File) {
                 const reader = new FileReader();
@@ -766,18 +771,6 @@ export default {
             });
         },
 
-        generateGCashQrCode() {
-            // Generate Payment Intent for GCash
-        },
-
-        generateMayaQrCode() {
-            // Generate Payment Intent for Maya
-        },
-
-        generateQRPhQrCode() {
-            // Generate Payment Intent for QRPh
-        },
-
         async submitForm() {
             try {
                 this.loadingStore.show("Submitting...");
@@ -814,6 +807,12 @@ export default {
                     const IdImageFile = Array.isArray(this.id_image_file) ? this.id_image_file[0] : this.id_image_file;
                     const compressedFile = await this.compressImage(IdImageFile);
                     formData.append("idcard_evidence", compressedFile);
+                }
+
+                if (this.ewallet_image_file) {
+                    const ewalletImageFile = Array.isArray(this.ewallet_image_file) ? this.ewallet_image_file[0] : this.ewallet_image_file;
+                    const compressedFile = await this.compressImage(ewalletImageFile);
+                    formData.append("ewallet_evidence", compressedFile);
                 }
 
 
@@ -956,6 +955,8 @@ export default {
             this.customer_discount = 0;
             this.id_image_file = '';
             this.idImgSrc = '';
+            this.ewallet_image_file = '';
+            this.eWalletImgSrc = '';
             this.payment_mode_id = 1;
             this.table_number = '';
             this.customer_name = '-';
