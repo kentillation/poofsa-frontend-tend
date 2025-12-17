@@ -166,8 +166,13 @@
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
                                     append-icon="mdi-send" type="submit" :loading="loading"
-                                    :disabled="!isFormValid || loading || Number(customer_cash) < subTotal ||
-                                     Number(customer_change) < 0 || Number(customer_charge) === 0.00 || subTotal <= 0">
+                                    :disabled="!isFormValid || 
+                                    loading || 
+                                    (payment_mode_id === 2 && !eWalletPaid) ||
+                                    Number(customer_cash) < subTotal ||
+                                    Number(customer_change) < 0 || 
+                                    Number(customer_charge) === 0.00 || 
+                                    subTotal <= 0">
                                     Submit
                                 </v-btn>
                             </div>
@@ -243,13 +248,14 @@
                 </v-btn>
                 <v-card class="d-flex align-center justify-center pa-6">
                     <h5 class="text-center my-3">Generate QR-code from the following</h5>
-                    <v-btn @click="generateGCashQrCode" v-model="gcash" color="blue" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >GCash</v-btn>
-                    <v-btn @click="generateMayaQrCode" v-model="paymaya" color="green" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >Maya</v-btn>
-                    <v-btn @click="generateQRPhQrCode" v-model="qrph" color="red" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >QRPh</v-btn>
+                    <v-btn @click="selectEwallet('gcash')" v-model="gcash" color="blue" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >GCash</v-btn>
+                    <v-btn @click="selectEwallet('paymaya')" v-model="paymaya" color="green" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >Maya</v-btn>
+                    <v-btn @click="selectEwallet('qrph')" v-model="qrph" color="red" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >QRPh</v-btn>
                     <h3>Total Due: ₱ {{ discountedSubtotal }}</h3>
-                    <v-card class="border" width="200" height="200">
-                        <!-- Display QRcode here -->
-                    </v-card>
+                    <div v-if="eWalletImgSrc" class="text-center mt-4">
+                        <v-img :src="eWalletImgSrc" width="200" height="200"></v-img>
+                    </div>
+                    <v-card v-else class="border" width="200" height="200"></v-card>
                 </v-card>
             </v-dialog>
         </v-form>
@@ -307,9 +313,6 @@ export default {
             // Payment
             eWalletDialog: false,
             selectedEwalletOption: '',
-            gcash: '',
-            paymaya: '',
-            qrph: '',
             isFormValid: false,
             referenceNumber: '',
             total_quantity: '',
@@ -767,19 +770,41 @@ export default {
             });
         },
 
-        generateGCashQrCode() {
-            this.selectedEwalletOption = 'gcash';
-            // Generate Payment Intent for GCash
+        selectEwallet(option) {
+            this.selectedEwalletOption = option;
+            this.generateQrForEwallet();
         },
 
-        generateMayaQrCode() {
-            this.selectedEwalletOption = 'paymaya';
-            // Generate Payment Intent for Maya
+        async generateQrForEwallet() {
+            if (!this.selectedEwalletOption) return;
+            try {
+                const amountInCentavos = Math.round(this.discountedSubtotal * 100);
+                const res = await this.$api.post('/paymongo/generate-qr', {
+                    amount: amountInCentavos,
+                    wallet: this.selectedEwalletOption,
+                });
+                this.eWalletImgSrc = res.data.qr_url;
+                this.pollEwalletPayment(res.data.payment_intent_id);
+            } catch (error) {
+                console.error(error);
+                this.showAlert('Failed to generate e-Wallet QR. Try again.');
+            }
         },
 
-        generateQRPhQrCode() {
-            this.selectedEwalletOption = 'qrph';
-            // Generate Payment Intent for QRPh
+        pollEwalletPayment(paymentIntentId) {
+            this.eWalletPaid = false;
+            const interval = setInterval(async () => {
+                try {
+                    const res = await this.$api.get(`/paymongo/payment-intents/${paymentIntentId}`);
+                    if (res.data.status === 'succeeded') {
+                        clearInterval(interval);
+                        this.eWalletPaid = true;
+                        this.showSuccess('Payment received!');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }, 3000);
         },
 
         async submitForm() {
