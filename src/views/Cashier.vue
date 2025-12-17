@@ -141,11 +141,14 @@
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" variant="outlined" density="compact" />
 
-                                <v-file-input class="payment-section-item me-2 mt-2" v-model="ewallet_image_file"
-                                    label="Attach receipt" variant="outlined" density="compact" prepend-icon=""
-                                    capture="environment" accept="image/*" @change="previewEWalletImage"
-                                    :disabled="isEwalletEvidenceDisabled" chips>
-                                </v-file-input>
+                                <div class="d-flex mt-2">
+                                    <v-file-input class="payment-section-item me-2" v-model="ewallet_image_file"
+                                        label="Attach receipt" variant="outlined" density="compact" prepend-icon=""
+                                        capture="environment" accept="image/*" @change="previewEWalletImage"
+                                        :disabled="isEwalletEvidenceDisabled" chips>
+                                    </v-file-input>
+                                    <v-btn prepend-icon="mdi-qrcode" width="150" height="37" color="green" class="payment-section-item">Generate QR</v-btn>
+                                </div>
 
                                 <span class="mt-2">
                                     <img v-if="eWalletImgSrc" :src="eWalletImgSrc" width="160" height="220"
