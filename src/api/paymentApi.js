@@ -3,11 +3,11 @@ import apiClient from '../axios';
 
 export const EWALLET_PAYMENT_API = {
     ENDPOINTS: {
-        CREATE_PAYMENT_INTENT: '/payments/intents',
-        ATTACH_PAYMENT_METHOD: '/payments/attach', // new backend endpoint
+        CREATE_PAYMENT_INTENT: '/payment-intents',
+        ATTACH_PAYMENT_METHOD: '/payment-intents/attach', // new backend endpoint
     },
 
-    async createPaymentIntent(amountInCentavos) {
+    async createPaymentIntentApi(amountInCentavos) {
         try {
             const authToken = localStorage.getItem('auth_token');
             if (!authToken) throw new Error('No authentication token found');

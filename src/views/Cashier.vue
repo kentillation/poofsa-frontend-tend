@@ -243,9 +243,9 @@
                 </v-btn>
                 <v-card class="d-flex align-center justify-center pa-6">
                     <h5 class="text-center my-3">Generate QR-code from the following</h5>
-                    <v-btn @click="generateGCashQrCode" v-model="GCashQrCode" color="blue" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >GCash</v-btn>
-                    <v-btn @click="generateMayaQrCode" v-model="MayaQrCode" color="green" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >Maya</v-btn>
-                    <v-btn @click="generateQRPhQrCode" v-model="QRPhQrCode" color="red" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >QRPh</v-btn>
+                    <v-btn @click="generateGCashQrCode" v-model="gcash" color="blue" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >GCash</v-btn>
+                    <v-btn @click="generateMayaQrCode" v-model="paymaya" color="green" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >Maya</v-btn>
+                    <v-btn @click="generateQRPhQrCode" v-model="qrph" color="red" prepend-icon="mdi-qrcode" height="40" class="w-100 mb-2" >QRPh</v-btn>
                     <h3>Total Due: ₱ {{ discountedSubtotal }}</h3>
                     <v-card class="border" width="200" height="200">
                         <!-- Display QRcode here -->
@@ -306,9 +306,10 @@ export default {
 
             // Payment
             eWalletDialog: false,
-            GCashQrCode: '',
-            MayaQrCode: '',
-            QRPhQrCode: '',
+            selectedEwalletOption: '',
+            gcash: '',
+            paymaya: '',
+            qrph: '',
             isFormValid: false,
             referenceNumber: '',
             total_quantity: '',
@@ -767,14 +768,17 @@ export default {
         },
 
         generateGCashQrCode() {
+            this.selectedEwalletOption = 'gcash';
             // Generate Payment Intent for GCash
         },
 
         generateMayaQrCode() {
+            this.selectedEwalletOption = 'paymaya';
             // Generate Payment Intent for Maya
         },
 
         generateQRPhQrCode() {
+            this.selectedEwalletOption = 'qrph';
             // Generate Payment Intent for QRPh
         },
 
@@ -842,27 +846,27 @@ export default {
             }
         },
 
-        async payWithGCash() {
+        async payWithEWallet() {
             try {
                 // Step 1: Create payment intent (₱50 = 5000 centavos)
                 const amount = this.discountedSubtotal * 100; // Convert to centavos
-                await this.paymentStore.createPaymentIntent(amount);
+                await this.paymentStore.createPaymentIntentStore(amount);
 
-                // Step 2: Attach GCash
-                const result = await this.paymentStore.attachPaymentMethod('gcash', {
+                // Step 2: Attach e-Wallet
+                const result = await this.paymentStore.attachPaymentMethod(this.selectedEwalletOption, {
                     name: 'Juan Dela Cruz',
                     email: 'juan@example.com',
                     phone: '+639171234567'
                 });
                 console.log('Payment method attached:', result);
 
-                // Step 3: Redirect to GCash checkout
+                // Step 3: Redirect to e-Wallet checkout
                 this.redirectUrl = this.paymentStore.attachPaymentMethod?.next_action?.redirect?.url || '';
                 this.redirectUrl = this.redirectUrl.replace(/^"|"$/g, '');
                 if (this.redirectUrl) {
                     window.open(this.redirectUrl, '_blank');
                 } else {
-                    console.log('No redirect URL available for GCash checkout.');
+                    console.log('No redirect URL available for e-Wallet checkout.');
                 }
             } catch (error) {
                 console.error(error);

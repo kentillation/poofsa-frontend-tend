@@ -12,27 +12,26 @@ export const usePaymentStore = defineStore('payment', {
     }),
 
     actions: {
-        async fetchAllOptions() {
-            this.loading = true;
-            try {
-                // Fetch all options in parallel (better performance)
-                const [paymentModes] = await Promise.all([
-                    this.fetchOptions('/open/payment-mode-option'),
-                ]);
-                this.paymentModeOptions = paymentModes;
-            } catch (error) {
-                this.error = error;
-                console.error(error);
-            } finally {
-                this.loading = false;
-            }
-        },
+        // async fetchAllOptions() {
+        //     this.loading = true;
+        //     try {
+        //         const [paymentModes] = await Promise.all([
+        //             this.fetchOptions('/open/payment-mode-option'),
+        //         ]);
+        //         this.paymentModeOptions = paymentModes;
+        //     } catch (error) {
+        //         this.error = error;
+        //         console.error(error);
+        //     } finally {
+        //         this.loading = false;
+        //     }
+        // },
 
-        async createPaymentIntent(amountInCentavos) {
+        async createPaymentIntentStore(amountInCentavos) {
             this.loading = true;
             this.error = null;
             try {
-                const response = await EWALLET_PAYMENT_API.createPaymentIntent(amountInCentavos);
+                const response = await EWALLET_PAYMENT_API.createPaymentIntentApi(amountInCentavos);
                 this.paymentIntent = response;
                 return response;
             } catch (error) {
@@ -42,11 +41,8 @@ export const usePaymentStore = defineStore('payment', {
                 this.loading = false;
             }
         },
-        /**
-         * Attach a payment method (GCash / PayMaya / QRPH)
-         * @param {string} methodType - 'gcash' | 'paymaya' | 'qrph'
-         * @param {object} billing - { name, email, phone }
-         */
+
+        
         async attachPaymentMethod(methodType, billing) {
             this.loading = true;
             this.error = null;
@@ -61,7 +57,6 @@ export const usePaymentStore = defineStore('payment', {
                     billing
                 );
 
-                // PayMongo usually returns a redirect URL for checkout
                 this.redirectUrl = response?.next_action?.redirect?.url || null;
 
                 return response;
