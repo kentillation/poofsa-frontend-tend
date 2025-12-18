@@ -6,7 +6,7 @@ export const EWALLET_PAYMENT_API = {
     CREATE_PAYMENT_INTENT: "/paymongo/payment-intents",
     ATTACH_PAYMENT_METHOD: "/paymongo/payment-intents/attach",
     GENERATE_QR: "/paymongo/generate-qr",
-    CHECK_STATUS: "/paymongo/check-payment-status",
+    CHECK_STATUS: "/paymongo/webhook",
   },
 
   async generateQrApi(amount, wallet, referenceNumber) {
@@ -25,7 +25,7 @@ export const EWALLET_PAYMENT_API = {
 
   async checkPaymentStatusApi(paymentIntentId) {
     try {
-      const response = await apiClient.get(
+      const response = await apiClient.post(
         `${this.ENDPOINTS.CHECK_STATUS}/${paymentIntentId}`
       );
       return response.data;
