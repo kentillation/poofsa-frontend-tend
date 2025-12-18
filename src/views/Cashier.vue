@@ -141,8 +141,9 @@
                                 <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" :items="paymentModeItems"
                                     item-title="paymentmode_label" item-value="paymentmode_id" label="Mode of payment"
                                     variant="outlined" density="compact" />
-                                <v-btn  @click="selectEwallet('qrph')" :disabled="isEwalletEvidenceDisabled"
-                                    prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn qrph me-2 mt-2">Generate
+                                <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled"
+                                    prepend-icon="mdi-qrcode" height="37" color="green"
+                                    class="ewallet-btn qrph me-2 mt-2">Generate
                                     QR</v-btn>
                             </div>
 
@@ -251,8 +252,8 @@
                 <v-card class="d-flex flex-column align-center pa-6">
                     <div class="d-flex flex-column w-100 mb-4" style="gap: 10px;">
 
-                        <v-btn @click="selectEwallet('qrph')" :disabled="paymentStore.loading"
-                            class="ewallet-btn qrph w-100" height="48">
+                        <v-btn @click="openQrPayment" :disabled="paymentStore.loading" class="ewallet-btn qrph w-100"
+                            height="48">
                             <v-icon start>mdi-qrcode</v-icon>
                             Regenerate QR code
                         </v-btn>
@@ -808,29 +809,38 @@ export default {
             });
         },
 
-        async selectEwallet(option) {
-            this.selectedEwalletOption = option;
-            this.eWalletImgSrc = null;
-            this.paymentStore.stopPaymentPolling();
-
-            if (this.discountedSubtotal <= 0) {
-                this.showError('Total due must be greater than 0');
+        async openQrPayment() {
+            this.selectedEwalletOption = 'qrph';
+            if (this.payment_mode_id !== 2) {
+                this.showError("Please select e-Wallet payment");
                 return;
             }
 
-            const refNumber = await this.generateReferenceNumber();
+            if (this.discountedSubtotal <= 0) {
+                this.showError("Invalid total amount");
+                return;
+            }
 
-            if (option === 'qrph') {
-                this.eWalletDialog = true;
-                await this.paymentStore.generateQrPhStore(this.discountedSubtotal, refNumber);
+            this.eWalletPaid = false;
+            this.eWalletDialog = true;
+
+            const referenceNumber = await this.generateReferenceNumber();
+
+            try {
+                await this.paymentStore.generateQrPh(
+                    this.discountedSubtotal,
+                    referenceNumber
+                );
+
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-                this.paymentIntentId = this.paymentStore.paymentIntentId;
 
-                // Start polling
-                this.paymentStore.startPaymentPolling(this.paymentIntentId, (status) => {
+                this.paymentStore.startPaymentPolling((status) => {
                     this.handlePaymentStatusChange(status);
                 });
 
+            } catch (err) {
+                this.showError("Failed to generate QR");
+                this.eWalletDialog = false;
             }
         },
 
