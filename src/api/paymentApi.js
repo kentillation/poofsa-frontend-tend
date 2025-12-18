@@ -6,7 +6,7 @@ export const EWALLET_PAYMENT_API = {
     CREATE_PAYMENT_INTENT: "/paymongo/payment-intents",
     ATTACH_PAYMENT_METHOD: "/paymongo/payment-intents/attach",
     GENERATE_QR: "/paymongo/generate-qr",
-    CHECK_STATUS: "/paymongo/check-status",
+    CHECK_STATUS: "/paymongo/check-payment-status",
   },
 
   async generateQrApi(amount, wallet, referenceNumber) {

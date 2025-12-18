@@ -141,8 +141,8 @@
                                 <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" :items="paymentModeItems"
                                     item-title="paymentmode_label" item-value="paymentmode_id" label="Mode of payment"
                                     variant="outlined" density="compact" />
-                                <v-btn @click="eWalletDialog = true" :disabled="isEwalletEvidenceDisabled"
-                                    prepend-icon="mdi-qrcode" height="37" color="green" class="me-2 mt-2">Generate
+                                <v-btn  @click="selectEwallet('qrph')" :disabled="isEwalletEvidenceDisabled"
+                                    prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn qrph me-2 mt-2">Generate
                                     QR</v-btn>
                             </div>
 
@@ -249,59 +249,37 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
-                    <h5 class="text-center my-3">Select e-Wallet Payment Method</h5>
-
                     <div class="d-flex flex-column w-100 mb-4" style="gap: 10px;">
 
-                        <v-btn @click="selectEwallet('gcash')"
-                            :disabled="selectedEwalletOption === 'gcash' || paymentStore.loading"
-                            :loading="paymentStore.loading && selectedEwalletOption === 'gcash'"
-                            class="ewallet-btn gcash w-100" color="#0090b6" height="48">
-                            <v-icon start>mdi-cellphone</v-icon>
-                            GCash
-                            <v-icon v-if="selectedEwalletOption === 'gcash'" end>mdi-check</v-icon>
-                        </v-btn>
-
-                        <v-btn @click="selectEwallet('paymaya')"
-                            :disabled="selectedEwalletOption === 'paymaya' || paymentStore.loading"
-                            :loading="paymentStore.loading && selectedEwalletOption === 'paymaya'"
-                            class="ewallet-btn paymaya w-100" height="48">
-                            <v-icon start>mdi-credit-card</v-icon>
-                            Maya
-                            <v-icon v-if="selectedEwalletOption === 'paymaya'" end>mdi-check</v-icon>
-                        </v-btn>
-
-                        <v-btn @click="selectEwallet('qrph')"
-                            :disabled="selectedEwalletOption === 'qrph' || paymentStore.loading"
-                            :loading="paymentStore.loading && selectedEwalletOption === 'qrph'"
+                        <v-btn @click="selectEwallet('qrph')" :disabled="paymentStore.loading"
                             class="ewallet-btn qrph w-100" height="48">
                             <v-icon start>mdi-qrcode</v-icon>
-                            QRPh
-                            <v-icon v-if="selectedEwalletOption === 'qrph'" end>mdi-check</v-icon>
+                            Regenerate QR code
                         </v-btn>
 
-                        <h4 class="text-center">Total Due: ₱ {{ discountedSubtotal.toFixed(2) }}</h4>
+                        <h4 class="text-center mt-1">Total Due: ₱ {{ discountedSubtotal.toFixed(2) }}</h4>
                     </div>
 
-                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center mt-1">
-                        <div v-if="eWalletImgSrc" class="mb-3">
-                            <p class="mb-2">Scan QR Code to Pay</p>
-                            <v-img :src="eWalletImgSrc" width="150" height="150" class="qr-image mx-auto"></v-img>
-                            <p class="text-caption text-grey mt-2">
+                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 px-3 py-2">
+                        <div v-if="eWalletImgSrc">
+                            <p class="mt-3">Scan QR code to Pay</p>
+                            <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
+                            <p class="text-caption text-grey">
                                 Powered by {{ selectedEwalletOption.toUpperCase() }}
                             </p>
                         </div>
 
-                        <div v-else class="border d-flex align-center justify-center"
-                            style="width: 200px; height: 200px;">
-                            <p class="text-grey">QR will appear here</p>
+                        <div v-else class="d-flex justify-center">
+                            <div style="display: flex; align-items: center; width: 200px; height: 200px;">
+                                <p class="text-grey">QR code will appear here</p>
+                            </div>
                         </div>
 
-                        <div v-if="eWalletPaid" class="payment-status success mt-2">
+                        <div v-if="eWalletPaid" class="payment-status success my-2">
                             <v-icon color="green" class="me-2">mdi-check-circle</v-icon>
                             Payment Successful!
                         </div>
-                        <div v-else-if="selectedEwalletOption && eWalletImgSrc" class="payment-status pending mt-2">
+                        <div v-else-if="selectedEwalletOption && eWalletImgSrc" class="payment-status pending my-2">
                             <v-progress-circular indeterminate size="20" width="2" class="me-2"></v-progress-circular>
                             Waiting for payment...
                         </div>
@@ -832,6 +810,7 @@ export default {
 
         async selectEwallet(option) {
             this.selectedEwalletOption = option;
+            this.eWalletImgSrc = null;
             this.paymentStore.stopPaymentPolling();
 
             if (this.discountedSubtotal <= 0) {
@@ -842,7 +821,7 @@ export default {
             const refNumber = await this.generateReferenceNumber();
 
             if (option === 'qrph') {
-                // QRPH flow
+                this.eWalletDialog = true;
                 await this.paymentStore.generateQrPhStore(this.discountedSubtotal, refNumber);
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
                 this.paymentIntentId = this.paymentStore.paymentIntentId;
@@ -852,19 +831,6 @@ export default {
                     this.handlePaymentStatusChange(status);
                 });
 
-            } else {
-                // GCash / PayMaya
-                const result = await this.paymentStore.startWalletPaymentStore(
-                    this.discountedSubtotal,
-                    option,
-                    {
-                        name: 'Walk-in Customer',
-                        email: 'kentanthony070495@gmail.com', // if available
-                        phone: '+639515886456', // if available
-                    }
-                );
-
-                window.location.href = result.redirect_url;
             }
         },
 
@@ -1268,36 +1234,17 @@ export default {
 
 .qr-container {
     background: white;
-    padding: 18px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.qr-image {
-    border: 2px solid #0090b6;
-    border-radius: 10px;
-    padding: 10px;
-    background: white;
-}
-
 .ewallet-btn {
     text-transform: none !important;
-    font-weight: 600 !important;
     letter-spacing: 0.5px !important;
 }
 
-.ewallet-btn.gcash {
-    background: linear-gradient(135deg, #00435c 0%, #0090b6 100%) !important;
-    color: white !important;
-}
-
-.ewallet-btn.paymaya {
-    background: linear-gradient(135deg, #005a39 0%, #008d5a 100%) !important;
-    color: white !important;
-}
-
 .ewallet-btn.qrph {
-    background: linear-gradient(135deg, #690200 0%, #c62828 100%) !important;
+    background: linear-gradient(135deg, #0b0069 0%, #c62828 100%) !important;
     color: white !important;
 }
 
