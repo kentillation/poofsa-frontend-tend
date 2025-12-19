@@ -284,7 +284,7 @@
 
                     <!-- Show payment status -->
                     <div v-if="paymentStore.paymentStatus" class="payment-status mt-1">
-                        <v-alert :type="paymentStatusType" :class="{ 'd-none' : this.eWalletImgSrc = null }" variant="tonal" class="mb-2">
+                        <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal" class="mb-2">
                             <div class="d-flex align-center justify-space-between">
                                 <span class="me-2"><strong>Status:</strong> {{ paymentStatusText }}</span>
                                 <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="20"
