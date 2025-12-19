@@ -283,11 +283,14 @@
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="payment-status mt-1">
+                    <div v-if="paymentStore.paymentStatus" class="payment-status">
                         <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal" class="mb-2">
                             <div class="d-flex align-center justify-space-between">
-                                <span class="me-2"><strong>Status:</strong> {{ paymentStatusText }}</span>
-                                <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="20"
+                                <div class="d-flex flex-column me-3">
+                                    <span><strong>Status:</strong></span>
+                                    <span> {{ paymentStatusText }}</span>
+                                </div>
+                                <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="15"
                                     width="2"></v-progress-circular>
                             </div>
                         </v-alert>
