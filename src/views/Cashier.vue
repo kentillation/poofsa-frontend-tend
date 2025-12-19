@@ -250,7 +250,8 @@
                 </v-card>
             </v-dialog>
 
-            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog">
+            <!-- e-Wallet Payment -->
+            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" persistent>
                 <v-btn @click="eWalletDialog = false" color="#0090b6" class="position-absolute" size="small"
                     style="top: -17px; left: -17px; z-index: 10;" icon>
                     <v-icon>mdi-close</v-icon>
@@ -266,7 +267,7 @@
 
                     <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 px-3 py-2">
                         <div v-if="eWalletImgSrc">
-                            <p class="mt-3">Scan QR code to Pay</p>
+                            <p class="mt-1">Scan QR code to Pay</p>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
                             <p class="text-caption text-grey">
                                 Powered by {{ selectedEwalletOption.toUpperCase() }}
@@ -275,34 +276,27 @@
 
                         <div v-else class="d-flex justify-center">
                             <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
-                                <p class="text-grey mb-3">Geneating QR code...</p>
+                                <p class="text-grey mb-3">Generating QR code...</p>
                                 <v-progress-circular indeterminate size="50" width="2"></v-progress-circular>
                             </div>
                         </div>
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="payment-status mt-3">
-                        <v-alert :type="paymentStatusType" variant="tonal" class="mb-2">
+                    <div v-if="paymentStore.paymentStatus" class="payment-status mt-1">
+                        <v-alert :type="paymentStatusType" :class="{ 'd-none' : this.eWalletImgSrc = null }" variant="tonal" class="mb-2">
                             <div class="d-flex align-center justify-space-between">
                                 <span class="me-2"><strong>Status:</strong> {{ paymentStatusText }}</span>
                                 <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="20"
                                     width="2"></v-progress-circular>
                             </div>
                         </v-alert>
+                    </div>
 
-                        <div class="text-center text-white" v-if="paymentStore.paymentDetails">
-                            <div v-if="paymentStore.paymentDetails.paid_at">
-                                <p class="text-white">
-                                    <strong>Paid at:</strong> {{ formatDateTime(paymentStore.paymentDetails.paid_at) }}
-                                </p>
-                            </div>
-                            <div class="text-center" v-if="paymentStore.paymentDetails.amount">
-                                <p class="text-white">
-                                    <strong>Amount:</strong> ₱{{ (paymentStore.paymentDetails.amount / 100).toFixed(2) }}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="text-center">
+                        <p>
+                            You are about to pay: <strong>₱{{ discountedSubtotal.toFixed(2) }}</strong> 
+                        </p>
                     </div>
                 </v-card>
             </v-dialog>
@@ -863,6 +857,7 @@ export default {
 
         async openQrPayment() {
             this.eWalletImgSrc = null;
+            this.stopPaymentPolling();
             this.selectedEwalletOption = 'qrph';
             if (this.payment_mode_id !== 2) {
                 this.showError("Please select e-Wallet payment");
@@ -1342,21 +1337,9 @@ export default {
 .payment-status {
     font-size: 14px;
     font-weight: normal;
-    padding: 10px;
+    padding: 5px;
     border-radius: 8px;
-    margin: 10px 0;
-}
-
-.payment-status.awaiting_next_action {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
-.payment-status.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    margin: 5px 0;
 }
 
 .refresh {
