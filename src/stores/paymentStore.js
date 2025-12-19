@@ -9,13 +9,17 @@ export const usePaymentStore = defineStore("payment", {
     qrData: null,
     paymentIntentId: null,
     paymentStatus: null,
+    paymentDetails: null,
 
     pollInterval: null,
+    maxPollAttempts: 60, // 3 minutes at 3s intervals
+    pollAttempts: 0,
+    isPollingActive: false,
   }),
 
   actions: {
     async generateQrPh(amount, referenceNumber) {
-      this.reset();
+      this.resetPaymentState();
       this.loading = true;
 
       try {
@@ -28,6 +32,10 @@ export const usePaymentStore = defineStore("payment", {
         this.qrData = res;
         this.paymentIntentId = res.payment_intent_id;
 
+        if (this.paymentIntentId) {
+          this.startPaymentPolling(this.paymentIntentId);
+        }
+
         return res;
       } catch (err) {
         this.error = err?.response?.data?.message || "Failed to generate QR";
@@ -37,30 +45,46 @@ export const usePaymentStore = defineStore("payment", {
       }
     },
 
-    startPaymentPolling(onUpdate) {
-      if (!this.paymentIntentId) return;
-
-      this.stopPaymentPolling();
-
-      this.pollInterval = setInterval(async () => {
-        try {
-          const res = await EWALLET_PAYMENT_API.checkPaymentStatusApi(
-            this.paymentIntentId
-          );
-
-          this.paymentStatus = res;
-
-          if (onUpdate) onUpdate(res);
-
-          if (
-            ["succeeded", "failed", "cancelled", "error"].includes(res.status)
-          ) {
-            this.stopPaymentPolling();
-          }
-        } catch (e) {
-          console.error("Polling error", e);
+    async checkPaymentStatus(intentId) {
+      try {
+        const res = await EWALLET_PAYMENT_API.checkPaymentStatusApi(intentId);
+        if (res.ok) {
+          this.paymentStatus = res.original_status;
+          this.paymentDetails = res;
+        } else {
+          this.paymentStatus = "error";
         }
-      }, 3000);
+        return res;
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+        this.paymentStatus = "error";
+        return { ok: false, status: "error" };
+      }
+    },
+
+    startPaymentPolling(intentId) {
+      if (!intentId) return;
+      this.stopPaymentPolling();
+      this.isPollingActive = true;
+      this.pollAttempts = 0;
+      this.pollInterval = setInterval(async () => {
+        if (this.pollAttempts >= this.maxPollAttempts) {
+          this.stopPaymentPolling();
+          return;
+        }
+        this.pollAttempts++;
+        const statusResult = await this.checkPaymentStatus(intentId);
+        if (this.isPaymentComplete) {
+          this.stopPaymentPolling();
+          if (this.onPaymentSuccess) {
+            this.onPaymentSuccess(this.paymentDetails);
+          }
+        }
+
+        if (this.onStatusUpdate) {
+          this.onStatusUpdate(statusResult);
+        }
+      }, 3000); // Check every 3 seconds
     },
 
     stopPaymentPolling() {
@@ -68,21 +92,33 @@ export const usePaymentStore = defineStore("payment", {
         clearInterval(this.pollInterval);
         this.pollInterval = null;
       }
+      this.isPollingActive = false;
     },
 
-    reset() {
+    resetPaymentState() {
       this.qrData = null;
       this.paymentIntentId = null;
       this.paymentStatus = null;
+      this.paymentDetails = null;
       this.error = null;
+      this.pollAttempts = 0;
       this.stopPaymentPolling();
+    },
+
+    onStatusUpdate(callback) {
+      this.onStatusUpdate = callback;
+    },
+
+    onPaymentSuccess(callback) {
+      this.onPaymentSuccess = callback;
     },
   },
 
   getters: {
     qrImageSrc: (s) => s.qrData?.qr_image,
-    isPaid: (s) => s.paymentStatus?.status === "succeeded",
-    isPending: (s) =>
-      ["pending", "processing"].includes(s.paymentStatus?.status),
+    isPaid: (s) => s.paymentStatus === "succeeded",
+    isPending: (s) => ["pending", "processing"].includes(s.paymentStatus),
+    isFailed: (s) => ["failed", "cancelled", "error"].includes(s.paymentStatus),
+    isPaymentComplete: (s) => s.isPaid || s.isFailed,
   },
 });

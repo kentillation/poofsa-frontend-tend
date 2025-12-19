@@ -6,7 +6,8 @@ export const EWALLET_PAYMENT_API = {
     CREATE_PAYMENT_INTENT: "/paymongo/payment-intents",
     ATTACH_PAYMENT_METHOD: "/paymongo/payment-intents/attach",
     GENERATE_QR: "/paymongo/generate-qr",
-    CHECK_STATUS: "/paymongo/webhook",
+    CHECK_STATUS: "/paymongo/payment-intents/:intentId/status",
+    WEBHOOK: "/paymongo/webhook",
   },
 
   async generateQrApi(amount, wallet, referenceNumber) {
@@ -25,12 +26,25 @@ export const EWALLET_PAYMENT_API = {
 
   async checkPaymentStatusApi(paymentIntentId) {
     try {
-      const response = await apiClient.post(
-        `${this.ENDPOINTS.CHECK_STATUS}/${paymentIntentId}`
+      const response = await apiClient.get(
+        this.ENDPOINTS.CHECK_STATUS.replace(":intentId", paymentIntentId)
       );
       return response.data;
     } catch (error) {
       console.error("Check payment status API error:", error);
+      throw error;
+    }
+  },
+
+  async cancelPaymentIntentApi(paymentIntentId) {
+    try {
+      // You might want to add this endpoint too
+      const response = await apiClient.post(
+        `/paymongo/payment-intents/${paymentIntentId}/cancel`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Cancel payment intent API error:", error);
       throw error;
     }
   },

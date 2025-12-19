@@ -138,10 +138,16 @@
                             </div>
 
                             <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" :items="paymentModeItems"
-                                    item-title="paymentmode_label" item-value="paymentmode_id" label="Mode of payment"
-                                    variant="outlined" density="compact" />
-                                <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled"
+                                <v-autocomplete :disabled="this.eWalletPaid"
+                                    class="me-2 mt-2" 
+                                    v-model="payment_mode_id" 
+                                    :items="paymentModeItems"
+                                    item-title="paymentmode_label" 
+                                    item-value="paymentmode_id" 
+                                    label="Mode of payment"
+                                    variant="outlined" 
+                                    density="compact" />
+                                <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled || this.eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn qrph me-2 mt-2">Generate
                                     QR</v-btn>
@@ -251,14 +257,11 @@
                 </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
                     <div class="d-flex flex-column w-100 mb-4" style="gap: 10px;">
-
                         <v-btn @click="openQrPayment" :disabled="paymentStore.loading" class="ewallet-btn qrph w-100"
                             height="48">
                             <v-icon start>mdi-qrcode</v-icon>
                             Regenerate QR code
                         </v-btn>
-
-                        <h4 class="text-center mt-1">Total Due: ₱ {{ discountedSubtotal.toFixed(2) }}</h4>
                     </div>
 
                     <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 px-3 py-2">
@@ -275,23 +278,30 @@
                                 <p class="text-grey">QR code will appear here</p>
                             </div>
                         </div>
-
-                        <div v-if="eWalletPaid" class="payment-status success my-2">
-                            <v-icon color="green" class="me-2">mdi-check-circle</v-icon>
-                            Payment Successful!
-                        </div>
-                        <div v-else-if="selectedEwalletOption && eWalletImgSrc" class="payment-status pending my-2">
-                            <v-progress-circular indeterminate size="20" width="2" class="me-2"></v-progress-circular>
-                            Waiting for payment...
-                        </div>
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="mt-2">
-                        <v-chip :color="paymentStore.isPaymentSuccessful ? 'green' :
-                            paymentStore.isPaymentFailed ? 'red' : 'orange'" class="mb-2">
-                            Status: {{ paymentStore.paymentStatus.status }}
-                        </v-chip>
+                    <div v-if="paymentStore.paymentStatus" class="payment-status mt-3">
+                        <v-alert :type="paymentStatusType" variant="tonal" class="mb-2">
+                            <div class="d-flex align-center justify-space-between">
+                                <span class="me-2"><strong>Status:</strong> {{ paymentStatusText }}</span>
+                                <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="20"
+                                    width="2"></v-progress-circular>
+                            </div>
+                        </v-alert>
+
+                        <div class="text-center text-white" v-if="paymentStore.paymentDetails">
+                            <div v-if="paymentStore.paymentDetails.paid_at">
+                                <p class="text-white">
+                                    <strong>Paid at:</strong> {{ formatDateTime(paymentStore.paymentDetails.paid_at) }}
+                                </p>
+                            </div>
+                            <div class="text-center" v-if="paymentStore.paymentDetails.amount">
+                                <p class="text-white">
+                                    <strong>Amount:</strong> ₱{{ (paymentStore.paymentDetails.amount / 100).toFixed(2) }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </v-card>
             </v-dialog>
@@ -353,6 +363,8 @@ export default {
             eWalletPaid: false,
             paymentIntentId: null,
             paymentPollInterval: null,
+            onPaymentSuccessCallback: null,
+            onStatusUpdateCallback: null,
             isFormValid: false,
             referenceNumber: '',
             total_quantity: '',
@@ -429,6 +441,13 @@ export default {
     },
 
     beforeUnmount() {
+        if (this.paymentStore) {
+            this.paymentStore.onStatusUpdate = null;
+            this.paymentStore.onPaymentSuccess = null;
+            this.paymentStore.stopPaymentPolling();
+            this.paymentStore.resetPaymentState();
+        }
+
         if (this.idImgSrc) {
             URL.revokeObjectURL(this.idImgSrc);
         }
@@ -515,6 +534,38 @@ export default {
 
     computed: {
         ...mapState(useStocksStore, ['stockNotificationQty']),
+
+        paymentStatus() {
+            return this.paymentStore.paymentStatus;
+        },
+
+        paymentDetails() {
+            return this.paymentStore.paymentDetails;
+        },
+
+        isPollingActive() {
+            return this.paymentStore.isPollingActive;
+        },
+
+        paymentStatusType() {
+            const status = this.paymentStatus;
+            if (status === 'awaiting_next_action') return 'warning';
+            if (status === 'succeeded') return 'success';
+            if (status === 'failed' || status === 'cancelled' || status === 'error') return 'error';
+            return 'info';
+        },
+
+        paymentStatusText() {
+            const status = this.paymentStatus;
+            const texts = {
+                'awaiting_next_action': 'Waiting for Payment',
+                'succeeded': 'Payment Successful',
+                'failed': 'Payment Failed',
+                'cancelled': 'Payment Cancelled',
+                'error': 'Error Checking Status'
+            };
+            return texts[status] || status;
+        },
 
         isOrderTypeChargeDisabled() {
             return Number(this.order_type_id) === 1;
@@ -815,33 +866,38 @@ export default {
                 this.showError("Please select e-Wallet payment");
                 return;
             }
-
             if (this.discountedSubtotal <= 0) {
                 this.showError("Invalid total amount");
                 return;
             }
-
             this.eWalletPaid = false;
             this.eWalletDialog = true;
-
             const referenceNumber = await this.generateReferenceNumber();
-
             try {
+                this.setupPaymentCallbacks();
                 await this.paymentStore.generateQrPh(
                     this.discountedSubtotal,
                     referenceNumber
                 );
-
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-
-                this.paymentStore.startPaymentPolling((status) => {
-                    this.handlePaymentStatusChange(status);
-                });
-
             } catch (err) {
-                this.showError("Failed to generate QR");
+                this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
+                console.error('QR generation error:', err);
                 this.eWalletDialog = false;
             }
+        },
+
+        setupPaymentCallbacks() {
+            this.paymentStore.onStatusUpdate = null;
+            this.paymentStore.onPaymentSuccess = null;
+            this.paymentStore.onStatusUpdate = (statusResult) => {
+                console.log('Payment status update:', statusResult);
+                this.handlePaymentStatusUpdate(statusResult);
+            };
+            this.paymentStore.onPaymentSuccess = (details) => {
+                console.log('Payment success! Details:', details);
+                this.handlePaymentSuccess();
+            };
         },
 
         async startWalletRedirect(wallet) {
@@ -924,6 +980,26 @@ export default {
             }
         },
 
+        handlePaymentStatusUpdate(statusResult) {
+            if (statusResult.ok) {
+                if (statusResult.status === 'succeeded') {
+                this.eWalletPaid = true;
+                } else if (['failed', 'cancelled'].includes(statusResult.status)) {
+                this.showError(`Payment ${statusResult.status}. Please try again.`);
+                }
+            } else {
+                console.error('Payment status check failed:', statusResult);
+            }
+        },
+
+        handlePaymentSuccess() {
+            this.showSuccess('Payment received successfully!');
+            this.eWalletPaid = true;
+            setTimeout(() => {
+                this.eWalletDialog = false;
+            }, 3000);
+        },
+
         handlePaymentStatusChange(status) {
             switch (status.status) {
                 case 'succeeded':
@@ -956,7 +1032,10 @@ export default {
         },
 
         closeEwalletDialog() {
+            this.paymentStore.onStatusUpdate = null;
+            this.paymentStore.onPaymentSuccess = null;
             this.paymentStore.stopPaymentPolling();
+            this.paymentStore.resetPaymentState();
             this.selectedEwalletOption = '';
             this.eWalletImgSrc = null;
             this.eWalletPaid = false;
@@ -1266,7 +1345,7 @@ export default {
     margin: 10px 0;
 }
 
-.payment-status.pending {
+.payment-status.awaiting_next_action {
     background-color: #fff3cd;
     color: #856404;
     border: 1px solid #ffeaa7;
