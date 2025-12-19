@@ -274,8 +274,9 @@
                         </div>
 
                         <div v-else class="d-flex justify-center">
-                            <div style="display: flex; align-items: center; width: 200px; height: 200px;">
-                                <p class="text-grey">QR code will appear here</p>
+                            <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
+                                <p class="text-grey mb-3">Geneating QR code...</p>
+                                <v-progress-circular indeterminate size="50" width="2"></v-progress-circular>
                             </div>
                         </div>
                     </div>
@@ -861,6 +862,7 @@ export default {
         },
 
         async openQrPayment() {
+            this.eWalletImgSrc = null;
             this.selectedEwalletOption = 'qrph';
             if (this.payment_mode_id !== 2) {
                 this.showError("Please select e-Wallet payment");
