@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
         // localStorage.clear();
         try {
             if (currentToken) {
-                await apiClient.post('/logout', null, {
+                await apiClient.post('/cashier/logout', null, {
                     headers: {
                         Authorization: `Bearer ${currentToken}`
                     },
