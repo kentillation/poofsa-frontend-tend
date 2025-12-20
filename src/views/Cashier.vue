@@ -397,7 +397,7 @@ export default {
             eWalletImgSrc: null,
             table_number: '',
             customer_name: '-',
-            order_note: '',
+            order_note: '-',
             redirectUrl: '',
             orderTypeItems: [
                 { ordertype_id: 1, ordertype_label: 'Dine-in' },
