@@ -252,7 +252,7 @@
 
             <!-- e-Wallet Payment -->
             <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" persistent>
-                <v-btn @click="eWalletDialog = false" color="#0090b6" class="position-absolute" size="small"
+                <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
                     style="top: -17px; left: -17px; z-index: 10;" icon>
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
@@ -265,26 +265,38 @@
                         </v-btn>
                     </div>
 
-                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 px-3 py-2">
+                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 px-4 py-2">
                         <div v-if="eWalletImgSrc">
-                            <p class="mt-1">Scan QR code to Pay</p>
+                            <div class="d-flex align-center justify-center">
+                                <p style="font-size: 15px;">Scan</p>
+                                <img class="e-wallet mx-1" :src="qrphLogo" style="width: 60px; height: 15px;" alt="QRPh Logo" loading="lazy">
+                                <p style="font-size: 15px;">code to pay</p>
+                            </div>
+                            
+                            <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
+                                <img class="e-wallet" :src="gcashLogo" style="width: 50px; height: 13px;" alt="GCash Logo" loading="lazy">
+                                <img class="e-wallet" :src="mayaLogo" style="width: 30px; height: 13px;" alt="Maya Logo" loading="lazy">
+                                <img class="e-wallet" :src="bpiLogo" style="width: 25px; height: 13px;" alt="BPI Logo" loading="lazy">
+                                <img class="e-wallet" :src="gotymeLogo" style="width: 40px; height: 13px;" alt="GoTyme Logo" loading="lazy">
+                                <img class="e-wallet" :src="homecreditLogo" style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
+                            </div>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
-                            <p class="text-caption text-grey">
-                                Powered by {{ selectedEwalletOption.toUpperCase() }}
+                            <p>
+                                <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
                             </p>
                         </div>
 
                         <div v-else class="d-flex justify-center">
                             <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
-                                <p class="text-grey mb-3">Generating QR code...</p>
-                                <v-progress-circular indeterminate size="50" width="2"></v-progress-circular>
+                                <p class="text-grey my-3">Generating QR code...</p>
+                                <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
                             </div>
                         </div>
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="payment-status">
-                        <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal" class="mb-2">
+                    <div v-if="paymentStore.paymentStatus" class="payment-status mt-2">
+                        <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal">
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>Status:</strong></span>
@@ -296,9 +308,9 @@
                         </v-alert>
                     </div>
 
-                    <div class="text-center">
-                        <p>
-                            You are about to pay: <strong>₱{{ discountedSubtotal.toFixed(2) }}</strong> 
+                    <div class="text-center mt-1">
+                        <p class="text-caption text-grey">
+                            Please don't refresh this page until payment is succeeded.
                         </p>
                     </div>
                 </v-card>
@@ -311,7 +323,6 @@
 
 <script>
 import { mapState } from 'pinia';
-// import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBranchStore } from '@/stores/branchStore';
 import { useProductsStore } from '@/stores/productsStore';
@@ -323,6 +334,12 @@ import ViewOrder from './ViewOrder.vue';
 import echo from '@/resources/js/echo';
 import Snackbar from '@/components/Snackbar.vue';
 import Alert from '@/components/Alert.vue';
+import QRPhLogo from '@/assets/img/png/e-wallets/QRPh-Logo.png';
+import GCashLogo from '@/assets/img/png/e-wallets/Gcash-Logo.png';
+import MayaLogo from '@/assets/img/png/e-wallets/Maya-Logo.png';
+import BPILogo from '@/assets/img/png/e-wallets/BPI-Logo.png';
+import GoTymeLogo from '@/assets/img/png/e-wallets/GoTyme-Logo.png';
+import HomeCreditLogo from '@/assets/img/png/e-wallets/HomeCredit-Logo.png';
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -391,6 +408,12 @@ export default {
                 { paymentmode_id: 1, paymentmode_label: 'Cash' },
                 { paymentmode_id: 2, paymentmode_label: 'e-Wallet' },
             ],
+            qrphLogo: QRPhLogo,
+            gcashLogo: GCashLogo,
+            mayaLogo: MayaLogo,
+            bpiLogo: BPILogo,
+            gotymeLogo: GoTymeLogo,
+            homecreditLogo: HomeCreditLogo,
 
             // Orders
             orders: [],
@@ -1337,12 +1360,27 @@ export default {
     color: white !important;
 }
 
+.v-alert {
+    padding: 10px !important;
+}
+
+.v-alert--density-default {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
 .payment-status {
     font-size: 14px;
     font-weight: normal;
     padding: 5px;
     border-radius: 8px;
     margin: 5px 0;
+}
+
+.payment-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .refresh {
