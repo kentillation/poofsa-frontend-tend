@@ -284,7 +284,7 @@
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="payment-status mt-2">
+                    <div v-if="paymentStore.paymentStatus" class="payment-status">
                         <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal">
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
@@ -297,7 +297,7 @@
                         </v-alert>
                     </div>
 
-                    <div class="text-center mt-1">
+                    <div class="text-center">
                         <p class="text-caption text-grey">
                             Please don't refresh this page until payment is succeeded.
                         </p>
