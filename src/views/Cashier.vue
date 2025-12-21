@@ -124,17 +124,6 @@
                                     inputmode="numeric" type="number" density="compact"
                                     prepend-inner-icon="mdi-cash-minus" />
 
-                                <v-file-input class="payment-section-item me-2 mt-2" v-model="id_image_file"
-                                    label="Attach ID" variant="outlined" density="compact" prepend-icon=""
-                                    capture="environment" accept="image/*" @change="previewIdImage"
-                                    :disabled="isIdEvidenceDisabled" chips>
-                                </v-file-input>
-
-                                <span class="mt-2">
-                                    <img v-if="idImgSrc" :src="idImgSrc" width="160" height="220"
-                                        style="border: 1px solid #ccc ;border-radius: 10px;"
-                                        alt="Customer ID Evidence" />
-                                </span>
                             </div>
 
                             <div class="payment-section d-flex">
@@ -391,8 +380,6 @@ export default {
             customer_change: '',
             customer_discount: 0,
             computed_discount: 0,
-            id_image_file: null,
-            idImgSrc: null,
             payment_mode_id: 1,
             eWalletImgSrc: null,
             table_number: '',
@@ -469,9 +456,6 @@ export default {
             this.paymentStore.resetPaymentState();
         }
 
-        if (this.idImgSrc) {
-            URL.revokeObjectURL(this.idImgSrc);
-        }
         if (this.paymentPollInterval) {
             clearInterval(this.paymentPollInterval);
         }
@@ -545,12 +529,6 @@ export default {
                 this.order_type_charge = 0;
             }
         },
-
-        id_image_file() {
-            if (this.id_image_file === '') {
-                this.idImgSrc = null;
-            }
-        },
     },
 
     computed: {
@@ -590,10 +568,6 @@ export default {
 
         isOrderTypeChargeDisabled() {
             return Number(this.order_type_id) === 1;
-        },
-
-        isIdEvidenceDisabled() {
-            return Number(this.customer_discount) === 0;
         },
 
         isEwalletEvidenceDisabled() {
@@ -834,53 +808,6 @@ export default {
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         },
 
-        previewIdImage() {
-            if (this.id_image_file && this.id_image_file instanceof File) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.idImgSrc = e.target.result;
-                };
-                reader.readAsDataURL(this.id_image_file);
-            } else {
-                this.idImgSrc = null;
-            }
-        },
-
-        async compressImage(file, targetSizeKB = 25) {
-            const img = new Image();
-            img.src = URL.createObjectURL(file);
-
-            return new Promise((resolve) => {
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const maxWidth = 1024;
-                    const scale = Math.min(maxWidth / img.width, 1);
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    let quality = 0.9; // start high
-                    const step = 0.05; // reduce quality step by step
-                    function tryCompress() {
-                        canvas.toBlob((blob) => {
-                            if (!blob) return;
-                            // check size
-                            const sizeKB = blob.size / 1024;
-                            if (sizeKB <= targetSizeKB || quality <= 0.1) {
-                                // done, return file
-                                resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-                            } else {
-                                // lower quality and try again
-                                quality -= step;
-                                tryCompress();
-                            }
-                        }, 'image/jpeg', quality);
-                    }
-                    tryCompress();
-                };
-            });
-        },
-
         async openQrPayment() {
             this.eWalletImgSrc = null;
             this.stopPaymentPolling();
@@ -978,7 +905,6 @@ export default {
                     throw new Error('Missing payment intent ID');
                 }
 
-                // ✅ START POLLING ONLY HERE
                 this.startPaymentPolling();
 
             } catch (error) {
@@ -1005,10 +931,10 @@ export default {
 
         handlePaymentStatusUpdate(statusResult) {
             if (statusResult.ok) {
-                if (statusResult.status === 'succeeded') {
+                if (statusResult.original_status === 'succeeded') {
                 this.eWalletPaid = true;
-                } else if (['failed', 'cancelled'].includes(statusResult.status)) {
-                this.showError(`Payment ${statusResult.status}. Please try again.`);
+                } else if (['failed', 'cancelled'].includes(statusResult.original_status)) {
+                this.showError(`Payment ${statusResult.original_status}. Please try again.`);
                 }
             } else {
                 console.error('Payment status check failed:', statusResult);
@@ -1024,11 +950,11 @@ export default {
         },
 
         handlePaymentStatusChange(status) {
-            switch (status.status) {
+            switch (status.original_status) {
                 case 'succeeded':
                     this.eWalletPaid = true;
 
-                    this.paymentStore.stopPaymentPolling(); // ✅ STOP HERE
+                    this.paymentStore.stopPaymentPolling();
 
                     this.showSuccess('Payment received successfully!');
                     setTimeout(() => {
@@ -1038,7 +964,7 @@ export default {
 
                 case 'failed':
                 case 'cancelled':
-                    this.paymentStore.stopPaymentPolling(); // ✅ STOP HERE
+                    this.paymentStore.stopPaymentPolling();
                     this.eWalletPaid = false;
                     this.showError('Payment failed. Please try again.');
                     break;
@@ -1047,7 +973,7 @@ export default {
                     break;
 
                 case 'error':
-                    this.paymentStore.stopPaymentPolling(); // ✅ STOP HERE
+                    this.paymentStore.stopPaymentPolling();
                     this.eWalletPaid = false;
                     this.showError('Error checking payment status.');
                     break;
@@ -1069,10 +995,12 @@ export default {
         async submitForm() {
             try {
                 this.loadingStore.show("Submitting...");
+
                 if (!this.$refs.transactionForm.validate()) {
                     this.loadingStore.hide();
                     return;
                 }
+
                 if (Number(this.payment_mode_id) === 2) {
                     if (!this.eWalletPaid) {
                         this.showError('Please complete e-Wallet payment first');
@@ -1087,7 +1015,9 @@ export default {
                     this.loadingStore.hide();
                     return;
                 }
+                
                 this.computed_discount = this.subTotal * (this.customer_discount / 100);
+
                 const formData = new FormData();
                 formData.append("transactions[0][reference_number]", refNumber);
                 formData.append("transactions[0][total_quantity]", this.totalQuantity);
@@ -1104,23 +1034,14 @@ export default {
                 formData.append("transactions[0][customer_name]", this.customer_name);
                 formData.append("transactions[0][order_note]", this.order_note);
 
-                if (this.id_image_file) {
-                    const IdImageFile = Array.isArray(this.id_image_file) ? this.id_image_file[0] : this.id_image_file;
-                    const compressedFile = await this.compressImage(IdImageFile);
-                    formData.append("idcard_evidence", compressedFile);
-                }
-
-
                 this.selectedProducts.forEach((product, index) => {
                     formData.append(`transactions[0][products][${index}][product_id]`, product.product_id);
                     formData.append(`transactions[0][products][${index}][station_id]`, product.station_id);
                     formData.append(`transactions[0][products][${index}][quantity]`, product.quantity);
                 });
 
-                // ✅ Only send formData (don’t pass orderedProducts separately)
                 await this.transactStore.submitTransactStore(formData);
 
-                // Success actions
                 this.fetchCurrentOrders();
                 this.$refs.transactionForm.reset();
                 this.resetPaymentSection();
@@ -1128,6 +1049,7 @@ export default {
                 this.totalQuantity = 0;
                 this.selectedProducts = [];
                 this.showSuccess("Success! Ready for next customer.");
+
             } catch (error) {
                 this.showError(error);
                 console.error(error);
@@ -1139,48 +1061,6 @@ export default {
         async toViewOrder(item) {
             this.selectedReferenceNumber = item.reference_number;
             this.viewOrderDialog = true;
-        },
-
-        changeStatus(order) {
-            if (!order || !order.reference_number) {
-                this.showError("Invalid order data!");
-                return;
-            }
-            const currentStatusIndex = this.order_statuses.findIndex(
-                status => Number(status.order_status_id) === Number(order.order_status_id)
-            );
-
-            if (currentStatusIndex === -1) {
-                this.showError("Current order status not found!");
-                return;
-            }
-            const nextStatusIndex = (currentStatusIndex + 1) % this.order_statuses.length;
-            const newStatus = Number(this.order_statuses[nextStatusIndex].order_status_id);
-
-            if (isNaN(newStatus)) {
-                this.showError("Next order status is invalid!");
-                return;
-            }
-            this.loadingStore.show("Updating status...");
-            this.transactStore.updateOrderStatusStore(order.reference_number, newStatus)
-                .then(() => {
-                    const statusName = this.getStatusName(newStatus);
-                    this.showSuccess(`Table# ${order.table_number} is ${statusName}`);
-                    order.order_status_id = newStatus;
-                    this.lowStockAlert();
-                })
-                .catch(error => {
-                    console.error(error);
-                    this.showError(error);
-                })
-                .finally(() => {
-                    this.loadingStore.hide();
-                });
-        },
-
-        getStatusName(statusId) {
-            const status = this.order_statuses.find(s => Number(s.order_status_id) === Number(statusId));
-            return status ? status.order_status : 'Unknown';
         },
 
         closeSelectedCategory() {
@@ -1226,8 +1106,6 @@ export default {
             this.order_type_charge = 0;
             this.customer_cash = 0;
             this.customer_discount = 0;
-            this.id_image_file = '';
-            this.idImgSrc = '';
             this.payment_mode_id = 1;
             this.table_number = '';
             this.customer_name = '-';
