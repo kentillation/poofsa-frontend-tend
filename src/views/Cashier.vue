@@ -58,8 +58,8 @@
                         <!-- Selected Products -->
                         <v-col cols="12">
                             <h3>Selected Products</h3>
-                            <v-data-table :headers="headersSelected" :loading="loadingProducts" :items="selectedProducts" density="comfortable"
-                                height="400px">
+                            <v-data-table :headers="headersSelected" :loading="loadingProducts"
+                                :items="selectedProducts" density="comfortable" height="400px">
                                 <template v-slot:item.product_name="{ item }">
                                     <div class="d-flex align-center justify-space-between">
                                         <span>
@@ -111,8 +111,7 @@
                                     variant="outlined" density="compact" type="number"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric" prepend-inner-icon="mdi-cash-plus"
-                                    placeholder="Enter cash">
+                                    inputmode="numeric" prepend-inner-icon="mdi-cash-plus" placeholder="Enter cash">
                                     <template #label>
                                         <span class="required-asterisk">*</span> Cash render
                                     </template>
@@ -123,8 +122,8 @@
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
-                                    variant="outlined" density="compact" type="number"
-                                    :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-cash-minus"
+                                    variant="outlined" density="compact" type="number" :rules="[v => !!v || 'Required']"
+                                    prepend-inner-icon="mdi-cash-minus"
                                     @input="e => customer_discount = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric">
                                     <template #label>
@@ -135,10 +134,9 @@
                             </div>
 
                             <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id"
-                                    variant="outlined" density="compact" prepend-inner-icon="mdi-cash"
-                                    :disabled="this.eWalletPaid" :items="paymentModeItems"
-                                    item-title="paymentmode_label" item-value="paymentmode_id" 
+                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
+                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="this.eWalletPaid"
+                                    :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
                                 <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled || this.eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
@@ -148,27 +146,25 @@
 
                             <div class="payment-section">
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number"
-                                    variant="outlined" density="compact" type="text"
-                                    :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-table-chair"
-                                    inputmode="numeric" placeholder="Enter table number">
+                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
+                                    prepend-inner-icon="mdi-table-chair" inputmode="numeric"
+                                    placeholder="Enter table number">
                                     <template #label>
                                         <span class="required-asterisk">*</span> Table number
                                     </template>
                                 </v-text-field>
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_name"
-                                    variant="outlined" density="compact" type="text"
-                                    :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-account"
-                                    placeholder="Enter customer name">
+                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
+                                    prepend-inner-icon="mdi-account" placeholder="Enter customer name">
                                     <template #label>
                                         <span class="required-asterisk">*</span> Customer name
                                     </template>
                                 </v-text-field>
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note"
-                                    variant="outlined" density="compact" type="text"
-                                    :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-note" 
-                                    placeholder="Enter note">
+                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
+                                    prepend-inner-icon="mdi-note" placeholder="Enter note">
                                     <template #label>
                                         <span class="required-asterisk">*</span> Note
                                     </template>
@@ -276,16 +272,22 @@
                         <div v-if="eWalletImgSrc">
                             <div class="d-flex align-center justify-center">
                                 <p style="font-size: 20px;">Scan</p>
-                                <img class="e-wallet mx-1" :src="qrphLogo" style="width: 60px; height: 15px;" alt="QRPh Logo" loading="lazy">
+                                <img class="e-wallet mx-1" :src="qrphLogo" style="width: 60px; height: 15px;"
+                                    alt="QRPh Logo" loading="lazy">
                                 <p style="font-size: 20px;">code to pay</p>
                             </div>
-                            
+
                             <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
-                                <img class="e-wallet" :src="gcashLogo" style="width: 50px; height: 13px;" alt="GCash Logo" loading="lazy">
-                                <img class="e-wallet" :src="mayaLogo" style="width: 30px; height: 13px;" alt="Maya Logo" loading="lazy">
-                                <img class="e-wallet" :src="bpiLogo" style="width: 25px; height: 13px;" alt="BPI Logo" loading="lazy">
-                                <img class="e-wallet" :src="gotymeLogo" style="width: 40px; height: 13px;" alt="GoTyme Logo" loading="lazy">
-                                <img class="e-wallet" :src="homecreditLogo" style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
+                                <img class="e-wallet" :src="gcashLogo" style="width: 50px; height: 13px;"
+                                    alt="GCash Logo" loading="lazy">
+                                <img class="e-wallet" :src="mayaLogo" style="width: 30px; height: 13px;" alt="Maya Logo"
+                                    loading="lazy">
+                                <img class="e-wallet" :src="bpiLogo" style="width: 25px; height: 13px;" alt="BPI Logo"
+                                    loading="lazy">
+                                <img class="e-wallet" :src="gotymeLogo" style="width: 40px; height: 13px;"
+                                    alt="GoTyme Logo" loading="lazy">
+                                <img class="e-wallet" :src="homecreditLogo" style="width: 35px; height: 13px;"
+                                    alt="Home Credit Logo" loading="lazy">
                             </div>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
                             <p>
@@ -296,7 +298,8 @@
                         <div v-else class="d-flex justify-center">
                             <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                 <p class="text-grey my-3">Generating QR code...</p>
-                                <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
+                                <v-progress-circular color="grey" indeterminate size="50"
+                                    width="2"></v-progress-circular>
                             </div>
                         </div>
                     </div>
@@ -318,7 +321,8 @@
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>No e-Wallet payment occurs.</strong></span>
-                                    <span style="font-size: 12px;">Unable to procceed when there is no e-Wallet payment occurs.</span>
+                                    <span style="font-size: 12px;">Unable to procceed when there is no e-Wallet payment
+                                        occurs.</span>
                                 </div>
                             </div>
                         </v-alert>
@@ -398,7 +402,6 @@ export default {
             paymentPollInterval: null,
             onPaymentSuccessCallback: null,
             onStatusUpdateCallback: null,
-            isFormValid: false,
             referenceNumber: '',
             total_quantity: '',
             customer_charge: 0,
@@ -655,7 +658,23 @@ export default {
                 return subtotal;
             }
             return subtotal - parseFloat(this.customer_discount);
-        }
+        },
+
+        isFormValid() {
+            return (
+                this.customer_charge &&
+                this.total_due &&
+                this.order_type_id &&
+                this.order_type_charge &&
+                this.customer_cash &&
+                this.customer_change &&
+                this.customer_discount &&
+                this.payment_mode_id &&
+                this.table_number &&
+                this.customer_name &&
+                this.order_note
+            );
+        },
     },
 
     async mounted() {
@@ -852,7 +871,7 @@ export default {
                 this.showError("No internet connection. Unable to process e-Wallet payment.");
                 return;
             }
-            
+
             if (this.payment_mode_id !== 2) {
                 this.showError("Please select e-Wallet payment. Unable to proceed e-Wallet payment.");
                 return;
@@ -869,7 +888,7 @@ export default {
             const referenceNumber = await this.generateReferenceNumber();
             try {
                 this.setupPaymentCallbacks();
-                const response =await this.paymentStore.generateQrPh(
+                const response = await this.paymentStore.generateQrPh(
                     this.discountedSubtotal,
                     referenceNumber
                 );
@@ -979,9 +998,9 @@ export default {
         handlePaymentStatusUpdate(statusResult) {
             if (statusResult.ok) {
                 if (statusResult.original_status === 'succeeded') {
-                this.eWalletPaid = true;
+                    this.eWalletPaid = true;
                 } else if (['failed', 'cancelled'].includes(statusResult.original_status)) {
-                this.showError(`Payment ${statusResult.original_status}. Please try again.`);
+                    this.showError(`Payment ${statusResult.original_status}. Please try again.`);
                 }
             } else {
                 console.error('Payment status check failed:', statusResult);
@@ -1067,7 +1086,7 @@ export default {
                     this.loadingStore.hide();
                     return;
                 }
-                
+
                 this.computed_discount = this.subTotal * (this.customer_discount / 100);
 
                 const formData = new FormData();
@@ -1252,8 +1271,8 @@ export default {
 }
 
 .required-asterisk {
-  color: red;
-  font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 
 .payment-section {
