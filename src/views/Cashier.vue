@@ -406,7 +406,7 @@ export default {
             customer_charge: null,
             total_due: 0,
             order_type_id: 1,
-            order_type_charge: null,
+            order_type_charge: '0',
             customer_cash: '',
             customer_change: '0',
             customer_discount: '0',
@@ -1159,7 +1159,7 @@ export default {
 
         resetPaymentSection() {
             this.order_type_id = 1;
-            this.order_type_charge = null;
+            this.order_type_charge = '0';
             this.customer_cash = '';
             this.customer_change = '0';
             this.customer_discount = '0';
