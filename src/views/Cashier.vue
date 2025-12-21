@@ -317,8 +317,8 @@
                         <v-alert v-else type="error" variant="tonal">
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
-                                    <span><strong>No internet connection</strong></span>
-                                    <span style="font-size: 10px;">Unable to notify successful e-Wallet payment.</span>
+                                    <span><strong>No e-Wallet payment occurs.</strong></span>
+                                    <span style="font-size: 10px;">Unable to procceed when there is no e-Wallet payment occurs.</span>
                                 </div>
                             </div>
                         </v-alert>
@@ -326,7 +326,7 @@
 
                     <div v-if="eWalletImgSrc" class="text-center">
                         <p class="text-caption text-grey">
-                            Please don't refresh this page until payment is succeeded.
+                            Please don't refresh this page until e-Wallet payment is succeeded.
                         </p>
                     </div>
                 </v-card>
