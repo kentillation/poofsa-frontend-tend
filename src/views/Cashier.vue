@@ -1233,7 +1233,7 @@ export default {
 }
 
 ::v-deep .v-input__details {
-    display: none;
+   /* display: none; */
 }
 
 .indication {
@@ -1265,7 +1265,7 @@ export default {
 }
 
 .v-input__details {
-    display: none;
+    /* display: none; */
 }
 
 /* QR Dialog Styles */
