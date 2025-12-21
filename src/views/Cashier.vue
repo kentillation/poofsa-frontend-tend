@@ -182,7 +182,8 @@
                                     Reset
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
-                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid || loading ||
+                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid ||
+                                        loading ||
                                         (payment_mode_id === 2 && !eWalletPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
@@ -1160,7 +1161,7 @@ export default {
             this.payment_mode_id = 1;
             this.table_number = '';
             this.customer_name = '-';
-            this.order_note = '-';
+            this.order_note = '';
         },
 
         showError(message) {
@@ -1233,7 +1234,7 @@ export default {
 }
 
 ::v-deep .v-input__details {
-   /* display: none; */
+    display: none;
 }
 
 .indication {
@@ -1265,7 +1266,7 @@ export default {
 }
 
 .v-input__details {
-    /* display: none; */
+    display: none;
 }
 
 /* QR Dialog Styles */
