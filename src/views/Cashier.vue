@@ -108,34 +108,38 @@
                                     prepend-inner-icon="mdi-cash-plus" />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model.number="customer_cash"
-                                    label="*Cash render" variant="outlined" density="compact" type="number"
+                                    variant="outlined" density="compact" type="number"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric" prepend-inner-icon="mdi-cash-plus"
-                                    placeholder="Enter cash amount" />
+                                    placeholder="Enter cash">
+                                    <template #label>
+                                        <span class="required-asterisk">*</span> Cash render
+                                    </template>
+                                </v-text-field>
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_change"
                                     label="Change" variant="outlined" density="compact"
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
-                                    label="*Discount" variant="outlined"
+                                    variant="outlined" density="compact" type="number"
+                                    :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-cash-minus"
                                     @input="e => customer_discount = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric" type="number" density="compact"
-                                    prepend-inner-icon="mdi-cash-minus" />
+                                    inputmode="numeric">
+                                    <template #label>
+                                        <span class="required-asterisk">*</span> Discount
+                                    </template>
+                                </v-text-field>
 
                             </div>
 
                             <div class="payment-section d-flex">
-                                <v-autocomplete :disabled="this.eWalletPaid"
-                                    class="me-2 mt-2" 
-                                    v-model="payment_mode_id" 
-                                    :items="paymentModeItems"
-                                    item-title="paymentmode_label" 
-                                    item-value="paymentmode_id" 
-                                    label="Mode of payment"
-                                    variant="outlined" 
-                                    density="compact" />
+                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id"
+                                    variant="outlined" density="compact" prepend-inner-icon="mdi-cash"
+                                    :disabled="this.eWalletPaid" :items="paymentModeItems"
+                                    item-title="paymentmode_label" item-value="paymentmode_id" 
+                                    label="Mode of payment" />
                                 <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled || this.eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn qrph me-2 mt-2">Generate
@@ -144,18 +148,32 @@
 
                             <div class="payment-section">
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number"
-                                    label="*Table number" variant="outlined" density="compact" type="text"
+                                    variant="outlined" density="compact" type="text"
                                     :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-table-chair"
-                                    inputmode="numeric" placeholder="Enter table number" />
+                                    inputmode="numeric" placeholder="Enter table number">
+                                    <template #label>
+                                        <span class="required-asterisk">*</span> Table number
+                                    </template>
+                                </v-text-field>
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_name"
-                                    label="*Customer name" variant="outlined" density="compact" type="text"
+                                    variant="outlined" density="compact" type="text"
                                     :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-account"
-                                    placeholder="Enter customer name" />
+                                    placeholder="Enter customer name">
+                                    <template #label>
+                                        <span class="required-asterisk">*</span> Customer name
+                                    </template>
+                                </v-text-field>
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note" label="Note"
-                                    variant="outlined" density="compact" type="text" prepend-inner-icon="mdi-note"
-                                    placeholder="Enter note" />
+                                <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note"
+                                    variant="outlined" density="compact" type="text"
+                                    :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-note" 
+                                    placeholder="Enter note">
+                                    <template #label>
+                                        <span class="required-asterisk">*</span> Note
+                                    </template>
+                                </v-text-field>
+
                             </div>
 
                             <div class="d-flex justify-end me-2 ms-1">
@@ -1181,10 +1199,6 @@ export default {
     }
 }
 
-.pdct-txt .v-input__details {
-    display: none !important;
-}
-
 ::v-deep .v-input__details {
     display: none;
 }
@@ -1201,6 +1215,11 @@ export default {
     font-size: 15px;
     width: 35px !important;
     height: 27px !important;
+}
+
+.required-asterisk {
+  color: red;
+  font-weight: bold;
 }
 
 .payment-section {
