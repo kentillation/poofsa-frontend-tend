@@ -850,7 +850,6 @@ export default {
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
-                console.error('QR generation error:', err);
                 this.eWalletDialog = false;
             }
         },
