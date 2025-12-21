@@ -58,7 +58,7 @@
                         <!-- Selected Products -->
                         <v-col cols="12">
                             <h3>Selected Products</h3>
-                            <v-data-table :headers="headersSelected" :items="selectedProducts" density="comfortable"
+                            <v-data-table :headers="headersSelected" :loading="loadingProducts" :items="selectedProducts" density="comfortable"
                                 height="400px">
                                 <template v-slot:item.product_name="{ item }">
                                     <div class="d-flex align-center justify-space-between">
@@ -272,7 +272,7 @@
                         </v-btn>
                     </div>
 
-                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 px-4 py-2">
+                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-4">
                         <div v-if="eWalletImgSrc">
                             <div class="d-flex align-center justify-center">
                                 <p style="font-size: 15px;">Scan</p>
@@ -293,6 +293,10 @@
                             </p>
                         </div>
 
+                        <!-- <div v-else-if="!paymentStore.isPollingActive">
+                            <v-img :src="WTFImgSrc" style="border-radius: 20px;" width="250" height="250" class="mx-auto"></v-img>
+                        </div> -->
+
                         <div v-else class="d-flex justify-center">
                             <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                 <p class="text-grey my-3">Generating QR code...</p>
@@ -302,20 +306,29 @@
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="payment-status">
+                    <div v-if="paymentStore.paymentStatus" class="payment-status w-100">
                         <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal">
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>Status:</strong></span>
                                     <span> {{ paymentStatusText }}</span>
                                 </div>
-                                <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="15"
+                                <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="20"
                                     width="2"></v-progress-circular>
+                            </div>
+                        </v-alert>
+
+                        <v-alert v-else type="error" variant="tonal">
+                            <div class="d-flex align-center justify-space-between">
+                                <div class="d-flex flex-column me-3">
+                                    <span><strong>No internet connection</strong></span>
+                                    <span style="font-size: 10px;">Unable to notify successful e-wallet payment.</span>
+                                </div>
                             </div>
                         </v-alert>
                     </div>
 
-                    <div class="text-center">
+                    <div v-if="eWalletImgSrc" class="text-center">
                         <p class="text-caption text-grey">
                             Please don't refresh this page until payment is succeeded.
                         </p>
@@ -347,6 +360,8 @@ import MayaLogo from '@/assets/img/png/e-wallets/Maya-Logo.png';
 import BPILogo from '@/assets/img/png/e-wallets/BPI-Logo.png';
 import GoTymeLogo from '@/assets/img/png/e-wallets/GoTyme-Logo.png';
 import HomeCreditLogo from '@/assets/img/png/e-wallets/HomeCredit-Logo.png';
+import WTFImage from '@/assets/img/jpg/features/WTF.jpg';
+
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -419,6 +434,7 @@ export default {
             bpiLogo: BPILogo,
             gotymeLogo: GoTymeLogo,
             homecreditLogo: HomeCreditLogo,
+            WTFImgSrc: WTFImage,
 
             // Orders
             orders: [],
@@ -827,35 +843,45 @@ export default {
         },
 
         async openQrPayment() {
+            this.selectedEwalletOption = 'qrph';
+
             this.eWalletImgSrc = null;
+
             this.stopPaymentPolling();
 
             if (!navigator.onLine) {
                 this.paymentStore.stopPaymentPolling();
                 this.eWalletPaid = false;
+                this.eWalletDialog = false;
                 this.showError("No internet connection. Unable to process e-Wallet payment.");
                 return;
             }
-
-            this.selectedEwalletOption = 'qrph';
+            
             if (this.payment_mode_id !== 2) {
-                this.showError("Please select e-Wallet payment");
+                this.showError("Please select e-Wallet payment. Unable to proceed e-Wallet payment.");
                 return;
             }
-            if (this.discountedSubtotal <= 0) {
-                this.showError("Invalid total amount");
+
+            if (this.discountedSubtotal === 0) {
+                this.showError("No product selected. Unable to proceed e-Wallet payment.");
                 return;
             }
+
             this.eWalletPaid = false;
             this.eWalletDialog = true;
+
             const referenceNumber = await this.generateReferenceNumber();
             try {
                 this.setupPaymentCallbacks();
-                await this.paymentStore.generateQrPh(
+                const response =await this.paymentStore.generateQrPh(
                     this.discountedSubtotal,
                     referenceNumber
                 );
-                this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                if (response) {
+                    this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                } else {
+                    this.stopPaymentPolling();
+                }
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
                 this.eWalletDialog = false;
@@ -975,6 +1001,11 @@ export default {
         },
 
         handlePaymentStatusChange(status) {
+            if (!navigator.onLine) {
+                this.closeEwalletDialog();
+                this.showError("No internet connection. Unable to process e-Wallet payment.");
+                return;
+            }
             switch (status.original_status) {
                 case 'succeeded':
                     this.eWalletPaid = true;
