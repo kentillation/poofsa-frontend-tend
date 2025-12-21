@@ -123,7 +123,7 @@
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
-                                    variant="outlined" density="compact" 
+                                    variant="outlined" density="compact" type="number"
                                     :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-cash-minus"
                                     @input="e => customer_discount = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric">
