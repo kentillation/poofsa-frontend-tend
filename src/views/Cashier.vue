@@ -119,6 +119,7 @@
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_change"
                                     label="Change" variant="outlined" density="compact"
+                                    :model-value="customerChange"
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
@@ -441,21 +442,7 @@ export default {
             loadingCurrentOrders: false,
             viewOrderDialog: false,
             selectedReferenceNumber: null,
-            defaultStatusMeta: {
-                color: 'grey',
-                icon: 'mdi-help-circle',
-                name: 'Loading...',
-                hasAnimation: false,
-                animationClass: '',
-                showSmoke: false
-            },
-            selectedTableNumber: null,
-            customerName: '',
-            totalAmount: 0,
             totalQuan: 0,
-            totalItems: 0,
-            customerCash: 0,
-            customerChange: 0,
             createdAt: '',
             updatedAt: '',
             tableNumber: 'N/A',
@@ -623,6 +610,14 @@ export default {
             const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.product_price * p.quantity), 0);
             const charge = Number(this.order_type_charge) || 0;
             return baseTotal + (charge !== 0 ? charge : 0);
+        },
+
+        customerChange() {
+            if(this.discountedSubtotal === 0) {
+                return 0;
+            }
+            const newCustomerChange = this.customer_cash - this.customer_charge;
+            return newCustomerChange;
         },
 
         currentOrders() {
@@ -811,8 +806,6 @@ export default {
             } else {
                 this.selectedProducts[index].quantity++;
             }
-            this.customer_cash = '';
-            this.customer_change = '';
         },
 
         minusQuan(product) {
