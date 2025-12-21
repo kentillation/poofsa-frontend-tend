@@ -123,7 +123,7 @@
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
-                                    variant="outlined" density="compact" type="number"
+                                    variant="outlined" density="compact" 
                                     :rules="[v => !!v || 'Required']" prepend-inner-icon="mdi-cash-minus"
                                     @input="e => customer_discount = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric">
@@ -1161,7 +1161,7 @@ export default {
             this.payment_mode_id = 1;
             this.table_number = '';
             this.customer_name = '-';
-            this.order_note = '';
+            this.order_note = '-';
         },
 
         showError(message) {
