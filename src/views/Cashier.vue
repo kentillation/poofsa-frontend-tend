@@ -878,6 +878,7 @@ export default {
                 );
                 if (response) {
                     this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                    this.customer_cash = this.discountedSubtotal;
                 } else {
                     this.stopPaymentPolling();
                 }
