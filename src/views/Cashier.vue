@@ -275,9 +275,9 @@
                     <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-4">
                         <div v-if="eWalletImgSrc">
                             <div class="d-flex align-center justify-center">
-                                <p style="font-size: 15px;">Scan</p>
+                                <p style="font-size: 20px;">Scan</p>
                                 <img class="e-wallet mx-1" :src="qrphLogo" style="width: 60px; height: 15px;" alt="QRPh Logo" loading="lazy">
-                                <p style="font-size: 15px;">code to pay</p>
+                                <p style="font-size: 20px;">code to pay</p>
                             </div>
                             
                             <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
@@ -292,10 +292,6 @@
                                 <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
                             </p>
                         </div>
-
-                        <!-- <div v-else-if="!paymentStore.isPollingActive">
-                            <v-img :src="WTFImgSrc" style="border-radius: 20px;" width="250" height="250" class="mx-auto"></v-img>
-                        </div> -->
 
                         <div v-else class="d-flex justify-center">
                             <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
@@ -322,7 +318,7 @@
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>No internet connection</strong></span>
-                                    <span style="font-size: 10px;">Unable to notify successful e-wallet payment.</span>
+                                    <span style="font-size: 10px;">Unable to notify successful e-Wallet payment.</span>
                                 </div>
                             </div>
                         </v-alert>
