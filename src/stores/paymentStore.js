@@ -15,6 +15,10 @@ export const usePaymentStore = defineStore("payment", {
     maxPollAttempts: 60, // 3 minutes at 3s intervals
     pollAttempts: 0,
     isPollingActive: false,
+
+    // Callback handlers
+    _onStatusUpdate: null,
+    _onPaymentSuccess: null,
   }),
 
   actions: {
@@ -48,12 +52,14 @@ export const usePaymentStore = defineStore("payment", {
     async checkPaymentStatus(intentId) {
       try {
         const res = await EWALLET_PAYMENT_API.checkPaymentStatusApi(intentId);
+
         if (res.ok) {
           this.paymentStatus = res.original_status;
           this.paymentDetails = res;
         } else {
           this.paymentStatus = "error";
         }
+
         return res;
       } catch (error) {
         console.error("Error checking payment status:", error);
@@ -67,24 +73,29 @@ export const usePaymentStore = defineStore("payment", {
       this.stopPaymentPolling();
       this.isPollingActive = true;
       this.pollAttempts = 0;
+
       this.pollInterval = setInterval(async () => {
         if (this.pollAttempts >= this.maxPollAttempts) {
           this.stopPaymentPolling();
           return;
         }
+
         this.pollAttempts++;
         const statusResult = await this.checkPaymentStatus(intentId);
+
+        // Trigger status update callback
+        if (this._onStatusUpdate) this._onStatusUpdate(statusResult);
+
+        // Stop polling if payment is complete
         if (this.isPaymentComplete) {
           this.stopPaymentPolling();
-          if (this.onPaymentSuccess) {
-            this.onPaymentSuccess(this.paymentDetails);
+
+          // Trigger success callback if paid
+          if (this.isPaid && this._onPaymentSuccess) {
+            this._onPaymentSuccess(this.paymentDetails);
           }
         }
-
-        if (this.onStatusUpdate) {
-          this.onStatusUpdate(statusResult);
-        }
-      }, 3000); // Check every 3 seconds
+      }, 3000);
     },
 
     stopPaymentPolling() {
@@ -105,20 +116,23 @@ export const usePaymentStore = defineStore("payment", {
       this.stopPaymentPolling();
     },
 
-    onStatusUpdate(callback) {
-      this.onStatusUpdate = callback;
+    // Setters for callbacks
+    setStatusUpdateCallback(callback) {
+      this._onStatusUpdate = callback;
     },
 
-    onPaymentSuccess(callback) {
-      this.onPaymentSuccess = callback;
+    setPaymentSuccessCallback(callback) {
+      this._onPaymentSuccess = callback;
     },
   },
 
   getters: {
-    qrImageSrc: (s) => s.qrData?.qr_image,
-    isPaid: (s) => s.paymentStatus === "succeeded",
-    isPending: (s) => ["pending", "processing"].includes(s.paymentStatus),
-    isFailed: (s) => ["failed", "cancelled", "error"].includes(s.paymentStatus),
-    isPaymentComplete: (s) => s.isPaid || s.isFailed,
+    qrImageSrc: (state) => state.qrData?.qr_image,
+    isPaid: (state) => state.paymentStatus === "succeeded",
+    isPending: (state) =>
+      ["pending", "processing"].includes(state.paymentStatus),
+    isFailed: (state) =>
+      ["failed", "cancelled", "error"].includes(state.paymentStatus),
+    isPaymentComplete: (state) => state.isPaid || state.isFailed,
   },
 });

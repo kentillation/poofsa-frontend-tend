@@ -829,6 +829,14 @@ export default {
         async openQrPayment() {
             this.eWalletImgSrc = null;
             this.stopPaymentPolling();
+
+            if (!navigator.onLine) {
+                this.paymentStore.stopPaymentPolling();
+                this.eWalletPaid = false;
+                this.showError("No internet connection. Unable to process e-Wallet payment.");
+                return;
+            }
+
             this.selectedEwalletOption = 'qrph';
             if (this.payment_mode_id !== 2) {
                 this.showError("Please select e-Wallet payment");
