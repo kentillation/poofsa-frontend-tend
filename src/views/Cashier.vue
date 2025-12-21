@@ -178,12 +178,10 @@
                                     Reset
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
-                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid ||
-                                        loading ||
+                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid || loading ||
                                         (payment_mode_id === 2 && !eWalletPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
-                                        Number(customer_charge) === 0.00 ||
                                         subTotal <= 0">
                                     Submit
                                 </v-btn>
@@ -395,6 +393,7 @@ export default {
             progressCircular: false,
 
             // Payment
+            isFormValid: false,
             eWalletDialog: false,
             selectedEwalletOption: '',
             eWalletPaid: false,
@@ -404,17 +403,17 @@ export default {
             onStatusUpdateCallback: null,
             referenceNumber: '',
             total_quantity: '',
-            customer_charge: 0,
+            customer_charge: null,
             total_due: 0,
             order_type_id: 1,
-            order_type_charge: 0,
+            order_type_charge: null,
             customer_cash: '',
-            customer_change: '',
-            customer_discount: 0,
-            computed_discount: 0,
+            customer_change: '0',
+            customer_discount: '0',
+            computed_discount: null,
             payment_mode_id: 1,
             eWalletImgSrc: null,
-            table_number: '',
+            table_number: null,
             customer_name: '-',
             order_note: '-',
             redirectUrl: '',
@@ -660,21 +659,6 @@ export default {
             return subtotal - parseFloat(this.customer_discount);
         },
 
-        isFormValid() {
-            return (
-                this.customer_charge &&
-                this.total_due &&
-                this.order_type_id &&
-                this.order_type_charge &&
-                this.customer_cash &&
-                this.customer_change &&
-                this.customer_discount &&
-                this.payment_mode_id &&
-                this.table_number &&
-                this.customer_name &&
-                this.order_note
-            );
-        },
     },
 
     async mounted() {
@@ -1174,13 +1158,15 @@ export default {
 
         resetPaymentSection() {
             this.order_type_id = 1;
-            this.order_type_charge = 0;
-            this.customer_cash = 0;
-            this.customer_discount = 0;
+            this.order_type_charge = null;
+            this.customer_cash = '';
+            this.customer_change = '0';
+            this.customer_discount = '0';
+            this.computed_discount = null;
             this.payment_mode_id = 1;
-            this.table_number = '';
+            this.table_number = null;
             this.customer_name = '-';
-            this.order_note = '';
+            this.order_note = '-';
         },
 
         showError(message) {
