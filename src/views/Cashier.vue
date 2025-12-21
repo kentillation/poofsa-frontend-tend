@@ -3,7 +3,7 @@
         <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
             <v-icon>mdi-refresh</v-icon>
         </v-btn>
-        <v-form ref="transactionForm" @submit.prevent="submitForm">
+        <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <v-row>
                 <!-- Main Section -->
                 <v-col cols="12" lg="6" md="6" sm="12" xs="12">
@@ -182,7 +182,7 @@
                                     Reset
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
-                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="loading ||
+                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="isFormValid || loading ||
                                         (payment_mode_id === 2 && !eWalletPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
