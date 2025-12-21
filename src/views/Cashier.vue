@@ -318,7 +318,7 @@
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>No e-Wallet payment occurs.</strong></span>
-                                    <span style="font-size: 10px;">Unable to procceed when there is no e-Wallet payment occurs.</span>
+                                    <span style="font-size: 12px;">Unable to procceed when there is no e-Wallet payment occurs.</span>
                                 </div>
                             </div>
                         </v-alert>
