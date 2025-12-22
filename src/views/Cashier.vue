@@ -253,7 +253,7 @@
             </v-dialog>
 
             <!-- e-Wallet Payment -->
-            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" persistent>
+            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" transition="dialog-bottom-transition" persistent scrollable>
                 <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
                     style="top: -17px; left: -17px; z-index: 10;" icon>
                     <v-icon>mdi-close</v-icon>
