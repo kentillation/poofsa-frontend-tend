@@ -321,7 +321,7 @@
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>No e-Wallet payment occured.</strong></span>
                                     <span style="font-size: 12px;">
-                                        Unable to continue processing if no e-Wallet payment occured.
+                                        Unable to continue if no e-Wallet payment occured.
                                     </span>
                                 </div>
                             </div>
