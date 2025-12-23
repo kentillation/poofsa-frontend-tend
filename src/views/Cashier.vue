@@ -131,26 +131,11 @@
                                     </template>
                                 </v-text-field>
 
-                            </div>
-
-                            <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
-                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="this.eWalletPaid"
-                                    :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
-                                    label="Mode of payment" />
-                                <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled || this.eWalletPaid"
-                                    prepend-icon="mdi-qrcode" height="37" color="green"
-                                    class="ewallet-btn qrph me-2 mt-2">Generate
-                                    QR</v-btn>
-                            </div>
-
-                            <div class="payment-section">
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number"
+                                <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note"
                                     variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                                    prepend-inner-icon="mdi-table-chair" inputmode="numeric"
-                                    placeholder="Enter table number">
+                                    prepend-inner-icon="mdi-note" placeholder="Enter note">
                                     <template #label>
-                                        <span class="required-asterisk">*</span> Table number
+                                        <span class="required-asterisk">*</span> Note
                                     </template>
                                 </v-text-field>
 
@@ -162,14 +147,26 @@
                                     </template>
                                 </v-text-field>
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note"
+                                <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number"
                                     variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                                    prepend-inner-icon="mdi-note" placeholder="Enter note">
+                                    prepend-inner-icon="mdi-table-chair" inputmode="numeric"
+                                    placeholder="Enter table number">
                                     <template #label>
-                                        <span class="required-asterisk">*</span> Note
+                                        <span class="required-asterisk">*</span> Table number
                                     </template>
                                 </v-text-field>
 
+                            </div>
+
+                            <div class="payment-section d-flex">
+                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
+                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="this.eWalletPaid"
+                                    :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
+                                    label="Mode of payment" />
+                                <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled || this.eWalletPaid"
+                                    prepend-icon="mdi-qrcode" height="37" color="green"
+                                    class="ewallet-btn qrph me-2 mt-2">Generate
+                                    QR</v-btn>
                             </div>
 
                             <div class="d-flex justify-end me-2 ms-1">
@@ -1086,6 +1083,7 @@ export default {
                 this.subTotal = 0;
                 this.totalQuantity = 0;
                 this.selectedProducts = [];
+                this.scrollToTop();
                 this.showSuccess("Success! Ready for next customer.");
 
             } catch (error) {
@@ -1094,6 +1092,10 @@ export default {
             } finally {
                 this.loadingStore.hide();
             }
+        },
+
+        scrollToTop() {            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
         async toViewOrder(item) {
