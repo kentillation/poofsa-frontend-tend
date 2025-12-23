@@ -259,7 +259,7 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
-                    <div class="d-flex flex-column w-100 mb-4" style="gap: 10px;">
+                    <div class="d-flex flex-column w-100 mb-2" style="gap: 10px;">
                         <v-btn @click="openQrPayment" :disabled="paymentStore.loading" class="ewallet-btn qrph w-100"
                             height="48">
                             <v-icon start>mdi-qrcode</v-icon>
@@ -267,26 +267,26 @@
                         </v-btn>
                     </div>
 
-                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-4">
+                    <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
                         <div v-if="eWalletImgSrc">
                             <div class="d-flex align-center justify-center">
                                 <p style="font-size: 20px;">Scan</p>
-                                <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo" style="width: 60px; height: 15px;"
-                                    alt="QRPh Logo" loading="lazy">
+                                <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo"
+                                    style="width: 60px; height: 15px;" alt="QRPh Logo" loading="lazy">
                                 <p style="font-size: 20px;">code to pay</p>
                             </div>
 
                             <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
-                                <img class="e-wallet" :src="this.ewalletImageStore.gcashLogo" style="width: 50px; height: 13px;"
-                                    alt="GCash Logo" loading="lazy">
-                                <img class="e-wallet" :src="this.ewalletImageStore.mayaLogo" style="width: 30px; height: 13px;" alt="Maya Logo"
-                                    loading="lazy">
-                                <img class="e-wallet" :src="this.ewalletImageStore.bpiLogo" style="width: 25px; height: 13px;" alt="BPI Logo"
-                                    loading="lazy">
-                                <img class="e-wallet" :src="this.ewalletImageStore.gotymeLogo" style="width: 40px; height: 13px;"
-                                    alt="GoTyme Logo" loading="lazy">
-                                <img class="e-wallet" :src="this.ewalletImageStore.homecreditLogo" style="width: 35px; height: 13px;"
-                                    alt="Home Credit Logo" loading="lazy">
+                                <img class="e-wallet" :src="this.ewalletImageStore.gcashLogo"
+                                    style="width: 50px; height: 13px;" alt="GCash Logo" loading="lazy">
+                                <img class="e-wallet" :src="this.ewalletImageStore.mayaLogo"
+                                    style="width: 30px; height: 13px;" alt="Maya Logo" loading="lazy">
+                                <img class="e-wallet" :src="this.ewalletImageStore.bpiLogo"
+                                    style="width: 25px; height: 13px;" alt="BPI Logo" loading="lazy">
+                                <img class="e-wallet" :src="this.ewalletImageStore.gotymeLogo"
+                                    style="width: 40px; height: 13px;" alt="GoTyme Logo" loading="lazy">
+                                <img class="e-wallet" :src="this.ewalletImageStore.homecreditLogo"
+                                    style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
                             </div>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
                             <p>
