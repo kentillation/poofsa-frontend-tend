@@ -82,7 +82,7 @@
                                 <strong>{{ selectedProductText }}</strong>
                             </span>
                             <div class="d-flex align-center justify-space-around">
-                                <span style="font-size: 16px;">Quantity: </span>
+                                <span style="font-size: 16px;">Void quantity: </span>
                                 <div class="mt-3">
                                     <v-btn @click="minusQuantity" color="#0090b6" class="mini-btn ms-3">
                                         <v-icon>mdi-minus</v-icon>
@@ -101,7 +101,7 @@
                             <v-spacer></v-spacer>
                             <v-btn color="green" variant="tonal" class="px-3 pt-1 pb-6" prepend-icon="mdi-check"
                                 @click="saveVoidOrder" :disabled="isSubmitting">
-                                {{ isSubmitting ? 'Processing...' : 'Proceed' }}
+                                {{ isSubmitting ? 'Processing...' : 'Void it!' }}
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -355,10 +355,10 @@ export default {
                 const response = await this.transactStore.saveVoidOrderStore(voidOrderData);
                 if (response.status === true)
                 {
-                    this.showSuccess('Void has been saved successfully');
+                    this.showSuccess('Void is now on-process.');
                     setTimeout(() => {
                         window.location.reload();
-                    }, 2000)
+                    }, 2000);
                 }
             } catch (error) {
                 console.error(error);
@@ -370,6 +370,10 @@ export default {
                 this.loadingStore.hide();
                 this.isSubmitting = false;
             }
+        },
+
+        scrollToTop() {            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
         formatOrder(order) {
