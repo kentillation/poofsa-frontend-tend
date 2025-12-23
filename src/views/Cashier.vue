@@ -320,9 +320,7 @@
 
                         <v-alert v-else-if="!paymentStore.isPaid" type="error" variant="tonal">
                             <div class="d-flex align-center justify-space-between">
-                                <div class="d-flex flex-column me-3">
-                                    <span><strong>No e-Wallet payment occurred.</strong></span>
-                                </div>
+                                <span>No e-Wallet payment occurred.</span>
                             </div>
                         </v-alert>
                     </div>
