@@ -118,8 +118,7 @@
                                 </v-text-field>
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_change"
-                                    label="Change" variant="outlined" density="compact"
-                                    :model-value="customerChange"
+                                    label="Change" variant="outlined" density="compact" :model-value="customerChange"
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
@@ -253,7 +252,8 @@
             </v-dialog>
 
             <!-- e-Wallet Payment -->
-            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" transition="dialog-bottom-transition" persistent scrollable>
+            <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" transition="dialog-bottom-transition"
+                persistent scrollable>
                 <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
                     style="top: -17px; left: -17px; z-index: 10;" icon>
                     <v-icon>mdi-close</v-icon>
@@ -305,24 +305,23 @@
 
                     <!-- Show payment status -->
                     <div v-if="paymentStore.paymentStatus" class="payment-status w-100">
-                        <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive" variant="tonal">
+                        <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive || paymentStore.isPaid"
+                            variant="tonal">
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
                                     <span><strong>Status:</strong></span>
                                     <span> {{ paymentStatusText }}</span>
                                 </div>
-                                <v-progress-circular v-if="paymentStore.isPollingActive" indeterminate size="20"
-                                    width="2"></v-progress-circular>
+                                <v-progress-circular v-if="paymentStore.isPollingActive && !paymentStore.isPaid"
+                                    indeterminate size="20" width="2"></v-progress-circular>
+                                <v-icon v-else-if="paymentStore.isPaid" color="success">mdi-check-circle</v-icon>
                             </div>
                         </v-alert>
 
-                        <v-alert v-else type="error" variant="tonal">
+                        <v-alert v-else-if="!paymentStore.isPaid" type="error" variant="tonal">
                             <div class="d-flex align-center justify-space-between">
                                 <div class="d-flex flex-column me-3">
-                                    <span><strong>No e-Wallet payment occured.</strong></span>
-                                    <span style="font-size: 12px;">
-                                        Unable to continue if no e-Wallet payment occured.
-                                    </span>
+                                    <span><strong>No e-Wallet payment occurred.</strong></span>
                                 </div>
                             </div>
                         </v-alert>
@@ -614,7 +613,7 @@ export default {
         },
 
         customerChange() {
-            if(this.discountedSubtotal === 0) {
+            if (this.discountedSubtotal === 0) {
                 return 0;
             }
             const newCustomerChange = this.customer_cash - this.customer_charge;

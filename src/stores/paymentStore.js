@@ -76,6 +76,7 @@ export const usePaymentStore = defineStore("payment", {
 
       this.pollInterval = setInterval(async () => {
         if (this.pollAttempts >= this.maxPollAttempts) {
+          this.isPollingActive = false;
           this.stopPaymentPolling();
           return;
         }
@@ -89,6 +90,7 @@ export const usePaymentStore = defineStore("payment", {
         // Stop polling if payment is complete
         if (this.isPaymentComplete) {
           this.stopPaymentPolling();
+          this.isPollingActive = this.isPaid;
 
           // Trigger success callback if paid
           if (this.isPaid && this._onPaymentSuccess) {
@@ -103,7 +105,10 @@ export const usePaymentStore = defineStore("payment", {
         clearInterval(this.pollInterval);
         this.pollInterval = null;
       }
-      this.isPollingActive = false;
+      
+      if (this.paymentStatus !== 'succeeded') {
+        this.isPollingActive = false;
+      }
     },
 
     resetPaymentState() {
