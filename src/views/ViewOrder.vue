@@ -346,7 +346,7 @@ export default {
                 }
                 const voidOrderData = {
                     reference_number: this.referenceNumber,
-                    transaction_id: this.selectedProduct.transaction_id,
+                    order_id: this.selectedProduct.order_id,
                     table_number: this.selectedProduct.table_number,
                     product_id: this.selectedProduct.product_id,
                     from_quantity: this.selectedProductOriginalQuantity,

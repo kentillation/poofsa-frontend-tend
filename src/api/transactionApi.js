@@ -382,9 +382,9 @@ export const TRANSACTION_API = {
     //     }
     // },
 
-    // async updateKitchenProductStatusApi(transactionId, orderStatus) {
-    //     if (!transactionId || !orderStatus) {
-    //         throw new Error('Invalid transactionId or orderStatus');
+    // async updateKitchenProductStatusApi(orderId, orderStatus) {
+    //     if (!orderId || !orderStatus) {
+    //         throw new Error('Invalid orderId or orderStatus');
     //     }
     //     try {
     //         const authToken = localStorage.getItem('auth_token');
@@ -399,7 +399,7 @@ export const TRANSACTION_API = {
     //         };
     //         const response = await apiClient.put(
     //             `${this.ENDPOINTS.CHANGE_KITCHEN_STATUS}`,
-    //             { transactionId, orderStatus },
+    //             { orderId, orderStatus },
     //             config
     //         );
     //         if (!response.data) {
@@ -452,7 +452,7 @@ export const TRANSACTION_API = {
     //     }
     // },
     
-    // async fetchKitchenProductDetailsApi(transactionId) {
+    // async fetchKitchenProductDetailsApi(orderId) {
     //     try {
     //         const authToken = localStorage.getItem('auth_token');
     //         if (!authToken) {
@@ -465,7 +465,7 @@ export const TRANSACTION_API = {
     //             },
     //         };
     //         const response = await apiClient.get(
-    //             `${this.ENDPOINTS.FETCH_KITCHEN_PRODUCT}/${transactionId}`,
+    //             `${this.ENDPOINTS.FETCH_KITCHEN_PRODUCT}/${orderId}`,
     //             config
     //         );
     //         if (!response.data) {

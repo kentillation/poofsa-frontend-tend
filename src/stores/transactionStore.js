@@ -276,17 +276,17 @@ export const useTransactStore = defineStore('transactionData', {
         //     }
         // },
 
-        // async updateKitchenProductStatusStore(transactionId, orderStatus) {
+        // async updateKitchenProductStatusStore(orderId, orderStatus) {
         //     this.loading = true;
         //     this.error = null;
         //     try {
-        //         if (!transactionId || !orderStatus) {
-        //             throw new Error('Invalid transactionId or orderStatus');
+        //         if (!orderId || !orderStatus) {
+        //             throw new Error('Invalid orderId or orderStatus');
         //         }
-        //         const response = await TRANSACTION_API.updateKitchenProductStatusApi(transactionId, orderStatus);
+        //         const response = await TRANSACTION_API.updateKitchenProductStatusApi(orderId, orderStatus);
         //         if (response && response.status === true) {
         //             this.currentOrders = this.currentOrders.map(order =>
-        //                 order.id === transactionId ? { ...order, orderStatus } : order
+        //                 order.id === orderId ? { ...order, orderStatus } : order
         //             );
         //             return response;
         //         } else {
@@ -326,14 +326,14 @@ export const useTransactStore = defineStore('transactionData', {
         //     }
         // },
 
-        // async fetchKitchenProductDetailsStore(transactionId) {
+        // async fetchKitchenProductDetailsStore(orderId) {
         //     this.loading = true;
         //     this.error = null;
         //     try {
-        //         if (!transactionId) {
-        //             throw new Error('Invalid transactionId');
+        //         if (!orderId) {
+        //             throw new Error('Invalid orderId');
         //         }
-        //         const response = await TRANSACTION_API.fetchKitchenProductDetailsApi(transactionId);
+        //         const response = await TRANSACTION_API.fetchKitchenProductDetailsApi(orderId);
         //         if (response && response.status === true) {
         //             this.orderDtls = response;
         //             this.orderDtlsData = response.data;
