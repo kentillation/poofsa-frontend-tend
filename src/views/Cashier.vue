@@ -271,21 +271,21 @@
                         <div v-if="eWalletImgSrc">
                             <div class="d-flex align-center justify-center">
                                 <p style="font-size: 20px;">Scan</p>
-                                <img class="e-wallet mx-1" :src="qrphLogo" style="width: 60px; height: 15px;"
+                                <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo" style="width: 60px; height: 15px;"
                                     alt="QRPh Logo" loading="lazy">
                                 <p style="font-size: 20px;">code to pay</p>
                             </div>
 
                             <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
-                                <img class="e-wallet" :src="gcashLogo" style="width: 50px; height: 13px;"
+                                <img class="e-wallet" :src="this.ewalletImageStore.gcashLogo" style="width: 50px; height: 13px;"
                                     alt="GCash Logo" loading="lazy">
-                                <img class="e-wallet" :src="mayaLogo" style="width: 30px; height: 13px;" alt="Maya Logo"
+                                <img class="e-wallet" :src="this.ewalletImageStore.mayaLogo" style="width: 30px; height: 13px;" alt="Maya Logo"
                                     loading="lazy">
-                                <img class="e-wallet" :src="bpiLogo" style="width: 25px; height: 13px;" alt="BPI Logo"
+                                <img class="e-wallet" :src="this.ewalletImageStore.bpiLogo" style="width: 25px; height: 13px;" alt="BPI Logo"
                                     loading="lazy">
-                                <img class="e-wallet" :src="gotymeLogo" style="width: 40px; height: 13px;"
+                                <img class="e-wallet" :src="this.ewalletImageStore.gotymeLogo" style="width: 40px; height: 13px;"
                                     alt="GoTyme Logo" loading="lazy">
-                                <img class="e-wallet" :src="homecreditLogo" style="width: 35px; height: 13px;"
+                                <img class="e-wallet" :src="this.ewalletImageStore.homecreditLogo" style="width: 35px; height: 13px;"
                                     alt="Home Credit Logo" loading="lazy">
                             </div>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
@@ -349,16 +349,11 @@ import { useStocksStore } from '@/stores/stocksStore';
 import { useTransactStore } from '@/stores/transactionStore';
 import { useLoadingStore } from '@/stores/loading';
 import { usePaymentStore } from '@/stores/paymentStore';
+import { useEWalletImageStore } from '@/stores/eWalletImageStore'
 import ViewOrder from './ViewOrder.vue';
 import echo from '@/resources/js/echo';
 import Snackbar from '@/components/Snackbar.vue';
 import Alert from '@/components/Alert.vue';
-import QRPhLogo from '@/assets/img/png/e-wallets/QRPh-Logo.png';
-import GCashLogo from '@/assets/img/png/e-wallets/Gcash-Logo.png';
-import MayaLogo from '@/assets/img/png/e-wallets/Maya-Logo.png';
-import BPILogo from '@/assets/img/png/e-wallets/BPI-Logo.png';
-import GoTymeLogo from '@/assets/img/png/e-wallets/GoTyme-Logo.png';
-import HomeCreditLogo from '@/assets/img/png/e-wallets/HomeCredit-Logo.png';
 import WTFImage from '@/assets/img/jpg/features/WTF.jpg';
 
 
@@ -427,12 +422,6 @@ export default {
                 { paymentmode_id: 1, paymentmode_label: 'Cash' },
                 { paymentmode_id: 2, paymentmode_label: 'e-Wallet' },
             ],
-            qrphLogo: QRPhLogo,
-            gcashLogo: GCashLogo,
-            mayaLogo: MayaLogo,
-            bpiLogo: BPILogo,
-            gotymeLogo: GoTymeLogo,
-            homecreditLogo: HomeCreditLogo,
             WTFImgSrc: WTFImage,
 
             // Orders
@@ -489,6 +478,7 @@ export default {
         const transactStore = useTransactStore();
         const loadingStore = useLoadingStore();
         const paymentStore = usePaymentStore();
+        const ewalletImageStore = useEWalletImageStore()
         const currentDate = new Date().toLocaleDateString('en-PH', {
             year: 'numeric',
             month: 'long',
@@ -506,6 +496,7 @@ export default {
             transactStore,
             loadingStore,
             paymentStore,
+            ewalletImageStore,
             formatCurrentDate
         };
         // paymentModeItems: computed(() => paymentStore.paymentModeOptions), };

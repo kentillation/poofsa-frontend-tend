@@ -60,6 +60,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useStocksStore } from '@/stores/stocksStore';
 import { useLoadingStore } from '@/stores/loading';
+import { useEWalletImageStore } from '@/stores/eWalletImageStore'
 import { useRoute } from 'vue-router';
 import GlobalLoader from '@/components/GlobalLoader.vue';
 
@@ -80,6 +81,7 @@ export default {
     const authStore = useAuthStore();
     const stocksStore = useStocksStore();
     const loadingStore = useLoadingStore();
+    const ewalletImageStore = useEWalletImageStore()
     const connectionStatus = ref('online');
     const route = useRoute();
     const isNotFoundPage = computed(() => route.name === 'NotFound');
@@ -101,6 +103,9 @@ export default {
     };
 
     onMounted(() => {
+      ewalletImageStore.initializeImages();
+      ewalletImageStore.initializeImagesAsync()
+
       window.addEventListener('online', updateStatus);
       window.addEventListener('offline', updateStatus);
 
