@@ -10,7 +10,6 @@ export const useTransactStore = defineStore('transactionData', {
         orderStatuses: [],
         stationStatuses: [],
         orderDtls: [],
-        orderDtlsData: [],
         orderQRCode: null,
         loading: false,
         error: null,
@@ -141,7 +140,6 @@ export const useTransactStore = defineStore('transactionData', {
                 const response = await TRANSACTION_API.fetchOrderDetailsApi(referenceNumber);
                 if (response && response.status === true) {
                     this.orderDtls = response;
-                    this.orderDtlsData = response.data;
                     return response;
                 } else {
                     throw new Error(response?.message || 'Failed to fetch order details');
@@ -156,6 +154,7 @@ export const useTransactStore = defineStore('transactionData', {
             }
         },
 
+        // For Receipt
         async fetchOrderDetailsTempStore(referenceNumber) {
             this.loading = true;
             this.error = null;
@@ -166,7 +165,6 @@ export const useTransactStore = defineStore('transactionData', {
                 const response = await TRANSACTION_API.fetchOrderDetailsTempApi(referenceNumber);
                 if (response && response.status === true) {
                     this.orderDtls = response;
-                    this.orderDtlsData = response.data;
                     return response;
                 } else {
                     throw new Error(response?.message || 'Failed to fetch order details');
@@ -336,7 +334,6 @@ export const useTransactStore = defineStore('transactionData', {
         //         const response = await TRANSACTION_API.fetchKitchenProductDetailsApi(orderId);
         //         if (response && response.status === true) {
         //             this.orderDtls = response;
-        //             this.orderDtlsData = response.data;
         //             return response;
         //         } else {
         //             throw new Error(response?.message || 'Failed to fetch kitchen product details');
