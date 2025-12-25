@@ -176,7 +176,7 @@
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
                                     append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid || loading ||
-                                        (payment_mode_id === 2 && !eWalletPaid) ||
+                                        (payment_mode_id === 2 && !paymentStore.isPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
                                         subTotal <= 0">
