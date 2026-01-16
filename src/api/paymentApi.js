@@ -10,11 +10,11 @@ export const EWALLET_PAYMENT_API = {
     WEBHOOK: "/paymongo/webhook",
   },
 
-  async generateQrApi(amount, wallet, referenceNumber) {
+  async generateQrApi(amount, walletType, referenceNumber) {
     try {
       const response = await apiClient.post(this.ENDPOINTS.GENERATE_QR, {
         amount: amount,
-        wallet: wallet,
+        wallet_type: walletType,
         reference_number: referenceNumber,
       });
       return response.data;

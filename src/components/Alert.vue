@@ -14,7 +14,7 @@ export default {
     return {
       snackbar: {
         visible: false,
-        message: '',
+        message: '[]',
         color: ''
       },
     };

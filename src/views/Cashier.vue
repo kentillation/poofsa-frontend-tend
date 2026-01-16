@@ -163,7 +163,7 @@
                                     density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
-                                <v-btn @click="openQrPayment" :disabled="isNotEwallet || eWalletPaid"
+                                <v-btn @click="openQrPayment" :disabled="!isOnline || isNotEwallet || eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn qrph me-2 mt-2">Generate
                                     QR</v-btn>
@@ -171,7 +171,7 @@
 
                             <div class="d-flex justify-end me-2 ms-1">
                                 <v-btn class="bg-red-lighten-2 d-flex w-50 py-6 mt-3" variant="flat"
-                                    prepend-icon="mdi-refresh" @click="resetPaymentSection" :disabled="loading">
+                                    prepend-icon="mdi-refresh" @click="resetPaymentSection" :disabled="loading || eWalletPaid">
                                     Reset
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
@@ -179,7 +179,7 @@
                                         (payment_mode_id === 2 && !eWalletPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
-                                        subTotal <= 0">
+                                        subTotal <= 0 || !isOnline">
                                     Submit
                                 </v-btn>
                             </div>
@@ -260,7 +260,7 @@
                         <v-btn @click="openQrPayment" :disabled="paymentStore.loading" class="ewallet-btn qrph w-100"
                             height="48">
                             <v-icon start>mdi-qrcode</v-icon>
-                            Regenerate QR code
+                            Regenerate QR
                         </v-btn>
                     </div>
 
@@ -289,11 +289,14 @@
                             <p>
                                 <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
                             </p>
+                            <p class="text-center mt-1" >
+                                QR will expire in {{ qrTimerDisplay }}
+                            </p>
                         </div>
 
                         <div v-else class="d-flex justify-center">
                             <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
-                                <p class="text-grey my-3">Generating QR code...</p>
+                                <p class="text-grey my-3">Generating...</p>
                                 <v-progress-circular color="grey" indeterminate size="50"
                                     width="2"></v-progress-circular>
                             </div>
@@ -302,25 +305,13 @@
 
                     <!-- Show payment status -->
                     <div v-if="paymentStore.paymentStatus" class="payment-status w-100">
-                        <p class="text-center mb-1">
-                            QR will expire in {{ qrTimerDisplay }}
-                        </p>
-                        <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive || paymentStore.isPaid"
+                        <v-alert v-if="paymentStore.isPollingActive || eWalletPaid" :type="paymentStatusType"
                             variant="tonal">
                             <div class="d-flex align-center justify-space-between">
-                                <div class="d-flex flex-column me-3">
-                                    <span><strong>Status:</strong></span>
-                                    <span> {{ paymentStatusText }}</span>
-                                </div>
-                                <v-progress-circular v-if="paymentStore.isPollingActive && !paymentStore.isPaid"
+                                <span> {{ paymentStatusText }}</span>
+                                <v-progress-circular v-if="paymentStore.isPollingActive && !eWalletPaid"
                                     indeterminate size="20" width="2"></v-progress-circular>
-                                <v-icon v-else-if="paymentStore.isPaid" color="success">mdi-check-circle</v-icon>
-                            </div>
-                        </v-alert>
-
-                        <v-alert v-else-if="!paymentStore.isPaid" type="error" variant="tonal">
-                            <div class="d-flex align-center justify-space-between">
-                                <span>No e-Wallet payment occurred.</span>
+                                <v-icon v-else-if="eWalletPaid" color="success">mdi-check-circle</v-icon>
                             </div>
                         </v-alert>
                     </div>
@@ -395,6 +386,7 @@ export default {
             qrTimerInterval: null,
             qrTimerDisplay: "03:00",
             selectedEwalletOption: 'qrph',
+            isOnline: navigator.onLine,
             onPaymentSuccessCallback: null,
             onStatusUpdateCallback: null,
             referenceNumber: '',
@@ -645,14 +637,34 @@ export default {
 
     async mounted() {
         this.reloadData();
+        window.addEventListener('online', this.onOnline);
+        window.addEventListener('offline', this.onOffline);
     },
 
     methods: {
 
+        onOffline() {
+            this.isOnline = false;
+
+            // Stop polling immediately
+            this.paymentStore.stopPaymentPolling();
+
+            // If payment not yet completed
+            if (!this.eWalletPaid && this.eWalletDialog) {
+            this.showError("Internet connection disconnected.");
+            this.closeEwalletDialog();
+            }
+        },
+
+        onOnline() {
+            this.isOnline = true;
+            this.showTopAlertSuccess("Internet connection restored.");
+        },
+
         lowStockAlert() {
             echo.channel('lowStockLevelChannel')
                 .listen('LowStockLevel', (e) => {
-                    this.showAlert(e.message);
+                    this.showTopAlertError(e.message);
                 });
         },
 
@@ -661,7 +673,7 @@ export default {
                 .listen('OrderStatusUpdated', (e) => {
                     console.log(e);
                     if (e.stationId === 1) {
-                        this.showNewOrderAlert(e.message);
+                        this.showTopAlertSuccess(e.message);
                     }
                 });
         },
@@ -671,7 +683,7 @@ export default {
                 .listen('OrderStatusUpdated', (e) => {
                     console.log(e);
                     if (e.stationId === 2) {
-                        this.showNewOrderAlert(e.message);
+                        this.showTopAlertSuccess(e.message);
                     }
                 });
         },
@@ -821,50 +833,17 @@ export default {
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         },
 
-        startQrTimer() {
-            this.qrTimer = 180; // 3 minutes
-            this.updateQrTimerDisplay();
-
-            if (this.qrTimerInterval) clearInterval(this.qrTimerInterval);
-
-            this.qrTimerInterval = setInterval(() => {
-                if (this.qrTimer > 0) {
-                    this.qrTimer--;
-                    this.updateQrTimerDisplay();
-                } else {
-                    this.stopQrTimer();
-                    this.showError("QR code expired. Please generate a new one.");
-                    this.eWalletPaid = false;
-                    this.eWalletImgSrc = null;
-                    this.paymentIntentId = null;
-                    this.eWalletDialog = false;
-                }
-            }, 1000);
-        },
-
-        stopQrTimer() {
-            if (this.qrTimerInterval) {
-                clearInterval(this.qrTimerInterval);
-                this.qrTimerInterval = null;
-            }
-        },
-
-        updateQrTimerDisplay() {
-            const minutes = Math.floor(this.qrTimer / 60).toString().padStart(2, "0");
-            const seconds = (this.qrTimer % 60).toString().padStart(2, "0");
-            this.qrTimerDisplay = `${minutes}:${seconds}`;
-        },
-
         async openQrPayment() {
-            this.selectedEwalletOption = 'qrph';
 
-            this.eWalletImgSrc = null;
+            if (!this.isOnline) {
+                // this.paymentStore.stopPaymentPolling();
+                // this.eWalletDialog = false;
+                this.showError("No internet connection. Unable to generate QR.");
+                return;
+            }
 
-            if (!navigator.onLine) {
-                this.paymentStore.stopPaymentPolling();
-                this.eWalletPaid = false;
-                this.eWalletDialog = false;
-                this.showError("No internet connection. Unable to process e-Wallet payment.");
+            if (this.eWalletPaid) {
+                this.showError("Payment already completed.");
                 return;
             }
 
@@ -878,6 +857,8 @@ export default {
                 return;
             }
 
+            this.selectedEwalletOption = 'qrph';
+            this.eWalletImgSrc = null;
             this.eWalletDialog = true;
 
             try {
@@ -943,9 +924,49 @@ export default {
             this.eWalletPaid = true;
         },
 
+        startQrTimer() {
+            this.qrTimer = 180; // 3 minutes
+            this.updateQrTimerDisplay();
+
+            if (this.qrTimerInterval) clearInterval(this.qrTimerInterval);
+
+            this.qrTimerInterval = setInterval(() => {
+                if (!this.isOnline) {
+                    this.stopQrTimer();
+                    this.showError("QR expired due to lost connection.");
+                    this.closeEwalletDialog();
+                    return;
+                }
+
+                if (this.qrTimer > 0) {
+                    this.qrTimer--;
+                    this.updateQrTimerDisplay();
+                } else {
+                    this.stopQrTimer();
+                    this.showError("The QR is expired. Please regenerate again!");
+                    this.closeEwalletDialog();
+                }
+            }, 1000);
+        },
+
+        stopQrTimer() {
+            if (this.qrTimerInterval) {
+                clearInterval(this.qrTimerInterval);
+                this.qrTimerInterval = null;
+            }
+        },
+
+        updateQrTimerDisplay() {
+            const minutes = Math.floor(this.qrTimer / 60).toString().padStart(2, "0");
+            const seconds = (this.qrTimer % 60).toString().padStart(2, "0");
+            this.qrTimerDisplay = `${minutes}:${seconds}`;
+        },
+
         closeEwalletDialog() {
-            this.eWalletImgSrc = null;
             this.eWalletDialog = false;
+            this.eWalletImgSrc = null;
+            this.eWalletPaid = false;
+            this.paymentIntentId = null;
             this.selectedEwalletOption = '';
             this.paymentStore._onStatusUpdate = null;
             this.paymentStore._onPaymentSuccess = null;
@@ -1081,20 +1102,28 @@ export default {
             this.order_note = '-';
         },
 
+        showTopAlertError(message) {
+            if (this.$refs.alertRef) {
+                this.$refs.alertRef.showSnackbarAlert(message, "error");
+            }
+        },
+
+        showTopAlertSuccess(message) {
+            if (this.$refs.alertRef) {
+                this.$refs.alertRef.showSnackbarAlert(message, "success");
+            }
+        },
+
         showError(message) {
-            this.$refs.snackbarRef.showSnackbar(message, "error");
-        },
-
-        showAlert(message) {
-            this.$refs.alertRef.showSnackbarAlert(message, "error");
-        },
-
-        showNewOrderAlert(message) {
-            this.$refs.alertRef.showSnackbarAlert(message, "success");
+            if (this.$refs.snackbarRef) {
+                this.$refs.snackbarRef.showSnackbar(message, "error");
+            }
         },
 
         showSuccess(message) {
-            this.$refs.snackbarRef.showSnackbar(message, "success");
+            if (this.$refs.snackbarRef) {
+                this.$refs.snackbarRef.showSnackbar(message, "success");
+            }
         },
 
     }
