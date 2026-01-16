@@ -127,7 +127,7 @@
                                     @input="e => customer_discount = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric">
                                     <template #label>
-                                        <span class="required-asterisk">*</span> Discount
+                                        <span class="required-asterisk">*</span> Discount (₱)
                                     </template>
                                 </v-text-field>
 
@@ -602,7 +602,7 @@ export default {
             if (this.discountedSubtotal === 0) {
                 return 0;
             }
-            const newCustomerChange = this.customer_cash - this.customer_charge;
+            const newCustomerChange = this.customer_cash - this.discountedSubtotal;
             return newCustomerChange;
         },
 
@@ -880,30 +880,30 @@ export default {
             };
         },
 
-        async startWalletRedirect(wallet) {
-            if (this.discountedSubtotal <= 0) {
-                this.showError('Total due must be greater than 0');
-                return;
-            }
-            try {
-                this.loadingStore.show("Redirecting to payment...");
-                this.paymentStore.resetPaymentState();
-                const refNumber = await this.generateReferenceNumber();
-                const result = await this.paymentStore.generateQrPhStore(
-                    this.discountedSubtotal,
-                    wallet,
-                    refNumber
-                );
-                if (!result.redirect_url) {
-                    throw new Error('Missing redirect URL');
-                }
-                window.location.href = result.redirect_url;
-            } catch (e) {
-                this.showError('Failed to redirect to wallet');
-            } finally {
-                this.loadingStore.hide();
-            }
-        },
+        // async startWalletRedirect(wallet) {
+        //     if (this.discountedSubtotal <= 0) {
+        //         this.showError('Total due must be greater than 0');
+        //         return;
+        //     }
+        //     try {
+        //         this.loadingStore.show("Redirecting to payment...");
+        //         this.paymentStore.resetPaymentState();
+        //         const refNumber = await this.generateReferenceNumber();
+        //         const result = await this.paymentStore.generateQrPhStore(
+        //             this.discountedSubtotal,
+        //             wallet,
+        //             refNumber
+        //         );
+        //         if (!result.redirect_url) {
+        //             throw new Error('Missing redirect URL');
+        //         }
+        //         window.location.href = result.redirect_url;
+        //     } catch (e) {
+        //         this.showError('Failed to redirect to wallet');
+        //     } finally {
+        //         this.loadingStore.hide();
+        //     }
+        // },
 
         async generateQrForEwallet() {
             if (!this.selectedEwalletOption) {
