@@ -289,7 +289,8 @@
                                 <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
                             </p>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
-                            <p class="text-center mt-1" >
+                            <!-- <v-chip @click="downloadQR" color="#0090b6" size="small" variant="flat" prepend-icon="mdi-download">Download QR</v-chip> -->
+                            <p class="text-center mt-2" >
                                 QR will expire in {{ qrTimerDisplay }}
                             </p>
                         </div>
@@ -870,6 +871,7 @@ export default {
                     this.discountedSubtotal,
                     referenceNumber
                 );
+                this.referenceNumber = referenceNumber;
 
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
                 this.customer_cash = this.discountedSubtotal;
@@ -880,6 +882,19 @@ export default {
                 this.eWalletDialog = false;
             }
         },
+
+        // downloadQR() {
+        //     if (!this.eWalletImgSrc) {
+        //         this.showError("No QR to download.");
+        //         return;
+        //     }
+        //     const link = document.createElement('a');
+        //     link.href = this.eWalletImgSrc;
+        //     link.download = 'Poofsa-QR-' + this.referenceNumber + '.png';
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     document.body.removeChild(link);
+        // },
 
         setupPaymentCallbacks() {
             this.paymentStore._onStatusUpdate = (statusResult) => {
