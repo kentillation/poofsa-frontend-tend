@@ -165,7 +165,7 @@
                                     label="Mode of payment" />
                                 <v-btn @click="openQrPayment" :disabled="!isOnline || isNotEwallet || eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
-                                    class="ewallet-btn qrph me-2 mt-2">Generate
+                                    class="ewallet-btn me-2 mt-2">Generate
                                     QR</v-btn>
                             </div>
 
@@ -257,7 +257,7 @@
                 </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
                     <div class="d-flex flex-column w-100 mb-2" style="gap: 10px;">
-                        <v-btn @click="openQrPayment" :disabled="paymentStore.loading" class="ewallet-btn qrph w-100"
+                        <v-btn @click="openQrPayment" :disabled="paymentStore.loading" class="ewallet-btn regenerate w-100"
                             height="48">
                             <v-icon start>mdi-qrcode</v-icon>
                             Regenerate QR
@@ -285,10 +285,10 @@
                                 <img class="e-wallet" :src="this.ewalletImageStore.homecreditLogo"
                                     style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
                             </div>
-                            <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
-                            <p>
+                            <p class="mt-4" style="font-size: 20px;">
                                 <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
                             </p>
+                            <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
                             <p class="text-center mt-1" >
                                 QR will expire in {{ qrTimerDisplay }}
                             </p>
@@ -306,7 +306,7 @@
                     <!-- Show payment status -->
                     <div v-if="paymentStore.paymentStatus" class="payment-status w-100">
                         <v-alert v-if="paymentStore.isPollingActive || eWalletPaid" :type="paymentStatusType"
-                            variant="tonal">
+                            variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
                             <div class="d-flex align-center justify-space-between">
                                 <span> {{ paymentStatusText }}</span>
                                 <v-progress-circular v-if="paymentStore.isPollingActive && !eWalletPaid"
@@ -449,13 +449,16 @@ export default {
 
     beforeUnmount() {
         if (this.paymentStore) {
-            this.paymentStore.onStatusUpdate = null;
-            this.paymentStore.onPaymentSuccess = null;
+            this.paymentStore._onStatusUpdate = null;
+            this.paymentStore._onPaymentSuccess = null;
             this.paymentStore.stopPaymentPolling();
             this.paymentStore.resetPaymentState();
         }
 
         echo.leave('newOrderChannel');
+
+        window.removeEventListener('online', this.onOnline);
+        window.removeEventListener('offline', this.onOffline);
     },
 
     setup() {
@@ -836,8 +839,6 @@ export default {
         async openQrPayment() {
 
             if (!this.isOnline) {
-                // this.paymentStore.stopPaymentPolling();
-                // this.eWalletDialog = false;
                 this.showError("No internet connection. Unable to generate QR.");
                 return;
             }
@@ -943,7 +944,7 @@ export default {
                     this.updateQrTimerDisplay();
                 } else {
                     this.stopQrTimer();
-                    this.showError("The QR is expired. Please regenerate again!");
+                    this.showError("QR expired. Regenerate again!");
                     this.closeEwalletDialog();
                 }
             }, 1000);
@@ -1223,18 +1224,19 @@ export default {
 
 .qr-container {
     background: #fffcfc;
-    border-radius: 10px;
+    border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .ewallet-btn {
     text-transform: none !important;
     letter-spacing: 0.5px !important;
-}
-
-.ewallet-btn.qrph {
     background: linear-gradient(135deg, #0b0069 0%, #c62828 100%) !important;
     color: white !important;
+}
+
+.ewallet-btn.regenerate {
+    border-radius: 15px;
 }
 
 .v-alert {
@@ -1249,8 +1251,7 @@ export default {
 .payment-status {
     font-size: 14px;
     font-weight: normal;
-    padding: 5px;
-    border-radius: 8px;
+    border-radius: 15px;
     margin: 5px 0;
 }
 
