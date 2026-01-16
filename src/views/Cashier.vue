@@ -108,7 +108,7 @@
                                     prepend-inner-icon="mdi-cash-plus" />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model.number="customer_cash"
-                                    variant="outlined" density="compact" type="number"
+                                    variant="outlined" density="compact" type="number" :disabled="eWalletPaid"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric" prepend-inner-icon="mdi-cash-plus" placeholder="Enter cash">
@@ -160,10 +160,10 @@
 
                             <div class="payment-section d-flex">
                                 <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
-                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="this.eWalletPaid"
+                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="!eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
-                                <v-btn @click="openQrPayment" :disabled="isEwalletEvidenceDisabled || this.eWalletPaid"
+                                <v-btn @click="openQrPayment" :disabled="isNotEwallet || !eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn qrph me-2 mt-2">Generate
                                     QR</v-btn>
@@ -176,7 +176,7 @@
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
                                     append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid || loading ||
-                                        (payment_mode_id === 2 && !paymentStore.isPaid) ||
+                                        (payment_mode_id === 2 && !eWalletPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
                                         subTotal <= 0">
@@ -302,6 +302,9 @@
 
                     <!-- Show payment status -->
                     <div v-if="paymentStore.paymentStatus" class="payment-status w-100">
+                        <p class="text-center mb-1">
+                            QR will expire in {{ qrTimerDisplay }}
+                        </p>
                         <v-alert :type="paymentStatusType" v-if="paymentStore.isPollingActive || paymentStore.isPaid"
                             variant="tonal">
                             <div class="d-flex align-center justify-space-between">
@@ -386,10 +389,12 @@ export default {
             // Payment
             isFormValid: false,
             eWalletDialog: false,
-            selectedEwalletOption: '',
             eWalletPaid: false,
-            paymentIntentId: null,
-            paymentPollInterval: null,
+            eWalletImgSrc: null,
+            qrTimer: 180, // seconds, 3 minutes = 180s
+            qrTimerInterval: null,
+            qrTimerDisplay: "03:00",
+            selectedEwalletOption: 'qrph',
             onPaymentSuccessCallback: null,
             onStatusUpdateCallback: null,
             referenceNumber: '',
@@ -403,7 +408,6 @@ export default {
             customer_discount: '0',
             computed_discount: null,
             payment_mode_id: 1,
-            eWalletImgSrc: null,
             table_number: null,
             customer_name: '-',
             order_note: '-',
@@ -459,9 +463,6 @@ export default {
             this.paymentStore.resetPaymentState();
         }
 
-        if (this.paymentPollInterval) {
-            clearInterval(this.paymentPollInterval);
-        }
         echo.leave('newOrderChannel');
     },
 
@@ -575,7 +576,7 @@ export default {
             return Number(this.order_type_id) === 1;
         },
 
-        isEwalletEvidenceDisabled() {
+        isNotEwallet() {
             return Number(this.payment_mode_id) !== 2;
         },
 
@@ -820,12 +821,45 @@ export default {
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         },
 
+        startQrTimer() {
+            // Reset timer
+            this.qrTimer = 180; // 3 minutes
+            this.updateQrTimerDisplay();
+
+            if (this.qrTimerInterval) clearInterval(this.qrTimerInterval);
+
+            this.qrTimerInterval = setInterval(() => {
+                if (this.qrTimer > 0) {
+                    this.qrTimer--;
+                    this.updateQrTimerDisplay();
+                } else {
+                    this.stopQrTimer();
+                    this.showError("QR code expired. Please generate a new one.");
+                    this.eWalletPaid = false;
+                    this.eWalletImgSrc = null;
+                    this.paymentIntentId = null;
+                    this.eWalletDialog = false;
+                }
+            }, 1000);
+        },
+
+        stopQrTimer() {
+            if (this.qrTimerInterval) {
+                clearInterval(this.qrTimerInterval);
+                this.qrTimerInterval = null;
+            }
+        },
+
+        updateQrTimerDisplay() {
+            const minutes = Math.floor(this.qrTimer / 60).toString().padStart(2, "0");
+            const seconds = (this.qrTimer % 60).toString().padStart(2, "0");
+            this.qrTimerDisplay = `${minutes}:${seconds}`;
+        },
+
         async openQrPayment() {
             this.selectedEwalletOption = 'qrph';
 
             this.eWalletImgSrc = null;
-
-            this.stopPaymentPolling();
 
             if (!navigator.onLine) {
                 this.paymentStore.stopPaymentPolling();
@@ -836,31 +870,31 @@ export default {
             }
 
             if (this.payment_mode_id !== 2) {
-                this.showError("Please select e-Wallet payment. Unable to proceed e-Wallet payment.");
+                this.showError("Please select e-Wallet payment.");
                 return;
             }
 
             if (this.discountedSubtotal === 0) {
-                this.showError("No product selected. Unable to proceed e-Wallet payment.");
+                this.showError("No product selected.");
                 return;
             }
 
-            this.eWalletPaid = false;
+            this.resetEwalletState();
             this.eWalletDialog = true;
 
-            const referenceNumber = await this.generateReferenceNumber();
             try {
                 this.setupPaymentCallbacks();
-                const response = await this.paymentStore.generateQrPh(
+
+                const referenceNumber = await this.generateReferenceNumber();
+                await this.paymentStore.generateQrPh(
                     this.discountedSubtotal,
                     referenceNumber
                 );
-                if (response) {
-                    this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-                    this.customer_cash = this.discountedSubtotal;
-                } else {
-                    this.stopPaymentPolling();
-                }
+
+                this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                this.customer_cash = this.discountedSubtotal;
+                this.startQrTimer();
+
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
                 this.eWalletDialog = false;
@@ -868,163 +902,62 @@ export default {
         },
 
         setupPaymentCallbacks() {
-            this.paymentStore.onStatusUpdate = null;
-            this.paymentStore.onPaymentSuccess = null;
-            this.paymentStore.onStatusUpdate = (statusResult) => {
+            this.paymentStore._onStatusUpdate = (statusResult) => {
                 console.log('Payment status update:', statusResult);
-                this.handlePaymentStatusUpdate(statusResult);
+                this.handlePaymentStatus(statusResult);
             };
-            this.paymentStore.onPaymentSuccess = (details) => {
+            this.paymentStore._onPaymentSuccess = (details) => {
                 console.log('Payment success! Details:', details);
                 this.handlePaymentSuccess();
             };
         },
 
-        // async startWalletRedirect(wallet) {
-        //     if (this.discountedSubtotal <= 0) {
-        //         this.showError('Total due must be greater than 0');
-        //         return;
-        //     }
-        //     try {
-        //         this.loadingStore.show("Redirecting to payment...");
-        //         this.paymentStore.resetPaymentState();
-        //         const refNumber = await this.generateReferenceNumber();
-        //         const result = await this.paymentStore.generateQrPhStore(
-        //             this.discountedSubtotal,
-        //             wallet,
-        //             refNumber
-        //         );
-        //         if (!result.redirect_url) {
-        //             throw new Error('Missing redirect URL');
-        //         }
-        //         window.location.href = result.redirect_url;
-        //     } catch (e) {
-        //         this.showError('Failed to redirect to wallet');
-        //     } finally {
-        //         this.loadingStore.hide();
-        //     }
-        // },
-
-        async generateQrForEwallet() {
-            if (!this.selectedEwalletOption) {
-                this.showError('Please select an e-Wallet option');
+        handlePaymentStatus(statusResult) {
+            if (!statusResult?.ok) {
+                this.showError("Error checking payment status.");
                 return;
             }
 
-            if (this.discountedSubtotal <= 0) {
-                this.showError('Total due must be greater than 0');
-                return;
-            }
+            switch (statusResult.original_status) {
+                case 'awaiting_next_action':
+                    // waiting for user scan — do nothing
+                    break;
 
-            try {
-                this.loadingStore.show("Generating QR code...");
-                this.paymentStore.resetPaymentState();
-
-                const refNumber = await this.generateReferenceNumber();
-
-                await this.paymentStore.generateQrStore(
-                    this.discountedSubtotal,
-                    this.selectedEwalletOption,
-                    refNumber
-                );
-
-                this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-                this.paymentIntentId = this.paymentStore.paymentIntentId;
-
-                if (!this.paymentIntentId) {
-                    throw new Error('Missing payment intent ID');
-                }
-
-                this.startPaymentPolling();
-
-            } catch (error) {
-                console.error('QR generation error:', error);
-                this.showError(this.paymentStore.error || 'Failed to generate QR code');
-            } finally {
-                this.loadingStore.hide();
-            }
-        },
-
-        startPaymentPolling() {
-            if (!this.paymentIntentId) return;
-            this.paymentStore.startPaymentPolling(this.paymentIntentId, (status) => {
-                this.handlePaymentStatusChange(status);
-            });
-        },
-
-        stopPaymentPolling() {
-            if (this.pollInterval) {
-                clearInterval(this.pollInterval);
-                this.pollInterval = null;
-            }
-        },
-
-        handlePaymentStatusUpdate(statusResult) {
-            if (statusResult.ok) {
-                if (statusResult.original_status === 'succeeded') {
-                    this.eWalletPaid = true;
-                } else if (['failed', 'cancelled'].includes(statusResult.original_status)) {
-                    this.showError(`Payment ${statusResult.original_status}. Please try again.`);
-                }
-            } else {
-                console.error('Payment status check failed:', statusResult);
-            }
-        },
-
-        handlePaymentSuccess() {
-            this.showSuccess('Payment received successfully!');
-            this.eWalletPaid = true;
-            setTimeout(() => {
-                this.eWalletDialog = false;
-            }, 3000);
-        },
-
-        handlePaymentStatusChange(status) {
-            if (!navigator.onLine) {
-                this.closeEwalletDialog();
-                this.showError("No internet connection. Unable to process e-Wallet payment.");
-                return;
-            }
-            switch (status.original_status) {
                 case 'succeeded':
                     this.eWalletPaid = true;
 
-                    this.paymentStore.stopPaymentPolling();
+                    this.showSuccess("e-Wallet payment received successfully!");
 
-                    this.showSuccess('Payment received successfully!');
                     setTimeout(() => {
-                        this.eWalletDialog = false;
+                        this.closeEwalletDialog();
                     }, 1500);
                     break;
 
                 case 'failed':
                 case 'cancelled':
-                    this.paymentStore.stopPaymentPolling();
-                    this.eWalletPaid = false;
-                    this.showError('Payment failed. Please try again.');
-                    break;
-
-                case 'processing':
-                    break;
-
-                case 'error':
-                    this.paymentStore.stopPaymentPolling();
-                    this.eWalletPaid = false;
-                    this.showError('Error checking payment status.');
+                    this.showError("Payment failed. Please try again.");
+                    this.closeEwalletDialog();
                     break;
             }
+        },
+
+        handlePaymentSuccess() {
+            this.eWalletPaid = true;
+        },
+
+        resetEwalletState() {
+            this.eWalletPaid = false;
+            this.eWalletImgSrc = null;
+            this.paymentStore.resetPaymentState();
         },
 
         closeEwalletDialog() {
             this.paymentStore.onStatusUpdate = null;
             this.paymentStore.onPaymentSuccess = null;
             this.paymentStore.stopPaymentPolling();
-            this.paymentStore.resetPaymentState();
-            this.selectedEwalletOption = '';
-            this.eWalletImgSrc = null;
-            this.eWalletPaid = false;
-            this.paymentIntentId = null;
+            this.resetEwalletState();
             this.eWalletDialog = false;
+            this.selectedEwalletOption = '';
         },
 
         async submitForm() {
@@ -1094,7 +1027,7 @@ export default {
             }
         },
 
-        scrollToTop() {            
+        scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
