@@ -160,10 +160,10 @@
 
                             <div class="payment-section d-flex">
                                 <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
-                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="!eWalletPaid"
+                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
-                                <v-btn @click="openQrPayment" :disabled="isNotEwallet || !eWalletPaid"
+                                <v-btn @click="openQrPayment" :disabled="isNotEwallet || eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn qrph me-2 mt-2">Generate
                                     QR</v-btn>
@@ -391,7 +391,7 @@ export default {
             eWalletDialog: false,
             eWalletPaid: false,
             eWalletImgSrc: null,
-            qrTimer: 180, // seconds, 3 minutes = 180s
+            qrTimer: 180, // 3 minutes
             qrTimerInterval: null,
             qrTimerDisplay: "03:00",
             selectedEwalletOption: 'qrph',
@@ -822,7 +822,6 @@ export default {
         },
 
         startQrTimer() {
-            // Reset timer
             this.qrTimer = 180; // 3 minutes
             this.updateQrTimerDisplay();
 
@@ -879,7 +878,6 @@ export default {
                 return;
             }
 
-            this.resetEwalletState();
             this.eWalletDialog = true;
 
             try {
@@ -945,19 +943,14 @@ export default {
             this.eWalletPaid = true;
         },
 
-        resetEwalletState() {
-            this.eWalletPaid = false;
-            this.eWalletImgSrc = null;
-            this.paymentStore.resetPaymentState();
-        },
-
         closeEwalletDialog() {
-            this.paymentStore.onStatusUpdate = null;
-            this.paymentStore.onPaymentSuccess = null;
-            this.paymentStore.stopPaymentPolling();
-            this.resetEwalletState();
+            this.eWalletImgSrc = null;
             this.eWalletDialog = false;
             this.selectedEwalletOption = '';
+            this.paymentStore._onStatusUpdate = null;
+            this.paymentStore._onPaymentSuccess = null;
+            this.paymentStore.stopPaymentPolling();
+            this.paymentStore.resetPaymentState();
         },
 
         async submitForm() {
@@ -1075,6 +1068,7 @@ export default {
         },
 
         resetPaymentSection() {
+            this.eWalletPaid = false;
             this.order_type_id = 1;
             this.order_type_charge = '0';
             this.customer_cash = '';
