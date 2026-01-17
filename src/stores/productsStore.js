@@ -58,7 +58,8 @@ export const useProductsStore = defineStore('products', {
     getters: {
         getCategories: (state) => {
             return state.categories.map(category => ({
-                label: category.category_label,
+                id: category.category_id,
+                label: typeof category === 'object' ? category.category_label : category,
                 icon: 'mdi-food-outline'
             }));
         },
