@@ -373,7 +373,6 @@ export default {
 
             // Categories
             categories: [],
-            selectedCategoryId: null,
             selectedCategory: '',
             loadingCategories: false,
             categoriesDialog: false,
@@ -782,7 +781,7 @@ export default {
             this.fetchCategories();
         },
 
-        /* handleCategorySelect(category) {
+        handleCategorySelect(category) {
             this.categoriesDialog = false;
             if (!category || !category.label) {
                 this.showError("Invalid category selected!");
@@ -797,17 +796,6 @@ export default {
             } else {
                 this.searchProduct = '';
             }
-        }, */
-
-        handleCategorySelect(category) {
-          this.categoriesDialog = false
-          if (!category || !category.id) {
-            this.showError("Invalid category selected!")
-            return
-          }
-         this.selectedCategoryId = category.id
-         this.selectedCategory = category.label
-         this.searchProduct = ''
         },
 
         selectProduct(product) {
