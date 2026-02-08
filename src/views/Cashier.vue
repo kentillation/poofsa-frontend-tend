@@ -926,6 +926,9 @@ export default {
                     setTimeout(() => {
                         this.closeEwalletDialog();
                     }, 1500);
+
+                    this.submitForm();
+                    
                     break;
 
                 case 'failed':
