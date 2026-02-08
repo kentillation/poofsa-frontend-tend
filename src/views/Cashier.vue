@@ -163,7 +163,7 @@
                                     density="compact" prepend-inner-icon="mdi-cash" :disabled="!table_number || eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
-                                <v-btn @click="openQrPayment" :disabled="!isOnline || isNotEwallet || eWalletPaid"
+                                <v-btn @click="openQrPayment" :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn me-2 mt-2">Generate
                                     QR</v-btn>
