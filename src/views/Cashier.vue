@@ -1049,8 +1049,8 @@ export default {
                 this.subTotal = 0;
                 this.totalQuantity = 0;
                 this.selectedProducts = [];
-                this.scrollToTop();
                 this.showSuccess("Success! Ready for next customer.");
+                this.scrollToTop();
 
             } catch (error) {
                 this.showError(error);
