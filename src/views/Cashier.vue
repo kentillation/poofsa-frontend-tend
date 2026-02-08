@@ -160,7 +160,7 @@
 
                             <div class="payment-section d-flex">
                                 <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
-                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
+                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="table_number || eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
                                 <v-btn @click="openQrPayment" :disabled="!isOnline || isNotEwallet || eWalletPaid"
