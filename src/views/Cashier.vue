@@ -42,8 +42,8 @@
                                 {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }}
                             </span>&nbsp;
                         </template>
-                        <template v-slot:item.product_price="{ item }">
-                            <span class="small">₱{{ item.product_price }}</span>
+                        <template v-slot:item.base_price="{ item }">
+                            <span class="small">₱{{ item.base_price }}</span>
                         </template>
                     </v-data-table>
                     <v-container v-else class="text-center">
@@ -65,7 +65,7 @@
                                         <span>
                                             {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{
                                                 item.quantity }}</span>
-                                        <span>&nbsp;&nbsp;₱{{ item.product_price }}</span>
+                                        <span>&nbsp;&nbsp;₱{{ item.base_price }}</span>
                                     </div>
                                 </template>
                                 <template v-slot:item.actions="{ item }">
@@ -88,12 +88,12 @@
                         <v-col cols="12">
                             <h3>Payment Section</h3>
                             <div class="payment-section mt-3">
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_charge"
+                                <v-text-field class="payment-section-item me-2 mt-2" v-model="subtotal"
                                     label="Sub total" variant="outlined" density="compact" type="number"
                                     :model-value="subTotal.toFixed(2)" prepend-inner-icon="mdi-cash" readonly />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="total_due"
-                                    label="Total due" variant="outlined" density="compact" type="number"
+                                <v-text-field class="payment-section-item me-2 mt-2" v-model="total_amount"
+                                    label="Total amount" variant="outlined" density="compact" type="number"
                                     :model-value="discountedSubtotal.toFixed(2)" prepend-inner-icon="mdi-cash"
                                     readonly />
 
@@ -121,10 +121,10 @@
                                     label="Change" variant="outlined" density="compact" :model-value="customerChange"
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_discount"
+                                <v-text-field class="payment-section-item me-2 mt-2" v-model.number="discount_amount"
                                     variant="outlined" density="compact" type="number" :rules="[v => !!v || 'Required']"
                                     prepend-inner-icon="mdi-cash-minus"
-                                    @input="e => customer_discount = e.target.value.replace(/[^0-9.]/g, '')"
+                                    @input="e => discount_amount = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric">
                                     <template #label>
                                         <span class="required-asterisk">*</span> Discount (₱)
@@ -159,7 +159,7 @@
                             </div>
 
                             <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_mode_id" variant="outlined"
+                                <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
                                     density="compact" prepend-inner-icon="mdi-cash" :disabled="!table_number || eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
@@ -176,7 +176,7 @@
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
                                     append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid || loading ||
-                                        (payment_mode_id === 2 && !eWalletPaid) ||
+                                        (payment_method_id === 2 && !eWalletPaid) ||
                                         Number(customer_cash) < subTotal ||
                                         Number(customer_change) < 0 ||
                                         subTotal <= 0 || !isOnline">
@@ -392,15 +392,15 @@ export default {
             onStatusUpdateCallback: null,
             referenceNumber: '',
             total_quantity: '',
-            customer_charge: null,
-            total_due: 0,
+            subtotal: null,
+            total_amount: 0,
             order_type_id: 1,
             order_type_charge: '0',
             customer_cash: '',
             customer_change: '0',
-            customer_discount: '0',
+            discount_amount: '0',
             computed_discount: null,
-            payment_mode_id: 1,
+            payment_method_id: 1,
             table_number: null,
             customer_name: '-',
             order_note: '-',
@@ -430,7 +430,7 @@ export default {
             loading: false,
             headersDisplay: [
                 { title: '', value: 'product_name' },
-                { title: '', value: 'product_price' },
+                { title: '', value: 'base_price' },
             ],
             headersSelected: [
                 { title: '', value: 'product_name', width: '50%' },
@@ -442,7 +442,7 @@ export default {
             ],
             headersOrderDetails: [
                 { title: '______PRODUCT_NAME______', value: 'product_name' },
-                { title: 'Price', value: 'product_price' },
+                { title: 'Price', value: 'base_price' },
                 { title: 'Subtotal', value: 'subtotal' },
             ],
         };
@@ -498,11 +498,11 @@ export default {
         selectedProducts: {
             handler() {
                 if (this.order_type_charge && Number(this.order_type_charge) !== 0) {
-                    this.customer_charge = Number(this.subTotal) + Number(this.order_type_charge);
+                    this.subtotal = Number(this.subTotal) + Number(this.order_type_charge);
                 } else {
-                    this.customer_charge = Number(this.subTotal);
+                    this.subtotal = Number(this.subTotal);
                 }
-                this.total_due = this.discountedSubtotal.toFixed(2);
+                this.total_amount = this.discountedSubtotal.toFixed(2);
             },
             deep: true
         },
@@ -518,10 +518,10 @@ export default {
             }
         },
 
-        customer_discount() {
-            this.total_due = Number(this.discountedSubtotal.toFixed(2));
+        discount_amount() {
+            this.total_amount = Number(this.discountedSubtotal.toFixed(2));
             if (this.customer_cash) {
-                const change = parseFloat(this.customer_cash) - parseFloat(this.total_due);
+                const change = parseFloat(this.customer_cash) - parseFloat(this.total_amount);
                 this.customer_change = change.toFixed(2);
             }
         },
@@ -573,7 +573,7 @@ export default {
         },
 
         isNotEwallet() {
-            return Number(this.payment_mode_id) !== 2;
+            return Number(this.payment_method_id) !== 2;
         },
 
         filteredProducts() {
@@ -590,7 +590,7 @@ export default {
         },
 
         subTotal() {
-            const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.product_price * p.quantity), 0);
+            const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
             const charge = Number(this.order_type_charge) || 0;
             return baseTotal + (charge !== 0 ? charge : 0);
         },
@@ -625,16 +625,16 @@ export default {
 
         totalOrderAmount() {
             return Array.isArray(this.orderDetails)
-                ? this.orderDetails.reduce((sum, item) => sum + (item.product_price * item.quantity || 0), 0)
+                ? this.orderDetails.reduce((sum, item) => sum + (item.base_price * item.quantity || 0), 0)
                 : 0;
         },
 
         discountedSubtotal() {
             let subtotal = this.subTotal;
-            if (!this.customer_discount || isNaN(this.customer_discount) || this.customer_discount <= 0) {
+            if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
                 return subtotal;
             }
-            return subtotal - parseFloat(this.customer_discount);
+            return subtotal - parseFloat(this.discount_amount);
         },
 
     },
@@ -799,7 +799,7 @@ export default {
         },
 
         selectProduct(product) {
-            if (!product || !product.product_name || !product.product_price) {
+            if (!product || !product.product_name || !product.base_price) {
                 console.error("Product data is missing!", product);
                 return;
             }
@@ -849,7 +849,7 @@ export default {
                 return;
             }
 
-            if (this.payment_mode_id !== 2) {
+            if (this.payment_method_id !== 2) {
                 this.showError("Please select e-Wallet payment.");
                 return;
             }
@@ -1002,7 +1002,7 @@ export default {
                     return;
                 }
 
-                if (Number(this.payment_mode_id) === 2) {
+                if (Number(this.payment_method_id) === 2) {
                     if (!this.eWalletPaid) {
                         this.showError('Please complete e-Wallet payment first');
                         this.loadingStore.hide();
@@ -1017,20 +1017,19 @@ export default {
                     return;
                 }
 
-                this.computed_discount = this.subTotal * (this.customer_discount / 100);
+                this.computed_discount = this.subTotal * (this.discount_amount / 100);
 
                 const formData = new FormData();
                 formData.append("transactions[0][reference_number]", refNumber);
                 formData.append("transactions[0][total_quantity]", this.totalQuantity);
-                formData.append("transactions[0][customer_charge]", parseFloat(this.subTotal) || 0);
-                formData.append("transactions[0][total_due]", parseFloat(this.discountedSubtotal) || 0);
+                formData.append("transactions[0][total_amount]", parseFloat(this.discountedSubtotal) || 0);
+                formData.append("transactions[0][subtotal]", parseFloat(this.subTotal) || 0);
                 formData.append("transactions[0][order_type_id]", Number(this.order_type_id));
                 formData.append("transactions[0][order_type_charge]", parseFloat(this.order_type_charge) || 0);
                 formData.append("transactions[0][customer_cash]", parseFloat(this.customer_cash) || 0);
                 formData.append("transactions[0][customer_change]", parseFloat(this.customer_change) || 0);
-                formData.append("transactions[0][customer_discount]", Number(this.customer_discount));
-                formData.append("transactions[0][computed_discount]", this.computed_discount);
-                formData.append("transactions[0][payment_mode_id]", Number(this.payment_mode_id));
+                formData.append("transactions[0][discount_amount]", this.computed_discount);
+                formData.append("transactions[0][payment_method_id]", Number(this.payment_method_id));
                 formData.append("transactions[0][table_number]", Number(this.table_number));
                 formData.append("transactions[0][customer_name]", this.customer_name);
                 formData.append("transactions[0][order_note]", this.order_note);
@@ -1079,7 +1078,7 @@ export default {
             return {
                 ...order,
                 product_name: order.product_name || '',
-                product_price: order.product_price ? parseFloat(order.product_price) : 0,
+                base_price: order.base_price ? parseFloat(order.base_price) : 0,
                 subtotal: order.subtotal ? parseFloat(order.subtotal) : 0,
                 quantity: order.quantity ? parseInt(order.quantity, 10) : 0,
                 temp_label: order.temp_label || '',
@@ -1113,9 +1112,9 @@ export default {
             this.order_type_charge = '0';
             this.customer_cash = '';
             this.customer_change = '0';
-            this.customer_discount = '0';
+            this.discount_amount = '0';
             this.computed_discount = null;
-            this.payment_mode_id = 1;
+            this.payment_method_id = 1;
             this.table_number = null;
             this.customer_name = '-';
             this.order_note = '-';

@@ -66,17 +66,17 @@ import GlobalLoader from '@/components/GlobalLoader.vue';
 
 export default {
   name: 'App',
+
   data() {
     return {
       stocks: [],
     }
   },
+
   components: {
     GlobalLoader,
   },
-  async mounted() {
-    await this.fetchLowStocks();
-  },
+
   setup() {
     const authStore = useAuthStore();
     const stocksStore = useStocksStore();
@@ -166,6 +166,7 @@ export default {
       isNotFoundPage,
     };
   },
+
   computed: {
     ...mapState(useStocksStore, ['stockNotificationQty']),
     showSidebar() {
@@ -175,6 +176,7 @@ export default {
       return this.$route.name !== 'LoginPage' && this.$route.name !== 'Reference' && !this.isNotFoundPage;
     },
   },
+
   methods: {
     toCashier() {
       this.$router.push('/cashier');
@@ -194,19 +196,6 @@ export default {
     },
     toAbout() {
       this.$router.push('/about');
-    },
-
-    async fetchLowStocks() {
-      try {
-        if (!this.authStore.branchId) {
-          console.error('Error fetching low stocks!');
-          this.stocks = [];
-          return;
-        }
-        await this.stocksStore.fetchLowStocksStore(this.authStore.branchId);
-      } catch (error) {
-        console.error('Error fetching stocks:', error);
-      }
     },
   }
 };
