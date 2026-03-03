@@ -70,14 +70,14 @@
                                 </template>
                                 <template v-slot:item.actions="{ item }">
                                     <v-btn @click="minusQuan(item)" color="#0090b6" class="mini-btn ms-3"
-                                        variant="tonal">
+                                        variant="flat">
                                         <v-icon>mdi-minus</v-icon>
                                     </v-btn>
-                                    <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="tonal">
+                                    <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
                                         <v-icon>mdi-plus</v-icon>
                                     </v-btn>
                                     <v-btn @click="removeProduct(item)" color="#ff0d0d" class="mini-btn"
-                                        variant="tonal">
+                                        variant="flat">
                                         <v-icon>mdi-delete</v-icon>
                                     </v-btn>
                                 </template>
@@ -419,7 +419,6 @@ export default {
 
             // Orders
             orders: [],
-            order_statuses: [],
             orderDetails: [],
             loadingCurrentOrders: false,
             viewOrderDialog: false,
@@ -642,9 +641,13 @@ export default {
     },
 
     async mounted() {
-        this.reloadData();
-        window.addEventListener('online', this.onOnline);
-        window.addEventListener('offline', this.onOffline);
+        await Promise.all([
+            this.fetchProducts(),
+            this.fetchCurrentOrders(),
+            this.fetchCategories(),
+            window.addEventListener('online', this.onOnline),
+            window.addEventListener('offline', this.onOffline)
+        ]);
     },
 
     methods: {
@@ -695,13 +698,9 @@ export default {
         },
 
         async reloadData() {
-            this.loadingStore.show("");
-            this.fetchProducts();
-            this.fetchCurrentOrders();
-            this.lowStockAlert();
-            this.updateFromBarista();
-            this.updateFromKitchen();
-            this.loadingStore.hide();
+            this.products = this.productsStore.products;
+            this.categories = this.productsStore.categories;
+            this.orders = this.transactStore.currentOrders;
         },
 
         async generateReferenceNumber() {
@@ -722,18 +721,17 @@ export default {
             }
         },
 
-        async fetchOrderStatus() {
-            try {
-                await this.transactStore.fetchAllOrderStatusStore();
-                this.order_statuses = this.transactStore.orderStatuses;
-            } catch (error) {
-                console.error('Error fetching order status:', error);
-                this.showError("Error fetching order status!");
-            }
-        },
+        // async fetchOrderStatus() {
+        //     try {
+        //         await this.transactStore.fetchAllOrderStatusStore();
+        //         this.order_statuses = this.transactStore.orderStatuses;
+        //     } catch (error) {
+        //         console.error('Error fetching order status:', error);
+        //         this.showError("Error fetching order status!");
+        //     }
+        // },
 
         async fetchCurrentOrders() {
-            this.fetchOrderStatus();
             this.loadingCurrentOrders = true;
             try {
                 await this.transactStore.fetchAllCurrentOrdersStore();
@@ -753,7 +751,6 @@ export default {
             try {
                 await this.productsStore.fetchAllCategoriesStore();
                 this.categories = this.productsStore.categories;
-                this.loadingCategories = false;
             } catch (error) {
                 console.error('Error fetching categories:', error);
                 this.showError("Error fetching categories!");
@@ -765,22 +762,17 @@ export default {
         },
 
         reloadProducts() {
-            this.loadingStore.show("");
-            this.fetchProducts();
-            this.loadingStore.hide();
+            this.products = this.productsStore.products;
+            this.categories = this.productsStore.categories;
         },
 
         reloadCategories() {
-            this.categoriesDialog = false;
-            this.loadingStore.show("");
-            this.fetchCategories();
-            this.loadingStore.hide();
-            this.categoriesDialog = true;
+            this.categories = this.productsStore.categories;
         },
 
         showCategoriesDialog() {
             this.categoriesDialog = true;
-            this.fetchCategories();
+            this.categories = this.productsStore.categories;
         },
 
         handleCategorySelect(category) {
@@ -1038,12 +1030,19 @@ export default {
 
                 await this.transactStore.submitTransactStore(formData);
 
-                this.fetchCurrentOrders();
                 this.$refs.transactionForm.reset();
-                this.resetPaymentSection();
                 this.subTotal = 0;
                 this.totalQuantity = 0;
                 this.selectedProducts = [];
+
+                await Promise.all([
+                    this.fetchProducts(),
+                    this.fetchCurrentOrders(),
+                    this.fetchCategories(),
+                    this.resetPaymentSection(),
+
+                ]);
+                
                 this.showSuccess("Success! Ready for next customer.");
                 this.scrollToTop();
 
@@ -1066,8 +1065,7 @@ export default {
 
         closeSelectedCategory() {
             this.selectedCategory = '';
-            this.products = [];
-            this.fetchProducts();
+            this.products = this.productsStore.products;
         },
 
         formatOrder(order) {
