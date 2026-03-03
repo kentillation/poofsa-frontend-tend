@@ -11,9 +11,9 @@ export const usePaymentStore = defineStore("payment", {
     paymentStatus: null,
     paymentDetails: null,
 
-    pollInterval: null,
-    maxPollAttempts: 60, // 3 minutes at 3s intervals
-    pollAttempts: 0,
+    pollingInterval: null,
+    maxPollingAttempts: 60, // 3 minutes at 3s intervals
+    pollingAttempts: 0,
     isPollingActive: false,
 
     // Callback handlers
@@ -22,30 +22,80 @@ export const usePaymentStore = defineStore("payment", {
   }),
 
   actions: {
-    async generateQrPh(amount, referenceNumber) {
+
+    async generateQRPhCodeStore(amountToPay, selectedEWallet, referenceNumber) {
+      if (!amountToPay || !selectedEWallet || !referenceNumber) return;
+
       this.resetPaymentState();
+
       this.loading = true;
 
       try {
-        const res = await EWALLET_PAYMENT_API.generateQrApi(
-          amount,
-          "qrph",
+        const response = await EWALLET_PAYMENT_API.generateQRPhCodeApi(
+          amountToPay,
+          selectedEWallet,
           referenceNumber
         );
 
-        this.qrData = res;
-        this.paymentIntentId = res.payment_intent_id;
+        this.qrData = response;
+        this.paymentIntentId = response.payment_intent_id;
 
         if (this.paymentIntentId) {
           this.startPaymentPolling(this.paymentIntentId);
         }
 
-        return res;
+        return response;
       } catch (err) {
         this.error = err?.response?.data?.message || "Failed to generate QR";
         throw err;
       } finally {
         this.loading = false;
+      }
+    },
+
+    async startPaymentPolling(paymentIntentId) {
+      if (!paymentIntentId) return;
+
+      const stopPolling = await this.stopPaymentPolling();
+
+      this.isPollingActive = true;
+      this.pollingAttempts = 0;
+
+      this.pollingInterval = setInterval(async () => {
+        if (this.pollingAttempts >= this.maxPollingAttempts) {
+          this.isPollingActive = false;
+          stopPolling;
+          return;
+        }
+
+        this.pollingAttempts++;
+
+        const statusResult = await this.checkPaymentStatus(paymentIntentId);
+
+        // Trigger status update callback
+        if (this._onStatusUpdate) this._onStatusUpdate(statusResult);
+
+        // Stop polling if payment is complete
+        if (this.isPaymentComplete) {
+          stopPolling;
+          this.isPollingActive = this.isPaid;
+
+          // Trigger success callback if paid
+          if (this.isPaid && this._onPaymentSuccess) {
+            this._onPaymentSuccess(this.paymentDetails);
+          }
+        }
+      }, 3000);
+    },
+
+    async stopPaymentPolling() {
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval);
+        this.pollingInterval = null;
+      }
+      
+      if (this.paymentStatus !== 'succeeded') {
+        this.isPollingActive = false;
       }
     },
 
@@ -68,59 +118,6 @@ export const usePaymentStore = defineStore("payment", {
       }
     },
 
-    startPaymentPolling(intentId) {
-      if (!intentId) return;
-      this.stopPaymentPolling();
-      this.isPollingActive = true;
-      this.pollAttempts = 0;
-
-      this.pollInterval = setInterval(async () => {
-        if (this.pollAttempts >= this.maxPollAttempts) {
-          this.isPollingActive = false;
-          this.stopPaymentPolling();
-          return;
-        }
-
-        this.pollAttempts++;
-        const statusResult = await this.checkPaymentStatus(intentId);
-
-        // Trigger status update callback
-        if (this._onStatusUpdate) this._onStatusUpdate(statusResult);
-
-        // Stop polling if payment is complete
-        if (this.isPaymentComplete) {
-          this.stopPaymentPolling();
-          this.isPollingActive = this.isPaid;
-
-          // Trigger success callback if paid
-          if (this.isPaid && this._onPaymentSuccess) {
-            this._onPaymentSuccess(this.paymentDetails);
-          }
-        }
-      }, 3000);
-    },
-
-    stopPaymentPolling() {
-      if (this.pollInterval) {
-        clearInterval(this.pollInterval);
-        this.pollInterval = null;
-      }
-      
-      if (this.paymentStatus !== 'succeeded') {
-        this.isPollingActive = false;
-      }
-    },
-
-    resetPaymentState() {
-      this.qrData = null;
-      this.paymentIntentId = null;
-      this.paymentStatus = null;
-      this.paymentDetails = null;
-      this.error = null;
-      this.pollAttempts = 0;
-      this.stopPaymentPolling();
-    },
-
     // Setters for callbacks
     setStatusUpdateCallback(callback) {
       this._onStatusUpdate = callback;
@@ -129,6 +126,17 @@ export const usePaymentStore = defineStore("payment", {
     setPaymentSuccessCallback(callback) {
       this._onPaymentSuccess = callback;
     },
+
+    resetPaymentState() {
+      this.qrData = null;
+      this.paymentIntentId = null;
+      this.paymentStatus = null;
+      this.paymentDetails = null;
+      this.error = null;
+      this.pollingAttempts = 0;
+      this.stopPaymentPolling();
+    },
+
   },
 
   getters: {

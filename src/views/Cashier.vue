@@ -163,7 +163,7 @@
                                     density="compact" prepend-inner-icon="mdi-cash" :disabled="!table_number || eWalletPaid"
                                     :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
-                                <v-btn @click="generateQRCode" :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
+                                <v-btn @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn me-2 mt-2">Generate
                                     QR</v-btn>
@@ -257,7 +257,7 @@
                 </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
                     <div class="d-flex flex-column w-100 mb-2" style="gap: 10px;">
-                        <v-btn @click="generateQRCode" :disabled="paymentStore.loading" class="ewallet-btn regenerate w-100"
+                        <v-btn @click="generateQRPhCode" :disabled="paymentStore.loading" class="ewallet-btn regenerate w-100"
                             height="48">
                             <v-icon start>mdi-qrcode</v-icon>
                             Regenerate QR
@@ -837,7 +837,7 @@ export default {
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         },
 
-        async generateQRCode() {
+        async generateQRPhCode() {
 
             if (!this.isOnline) {
                 this.showError("No internet connection. Unable to generate QR.");
@@ -859,7 +859,6 @@ export default {
                 return;
             }
 
-            this.selectedEwalletOption = 'qrph';
             this.eWalletImgSrc = null;
             this.eWalletDialog = true;
 
@@ -867,14 +866,19 @@ export default {
                 this.setupPaymentCallbacks();
 
                 const referenceNumber = await this.generateReferenceNumber();
-                await this.paymentStore.generateQrPh(
-                    this.discountedSubtotal,
+                
+                const amountToPay = this.discountedSubtotal;
+
+                const selectedEWallet = this.selectedEwalletOption;
+
+                await this.paymentStore.generateQRPhCodeStore(
+                    amountToPay,
+                    selectedEWallet,
                     referenceNumber
                 );
                 this.referenceNumber = referenceNumber;
-
+                this.customer_cash = amountToPay;
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-                this.customer_cash = this.discountedSubtotal;
                 this.startQrTimer();
 
             } catch (err) {

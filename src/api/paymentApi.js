@@ -3,14 +3,14 @@ import apiClient from "../axios";
 
 export const EWALLET_PAYMENT_API = {
   ENDPOINTS: {
+    GENERATE_QR: "/paymongo/generate-qr",
     CREATE_PAYMENT_INTENT: "/paymongo/payment-intents",
     ATTACH_PAYMENT_METHOD: "/paymongo/payment-intents/attach",
-    GENERATE_QR: "/paymongo/generate-qr",
     CHECK_STATUS: "/paymongo/payment-intents/:intentId/status",
     WEBHOOK: "/paymongo/webhook",
   },
 
-  async generateQrApi(amount, walletType, referenceNumber) {
+  async generateQRPhCodeApi(amount, walletType, referenceNumber) {
     try {
       const response = await apiClient.post(this.ENDPOINTS.GENERATE_QR, {
         amount: amount,
