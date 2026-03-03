@@ -56,36 +56,49 @@ export const usePaymentStore = defineStore("payment", {
     async startPaymentPolling(paymentIntentId) {
       if (!paymentIntentId) return;
 
-      const stopPolling = await this.stopPaymentPolling();
+      await this.stopPaymentPolling();
 
       this.isPollingActive = true;
       this.pollingAttempts = 0;
 
-      this.pollingInterval = setInterval(async () => {
+      const poll = async () => {
+        if (!this.isPollingActive) return;
+
         if (this.pollingAttempts >= this.maxPollingAttempts) {
           this.isPollingActive = false;
-          stopPolling;
           return;
         }
 
         this.pollingAttempts++;
 
-        const statusResult = await this.checkPaymentStatus(paymentIntentId);
+        try {
+          const statusResult = await this.checkPaymentStatus(paymentIntentId);
 
-        // Trigger status update callback
-        if (this._onStatusUpdate) this._onStatusUpdate(statusResult);
-
-        // Stop polling if payment is complete
-        if (this.isPaymentComplete) {
-          stopPolling;
-          this.isPollingActive = this.isPaid;
-
-          // Trigger success callback if paid
-          if (this.isPaid && this._onPaymentSuccess) {
-            this._onPaymentSuccess(this.paymentDetails);
+          if (this._onStatusUpdate) {
+            this._onStatusUpdate(statusResult);
           }
+
+          if (this.isPaymentComplete) {
+            this.isPollingActive = false;
+
+            if (this.isPaid && this._onPaymentSuccess) {
+              this._onPaymentSuccess(this.paymentDetails);
+            }
+
+            return; // STOP polling
+          }
+
+        } catch (error) {
+          console.error("Polling error:", error);
         }
-      }, 3000);
+
+        // Schedule next poll ONLY after request finishes
+        if (this.isPollingActive) {
+          this.pollingTimeout = setTimeout(poll, 1000);
+        }
+      };
+
+      poll();
     },
 
     async stopPaymentPolling() {
@@ -93,7 +106,7 @@ export const usePaymentStore = defineStore("payment", {
         clearInterval(this.pollingInterval);
         this.pollingInterval = null;
       }
-      
+
       if (this.paymentStatus !== 'succeeded') {
         this.isPollingActive = false;
       }

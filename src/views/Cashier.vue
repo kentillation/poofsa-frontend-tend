@@ -305,11 +305,12 @@
                     </div>
 
                     <!-- Show payment status -->
-                    <div v-if="paymentStore.paymentStatus" class="payment-status w-100">
+                    <div class="payment-status w-100">
                         <v-alert v-if="paymentStore.isPollingActive || eWalletPaid" :type="paymentStatusType"
                             variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
                             <div class="d-flex align-center justify-space-between">
-                                <span> {{ paymentStatusText }}</span>
+                                <span v-if="!paymentStatus">Waiting for Payment</span>
+                                <span v-else>{{ paymentStatusText }}</span>
                                 <v-progress-circular v-if="paymentStore.isPollingActive && !eWalletPaid"
                                     indeterminate size="20" width="2"></v-progress-circular>
                                 <v-icon v-else-if="eWalletPaid" color="success">mdi-check-circle</v-icon>
@@ -553,7 +554,8 @@ export default {
             if (status === 'awaiting_next_action') return 'warning';
             if (status === 'succeeded') return 'success';
             if (status === 'failed' || status === 'cancelled' || status === 'error') return 'error';
-            return 'info';
+            return 'warning';
+            // return 'info';
         },
 
         paymentStatusText() {
@@ -987,13 +989,6 @@ export default {
 
         closeEwalletDialog() {
             this.eWalletDialog = false;
-            this.eWalletImgSrc = null;
-            this.eWalletPaid = false;
-            this.paymentIntentId = null;
-            this.selectedEwalletOption = '';
-            this.paymentStore._onStatusUpdate = null;
-            this.paymentStore._onPaymentSuccess = null;
-            this.paymentStore.stopPaymentPolling();
             this.paymentStore.resetPaymentState();
         },
 
