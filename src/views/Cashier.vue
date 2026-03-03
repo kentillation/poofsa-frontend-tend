@@ -926,15 +926,11 @@ export default {
 
                 case 'succeeded':
                     this.eWalletPaid = true;
-
                     this.showSuccess("e-Wallet payment received successfully!");
-
                     setTimeout(() => {
                         this.closeEwalletDialog();
-                    }, 1500);
-
+                    }, 1000);
                     this.submitForm();
-                    
                     break;
 
                 case 'failed':
@@ -968,7 +964,7 @@ export default {
                     this.updateQrTimerDisplay();
                 } else {
                     this.stopQrTimer();
-                    this.showError("QR expired. Regenerate again!");
+                    this.showError("QR expired. You can regenerate again!");
                     this.closeEwalletDialog();
                 }
             }, 1000);
@@ -989,6 +985,7 @@ export default {
 
         closeEwalletDialog() {
             this.eWalletDialog = false;
+            this.stopQrTimer();
             this.paymentStore.resetPaymentState();
         },
 
