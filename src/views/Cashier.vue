@@ -1,11 +1,32 @@
 <template>
+    
     <v-container>
-        <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
+        <!-- <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
             <v-icon>mdi-refresh</v-icon>
-        </v-btn>
+        </v-btn> -->
+
+        <div class="payment-indication pa-2 text-white">
+            <h3 class="me-13 text-white">Quantity: <span>{{ totalQuantity }}</span></h3>
+            <h3 class="ms-15 text-white">Charge: ₱ <span>{{ subTotal.toFixed() }}</span></h3>
+        </div>
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <v-row>
                 <!-- Main Section -->
+                <v-container class="image-section">
+                    <!-- Products -->
+                    <div v-for="product in this.products" :key="product.id" @click="selectProduct(product)"
+                        class="image-section-item">
+                        <v-card class="product-card">
+                            <v-img :src="WTFImgSrc"></v-img>
+                            <div class="mt-2">
+                                <p style="font-size: 14px;" class="text-truncate">{{ product.product_name }}</p>
+                                <p style="font-size: 14px;">{{ product.temp_label }} {{ product.size_label }}</p>
+                                <p><strong>₱ {{ product.base_price }}</strong></p>
+                            </div>
+                        </v-card>
+                    </div>
+                </v-container>
+
                 <v-col cols="12" lg="6" md="6" sm="12" xs="12">
                     <div class="d-flex align-items-center flex-column">
                         <div class="indication pa-2 text-white">
@@ -76,8 +97,7 @@
                                     <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
                                         <v-icon>mdi-plus</v-icon>
                                     </v-btn>
-                                    <v-btn @click="removeProduct(item)" color="#ff0d0d" class="mini-btn"
-                                        variant="flat">
+                                    <v-btn @click="removeProduct(item)" color="#ff0d0d" class="mini-btn" variant="flat">
                                         <v-icon>mdi-delete</v-icon>
                                     </v-btn>
                                 </template>
@@ -160,10 +180,12 @@
 
                             <div class="payment-section d-flex">
                                 <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
-                                    density="compact" prepend-inner-icon="mdi-cash" :disabled="!table_number || eWalletPaid"
-                                    :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
+                                    density="compact" prepend-inner-icon="mdi-cash"
+                                    :disabled="!table_number || eWalletPaid" :items="paymentModeItems"
+                                    item-title="paymentmode_label" item-value="paymentmode_id"
                                     label="Mode of payment" />
-                                <v-btn @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
+                                <v-btn @click="generateQRPhCode"
+                                    :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
                                     prepend-icon="mdi-qrcode" height="37" color="green"
                                     class="ewallet-btn me-2 mt-2">Generate
                                     QR</v-btn>
@@ -171,7 +193,8 @@
 
                             <div class="d-flex justify-end me-2 ms-1">
                                 <v-btn class="bg-red-lighten-2 d-flex w-50 py-6 mt-3" variant="flat"
-                                    prepend-icon="mdi-refresh" @click="resetPaymentSection" :disabled="loading || eWalletPaid">
+                                    prepend-icon="mdi-refresh" @click="resetPaymentSection"
+                                    :disabled="loading || eWalletPaid">
                                     Reset
                                 </v-btn>&nbsp;
                                 <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
@@ -257,8 +280,8 @@
                 </v-btn>
                 <v-card class="d-flex flex-column align-center pa-6">
                     <div class="d-flex flex-column w-100 mb-2" style="gap: 10px;">
-                        <v-btn @click="generateQRPhCode" :disabled="paymentStore.loading" class="ewallet-btn regenerate w-100"
-                            height="48">
+                        <v-btn @click="generateQRPhCode" :disabled="paymentStore.loading"
+                            class="ewallet-btn regenerate w-100" height="48">
                             <v-icon start>mdi-qrcode</v-icon>
                             Regenerate QR
                         </v-btn>
@@ -290,7 +313,7 @@
                             </p>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
                             <!-- <v-chip @click="downloadQR" color="#0090b6" size="small" variant="flat" prepend-icon="mdi-download">Download QR</v-chip> -->
-                            <p class="text-center mt-2" >
+                            <p class="text-center mt-2">
                                 QR will expire in {{ qrTimerDisplay }}
                             </p>
                         </div>
@@ -311,8 +334,8 @@
                             <div class="d-flex align-center justify-space-between">
                                 <span v-if="!paymentStatus">Waiting for Payment</span>
                                 <span v-else>{{ paymentStatusText }}</span>
-                                <v-progress-circular v-if="paymentStore.isPollingActive && !eWalletPaid"
-                                    indeterminate size="20" width="2"></v-progress-circular>
+                                <v-progress-circular v-if="paymentStore.isPollingActive && !eWalletPaid" indeterminate
+                                    size="20" width="2"></v-progress-circular>
                                 <v-icon v-else-if="eWalletPaid" color="success">mdi-check-circle</v-icon>
                             </div>
                         </v-alert>
@@ -345,7 +368,7 @@ import ViewOrder from './ViewOrder.vue';
 import echo from '@/resources/js/echo';
 import Snackbar from '@/components/Snackbar.vue';
 import Alert from '@/components/Alert.vue';
-import WTFImage from '@/assets/img/jpg/features/WTF.jpg';
+// import WTFImage from '@/assets/img/jpg/features/WTF.jpg';
 
 
 export default {
@@ -415,7 +438,7 @@ export default {
                 { paymentmode_id: 1, paymentmode_label: 'Cash' },
                 { paymentmode_id: 2, paymentmode_label: 'e-Wallet' },
             ],
-            WTFImgSrc: WTFImage,
+            WTFImgSrc: require('@/assets/img/jpg/features/WTF.jpg'),
 
             // Orders
             orders: [],
@@ -643,8 +666,8 @@ export default {
     async mounted() {
         await Promise.all([
             this.fetchProducts(),
-            this.fetchCurrentOrders(),
-            this.fetchCategories(),
+            // this.fetchCurrentOrders(),
+            // this.fetchCategories(),
             window.addEventListener('online', this.onOnline),
             window.addEventListener('offline', this.onOffline)
         ]);
@@ -660,8 +683,8 @@ export default {
 
             // If payment not yet completed
             if (!this.eWalletPaid && this.eWalletDialog) {
-            this.showError("Internet connection disconnected.");
-            this.closeEwalletDialog();
+                this.showError("Internet connection disconnected.");
+                this.closeEwalletDialog();
             }
         },
 
@@ -860,7 +883,7 @@ export default {
                 this.setupPaymentCallbacks();
 
                 const referenceNumber = await this.generateReferenceNumber();
-                
+
                 const amountToPay = this.discountedSubtotal;
 
                 const selectedEWallet = this.selectedEwalletOption;
@@ -1042,7 +1065,7 @@ export default {
                     this.resetPaymentSection(),
 
                 ]);
-                
+
                 this.showSuccess("Success! Ready for next customer.");
                 this.scrollToTop();
 
@@ -1203,6 +1226,19 @@ export default {
     background: #696969;
 }
 
+.v-container div.payment-indication {
+    position: fixed;
+    bottom: 20px;
+    height: 70px;
+    width: 90%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px !important;
+    background-color: #0090b6;
+}
+
 .mini-btn {
     font-size: 15px;
     width: 35px !important;
@@ -1221,6 +1257,40 @@ export default {
 
 .payment-section-item {
     width: 200px;
+}
+
+
+.image-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.image-section-item {
+    width: 185px;
+    min-width: 100px;
+}
+
+.image-section .v-card {
+    margin: 5px;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.image-section .v-card:hover {
+    background-color: rgb(228, 243, 255) !important;
+    transition: 0.5s ease;
+}
+
+.image-section .v-img {
+    border-radius: 10px;
+}
+
+.text-truncate {
+    width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .v-input__details {
