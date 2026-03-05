@@ -4,16 +4,36 @@
             <v-icon>mdi-refresh</v-icon>
         </v-btn> -->
 
-        <!-- <div class="payment-indication pa-2 text-white">
-            <h3 class="me-13 text-white">Quantity: <span>{{ totalQuantity }}</span></h3>
-            <h3 class="ms-15 text-white">Charge: ₱ <span>{{ subTotal.toFixed() }}</span></h3>
-        </div> -->
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
-            <v-row>
-                <!-- Main Section -->
-                <v-container class="image-section">
-                    <!-- Products -->
-                    <div v-for="product in this.products" :key="product.id" @click="selectProduct(product)"
+
+            
+            <v-container>
+                <!-- Search Products -->
+                <div class="d-flex align-items-center flex-column">
+                    <div class="d-flex align-items-center justify-content-center mt-2">
+                        <v-text-field v-model="searchProduct" class="find-product-input w-75" placeholder="Search product..."
+                            density="compact">
+                        </v-text-field>
+                        <div class="d-flex justify-center mt-10" style="z-index: 1;">
+                            <template v-if="this.selectedCategory">
+                                <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 105px;"
+                                    size="small">
+                                    {{ this.selectedCategory }}
+                                </v-chip>
+                                <v-icon @click="closeSelectedCategory" class="position-absolute" style="top: 95px;">
+                                    mdi-close</v-icon>
+                            </template>
+                        </div>
+                        <v-btn color="#0090b6" class="category-btn ms-2 d-flex align-items-center" variant="flat"
+                            @click="showCategoriesDialog" large>
+                            <v-icon>mdi-tune-variant</v-icon>
+                        </v-btn>
+                    </div>
+                </div>
+
+                <!-- Products -->
+                <div class="mt-3 image-section">
+                    <div v-for="product in this.filteredProducts" :key="product.id" @click="selectProduct(product)"
                         class="image-section-item">
                         <v-card class="product-card">
                             <v-img :src="WTFImgSrc"></v-img>
@@ -24,84 +44,39 @@
                             </div>
                         </v-card>
                     </div>
-                </v-container>
+                </div>
 
-                <v-col cols="12" lg="6" md="6" sm="12" xs="12">
-                    <div class="d-flex align-items-center flex-column">
-                        <div class="indication pa-2 text-white">
-                            <h3 class="me-13 text-white">Quantity: <span>{{ totalQuantity }}</span></h3>
-                            <h3 class="ms-15 text-white">Charge: ₱ <span>{{ subTotal.toFixed() }}</span></h3>
+                <!-- Selected Products -->
+                <h3 class="mt-5">Selected Products</h3>
+                <v-data-table :headers="headersSelected" :loading="loadingProducts" :items="selectedProducts"
+                    density="comfortable" height="400px">
+                    <!-- eslint-disable vue/valid-v-slot -->
+                    <template v-slot:item.product_name="{ item }">
+                        <div class="d-flex align-center justify-space-between">
+                            <span>
+                                {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{
+                                    item.quantity }}</span>
+                            <span>&nbsp;&nbsp;₱{{ item.base_price }}</span>
                         </div>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <v-text-field v-model="searchProduct" class="find-product-input w-75"
-                                placeholder="FIND PRODUCT..." density="compact">
-                            </v-text-field>
-                            <div class="d-flex justify-center mt-10" style="z-index: 1;">
-                                <template v-if="this.selectedCategory">
-                                    <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 105px;"
-                                        size="small">
-                                        {{ this.selectedCategory }}
-                                    </v-chip>
-                                    <v-icon @click="closeSelectedCategory" class="position-absolute" style="top: 95px;">
-                                        mdi-close</v-icon>
-                                </template>
-                            </div>
-                            <v-btn color="#0090b6" class="category-btn ms-2 d-flex align-items-center" variant="flat"
-                                @click="showCategoriesDialog" large>
-                                <v-icon>mdi-tune-variant</v-icon>
-                            </v-btn>
-                        </div>
-                    </div>
-                    <v-data-table v-if="this.products.length > 0" :headers="headersDisplay" :items="filteredProducts"
-                        :loading="loadingProducts" :items-per-page="-1" height="400px"
-                        @click:row="(event, { item }) => selectProduct(item)" density="comfortable"
-                        class="hover-table mt-2">
-                        <!-- eslint-disable vue/valid-v-slot -->
-                        <template v-slot:item.product_name="{ item }">
-                            <span class="small">
-                                {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }}
-                            </span>&nbsp;
-                        </template>
-                        <template v-slot:item.base_price="{ item }">
-                            <span class="small">₱{{ item.base_price }}</span>
-                        </template>
-                    </v-data-table>
-                    <v-container v-else class="text-center">
-                        <p style="font-size: 15px;">No available products. <span @click="reloadProducts"
-                                class="text-primary" style="cursor: pointer;">Tap to reload</span> </p>
-                    </v-container>
-                </v-col>
+                    </template>
+                    <template v-slot:item.actions="{ item }">
+                        <v-btn @click="minusQuan(item)" color="#0090b6" class="mini-btn ms-3" variant="flat">
+                            <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+                        <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
+                            <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                        <v-btn @click="removeProduct(item)" color="#ff0d0d" class="mini-btn" variant="flat">
+                            <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                    </template>
+                </v-data-table>
+            </v-container>
 
-                <!-- Selected & Payment Section -->
+            <!-- Payment Section -->
+            <v-row>
                 <v-col cols="12" lg="6" md="6" sm="12" xs="12">
                     <v-row>
-                        <!-- Selected Products -->
-                        <v-col cols="12">
-                            <h3>Selected Products</h3>
-                            <v-data-table :headers="headersSelected" :loading="loadingProducts"
-                                :items="selectedProducts" density="comfortable" height="400px">
-                                <template v-slot:item.product_name="{ item }">
-                                    <div class="d-flex align-center justify-space-between">
-                                        <span>
-                                            {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{
-                                                item.quantity }}</span>
-                                        <span>&nbsp;&nbsp;₱{{ item.base_price }}</span>
-                                    </div>
-                                </template>
-                                <template v-slot:item.actions="{ item }">
-                                    <v-btn @click="minusQuan(item)" color="#0090b6" class="mini-btn ms-3"
-                                        variant="flat">
-                                        <v-icon>mdi-minus</v-icon>
-                                    </v-btn>
-                                    <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
-                                        <v-icon>mdi-plus</v-icon>
-                                    </v-btn>
-                                    <v-btn @click="removeProduct(item)" color="#ff0d0d" class="mini-btn" variant="flat">
-                                        <v-icon>mdi-delete</v-icon>
-                                    </v-btn>
-                                </template>
-                            </v-data-table>
-                        </v-col>
 
                         <!--Payment Section  -->
                         <v-col cols="12">
@@ -141,7 +116,7 @@
                                     prepend-inner-icon="mdi-cash-refund" readonly />
 
                                 <v-text-field class="payment-section-item me-2 mt-2" v-model.number="discount_amount"
-                                    variant="outlined" density="compact" type="number" :rules="[v => !!v || 'Required']"
+                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
                                     prepend-inner-icon="mdi-cash-minus"
                                     @input="e => discount_amount = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric">
@@ -529,6 +504,14 @@ export default {
                 this.total_amount = this.discountedSubtotal.toFixed(2);
             },
             deep: true
+        },
+
+        totalQuantity(newValue) {
+            this.ordersStore.crrntTtlOrdrQntty = newValue;
+        },
+
+        discountedSubtotal(newValue) {
+            this.ordersStore.crrntTtlOrdrChrg = newValue;
         },
 
         customer_cash() {
@@ -1255,8 +1238,8 @@ export default {
 }
 
 .image-section-item {
-    width: 185px;
-    min-width: 100px;
+    width: 50%;
+    min-width: 140px;
 }
 
 .image-section .v-card {

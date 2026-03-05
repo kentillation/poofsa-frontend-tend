@@ -42,18 +42,20 @@
               Out</v-list-item>
           </v-list>
         </v-navigation-drawer>
+        <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
+          <div class="payment-indication" style="background-color: #a9a9a9;">
+            <h3 class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</h3>
+            <h3 class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</h3>
+          </div>
+          <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Place order</v-btn>
+        </div>
       </template>
       <v-layout>
         <router-view />
         <GlobalLoader />
       </v-layout>
     </v-main>
-    <div class="payment-indication-container" v-if="!isNotFoundPage">
-      <div class="payment-indication text-white">
-        <h3 class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</h3>
-        <h3 class="text-white">Charge: ₱0</h3>
-      </div>
-    </div>
+    
   </v-app>
 </template>
 
@@ -216,9 +218,14 @@ export default {
 
 .payment-indication-container {
     position: fixed;
-    bottom: 70px;
+    bottom: 20px;
     width: 100%;
     z-index: 1000;
+}
+
+.payment-indication-container .v-btn {
+  font-weight: normal !important;
+  font-size: 20px !important;
 }
 
 .payment-indication {
@@ -230,7 +237,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   border-radius: 8px !important;
-  background-color: #0090b6;
+  color: #fff
 }
 
 .payment-indication h3 {
