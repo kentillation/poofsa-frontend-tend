@@ -16,15 +16,12 @@
           <v-spacer></v-spacer>
 
           <v-btn icon>
-            <v-badge 
-              v-if="stockNotificationQty >= 1" 
-              :content="stockNotificationQty" 
-              class="position-absolute" 
-              style="top: 2px; right: 9px;" 
-              color="error"/>
+            <v-badge v-if="stockNotificationQty >= 1" :content="stockNotificationQty" class="position-absolute"
+              style="top: 2px; right: 9px;" color="error" />
             <v-icon>mdi-archive-outline</v-icon>
             <v-tooltip v-if="stockNotificationQty >= 1" activator="parent" location="bottom">
-              <span class="text-white pa-3">{{ stockNotificationQty }} {{ stockNotificationQty === 1 ? 'stock' : 'stocks' }} has low quantity.</span>
+              <span class="text-white pa-3">{{ stockNotificationQty }} {{ stockNotificationQty === 1 ? 'stock' :
+                'stocks' }} has low quantity.</span>
             </v-tooltip>
           </v-btn>
 
@@ -51,6 +48,12 @@
         <GlobalLoader />
       </v-layout>
     </v-main>
+    <div class="payment-indication-container" v-if="!isNotFoundPage">
+      <div class="payment-indication text-white">
+        <h3 class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</h3>
+        <h3 class="text-white">Charge: ₱0</h3>
+      </div>
+    </div>
   </v-app>
 </template>
 
@@ -58,6 +61,7 @@
 import { mapState } from 'pinia';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useOrdersStore } from '@/stores/ordersStore';
 import { useStocksStore } from '@/stores/stocksStore';
 import { useLoadingStore } from '@/stores/loading';
 import { useEWalletImageStore } from '@/stores/eWalletImageStore'
@@ -80,6 +84,7 @@ export default {
   setup() {
     const authStore = useAuthStore();
     const stocksStore = useStocksStore();
+    const ordersStore = useOrdersStore();
     const loadingStore = useLoadingStore();
     const ewalletImageStore = useEWalletImageStore()
     const connectionStatus = ref('online');
@@ -157,6 +162,7 @@ export default {
     return {
       authStore,
       stocksStore,
+      ordersStore,
       loadingStore,
       drawer: ref(true),
       open: ref(false),
@@ -206,5 +212,28 @@ export default {
   font-weight: 700 !important;
   padding: 2px 4px !important;
   min-width: 0 !important;
+}
+
+.payment-indication-container {
+    position: fixed;
+    bottom: 70px;
+    width: 100%;
+    z-index: 1000;
+}
+
+.payment-indication {
+  height: 50px;
+  width: 90%;
+  margin: 10px auto;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px !important;
+  background-color: #0090b6;
+}
+
+.payment-indication h3 {
+  font-weight: normal;
 }
 </style>

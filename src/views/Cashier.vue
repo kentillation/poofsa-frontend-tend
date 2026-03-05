@@ -1,14 +1,13 @@
 <template>
-    
     <v-container>
         <!-- <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
             <v-icon>mdi-refresh</v-icon>
         </v-btn> -->
 
-        <div class="payment-indication pa-2 text-white">
+        <!-- <div class="payment-indication pa-2 text-white">
             <h3 class="me-13 text-white">Quantity: <span>{{ totalQuantity }}</span></h3>
             <h3 class="ms-15 text-white">Charge: ₱ <span>{{ subTotal.toFixed() }}</span></h3>
-        </div>
+        </div> -->
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <v-row>
                 <!-- Main Section -->
@@ -360,6 +359,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useBranchStore } from '@/stores/branchStore';
 import { useProductsStore } from '@/stores/productsStore';
 import { useStocksStore } from '@/stores/stocksStore';
+import { useOrdersStore } from '@/stores/ordersStore';
 import { useTransactStore } from '@/stores/transactionStore';
 import { useLoadingStore } from '@/stores/loading';
 import { usePaymentStore } from '@/stores/paymentStore';
@@ -446,7 +446,6 @@ export default {
             loadingCurrentOrders: false,
             viewOrderDialog: false,
             selectedReferenceNumber: null,
-            totalQuan: 0,
             createdAt: '',
             updatedAt: '',
             tableNumber: 'N/A',
@@ -490,6 +489,7 @@ export default {
         const branchStore = useBranchStore();
         const productsStore = useProductsStore();
         const stocksStore = useStocksStore();
+        const ordersStore = useOrdersStore();
         const transactStore = useTransactStore();
         const loadingStore = useLoadingStore();
         const paymentStore = usePaymentStore();
@@ -508,6 +508,7 @@ export default {
             branchStore,
             productsStore,
             stocksStore,
+            ordersStore,
             transactStore,
             loadingStore,
             paymentStore,
@@ -1224,19 +1225,6 @@ export default {
     position: sticky;
     border-radius: 8px !important;
     background: #696969;
-}
-
-.v-container div.payment-indication {
-    position: fixed;
-    bottom: 20px;
-    height: 70px;
-    width: 90%;
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 8px !important;
-    background-color: #0090b6;
 }
 
 .mini-btn {
