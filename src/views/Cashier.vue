@@ -87,12 +87,12 @@
                             <v-img :src="WTFImgSrc" width="80" height="80"
                                 style="border-radius: 10px !important;"></v-img>
                         </div>
-                        <div class="d-flex flex-column mx-3">
+                        <div class="d-flex flex-column w-100 mx-3">
                             <p class="text-truncate">{{ selectedProduct.product_name }}</p>
                             <p class="text-grey my-1" style="font-size: 13px;">{{ selectedProduct.size_label }}</p>
-                            <div class="d-flex align-center">
+                            <div class="d-flex align-center justify-space-between">
                                 <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
-                                <div class="ms-8">
+                                <div class="">
                                     <v-btn @click="minusQuan(selectedProduct)" color="#0090b6" class="mini-btn ms-3"
                                         variant="flat">
                                         <v-icon style="font-size: 10px;">mdi-minus</v-icon>
