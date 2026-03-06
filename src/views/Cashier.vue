@@ -1,46 +1,44 @@
 <template>
-    <v-container>
+    <v-container style="background-color: #e8faff;">
         <!-- <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
             <v-icon>mdi-refresh</v-icon>
         </v-btn> -->
 
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
-            <v-container>
+            <div>
                 <!-- Search Products -->
-                <div class="d-flex align-items-center flex-column">
-                    <div class="d-flex align-items-center justify-content-center mt-2">
-                        <v-text-field v-model="searchProduct" class="find-product-input w-75" placeholder="Search product..."
-                            density="compact">
-                        </v-text-field>
-                        <div class="d-flex justify-center mt-10" style="z-index: 1;">
-                            <template v-if="this.selectedCategory">
-                                <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 105px;"
-                                    size="small">
-                                    {{ this.selectedCategory }}
-                                </v-chip>
-                                <v-icon @click="closeSelectedCategory" class="position-absolute" style="top: 95px;">
-                                    mdi-close</v-icon>
-                            </template>
-                        </div>
-                        <v-btn color="#0090b6" class="category-btn ms-2 d-flex align-items-center" variant="flat"
-                            @click="showCategoriesDialog" large>
-                            <v-icon>mdi-tune-variant</v-icon>
-                        </v-btn>
+                <div class="d-flex align-items-center justify-content-center ms-1">
+                    <v-text-field v-model="searchProduct" class="search-product-input w-75"
+                        placeholder="Search product..." density="compact">
+                    </v-text-field>
+                    <div class="d-flex justify-center mt-10" style="z-index: 1;">
+                        <template v-if="this.selectedCategory">
+                            <v-icon @click="closeSelectedCategory" class="position-absolute" style="top: 55px; z-index: 10; cursor: pointer;">
+                                mdi-close</v-icon>
+                            <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 65px;"
+                                size="small">
+                                {{ this.selectedCategory }}
+                            </v-chip>
+                        </template>
                     </div>
+                    <v-btn color="#0090b6" class="category-btn ms-2 d-flex align-items-center" variant="flat"
+                        @click="showCategoriesDialog" small>
+                        <v-icon>mdi-tune-variant</v-icon>
+                    </v-btn>
                 </div>
 
                 <!-- Products -->
                 <div class="mt-3 image-section">
                     <div v-for="product in this.filteredProducts" :key="product.id" @click="selectProduct(product)"
                         class="image-section-item">
-                        <v-card class="product-card">
+                        <div class="product-card">
                             <v-img :src="WTFImgSrc"></v-img>
                             <div class="mt-2">
-                                <p style="font-size: 14px;" class="text-truncate">{{ product.product_name }}</p>
-                                <p style="font-size: 14px;">{{ product.temp_label }} {{ product.size_label }}</p>
-                                <p><strong>₱ {{ product.base_price }}</strong></p>
+                                <p class="text-truncate">{{ product.product_name }}</p>
+                                <p class="text-grey">{{ product.size_label }} {{ product.temp_label }}</p>
+                                <p>₱ {{ product.base_price }}</p>
                             </div>
-                        </v-card>
+                        </div>
                     </div>
                 </div>
 
@@ -69,7 +67,7 @@
                         </v-btn>
                     </template>
                 </v-data-table>
-            </v-container>
+            </div>
 
             <!-- Payment Section -->
             <v-row>
@@ -649,7 +647,7 @@ export default {
         await Promise.all([
             this.fetchProducts(),
             // this.fetchCurrentOrders(),
-            // this.fetchCategories(),
+            this.fetchCategories(),
             window.addEventListener('online', this.onOnline),
             window.addEventListener('offline', this.onOffline)
         ]);
@@ -1152,13 +1150,13 @@ export default {
     margin-left: 0 !important;
 }
 
-.find-product-input {
-    border-radius: 10px;
+.search-product-input {
+    border-radius: 15px !important;
 }
 
 .category-btn {
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 20px;
 }
 
 .v-icon--size-default {
@@ -1240,13 +1238,15 @@ export default {
     min-width: 140px;
 }
 
-.image-section .v-card {
+.image-section .product-card {
     margin: 5px;
     padding: 16px;
     cursor: pointer;
+    background-color: #fff;
+    border-radius: 10px;
 }
 
-.image-section .v-card:hover {
+.image-section .product-card:hover {
     background-color: rgb(228, 243, 255) !important;
     transition: 0.5s ease;
 }

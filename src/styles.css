@@ -2,14 +2,14 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-h2,
+/* h2,
 h3,
 h4,
 h5,
 p,
 .v-list-item {
   color: #0090b6;
-}
+} */
 
 .v-btn {
   text-transform: none;
@@ -73,21 +73,21 @@ thead .v-data-table__th .v-data-table-header__content {
   z-index: 1010 !important;
 }
 
-.payment-indication-container .v-btn {
-  font-weight: normal !important;
-  font-size: 20px !important;
-}
-
 .payment-indication-container .payment-indication {
   height: 50px;
   width: 90%;
-  margin: 10px auto;
-  padding: 0 10px;
+  margin: 5px auto;
+  padding: 0 13px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 8px !important;
-  color: #fff
+  border-radius: 30px !important;
+  color: #fff9f9;
+  font-size: 18px !important;
+}
+
+.payment-indication-container .v-btn {
+  font-weight: normal !important;
 }
 
 .payment-indication-container .payment-indication h3 {

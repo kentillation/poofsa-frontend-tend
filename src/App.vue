@@ -9,12 +9,13 @@
       </div>
     </div>
     <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
-          <div class="payment-indication" style="background-color: #a9a9a9;">
-            <h3 class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</h3>
-            <h3 class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</h3>
-          </div>
-          <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Check out</v-btn>
-        </div>
+      <div class="payment-indication" style="background-color: #a9a9a9;">
+        <p class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</p>
+        <p class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</p>
+      </div>
+      <!-- <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Checkout &bull; ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</v-btn> -->
+      <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Checkout</v-btn>
+    </div>
     <v-main>
       <template v-if="!isNotFoundPage">
         <v-app-bar v-if="showMenu" prominent>
@@ -36,7 +37,7 @@
             <v-icon @click="toSettings">mdi-account-circle-outline</v-icon>
           </v-btn>
         </v-app-bar>
-        
+
         <v-navigation-drawer class="h-screen pa-3" v-model="drawer" v-if="showSidebar">
           <v-list density="compact" nav>
             <v-list-subheader size="30">Menu</v-list-subheader>
@@ -50,14 +51,14 @@
               Out</v-list-item>
           </v-list>
         </v-navigation-drawer>
-        
+
       </template>
       <v-layout>
         <router-view />
         <GlobalLoader />
       </v-layout>
     </v-main>
-    
+
   </v-app>
 </template>
 
