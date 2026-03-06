@@ -5,220 +5,205 @@
         </v-btn> -->
 
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
-            <div>
-                <!-- Search Products -->
-                <div class="d-flex align-items-center justify-content-center ms-1">
-                    <v-text-field v-model="searchProduct" class="search-product-input w-75"
-                        placeholder="Search product..." density="compact">
-                    </v-text-field>
-                    <div class="d-flex justify-center mt-10" style="z-index: 1;">
-                        <template v-if="this.selectedCategory">
-                            <v-icon @click="closeSelectedCategory" class="position-absolute" style="top: 55px; z-index: 10; cursor: pointer;">
-                                mdi-close</v-icon>
-                            <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 65px;"
-                                size="small">
-                                {{ this.selectedCategory }}
-                            </v-chip>
-                        </template>
-                    </div>
-                    <v-btn color="#0090b6" class="category-btn ms-2 d-flex align-items-center" variant="flat"
-                        @click="showCategoriesDialog" small>
-                        <v-icon>mdi-tune-variant</v-icon>
-                    </v-btn>
-                </div>
-
-                <!-- Products -->
-                <div class="mt-3 image-section">
-                    <div v-for="product in this.filteredProducts" :key="product.id" @click="selectProduct(product)"
-                        class="image-section-item">
-                        <div class="product-card">
-                            <v-img :src="WTFImgSrc"></v-img>
-                            <div class="mt-2">
-                                <p class="text-truncate">{{ product.product_name }}</p>
-                                <p class="text-grey">{{ product.size_label }} {{ product.temp_label }}</p>
-                                <p>₱ {{ product.base_price }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Selected Products -->
-                <h3 class="mt-5">Selected Products</h3>
-                <v-data-table :headers="headersSelected" :loading="loadingProducts" :items="selectedProducts"
-                    density="comfortable" height="400px">
-                    <!-- eslint-disable vue/valid-v-slot -->
-                    <template v-slot:item.product_name="{ item }">
-                        <div class="d-flex align-center justify-space-between">
-                            <span>
-                                {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }} x {{
-                                    item.quantity }}</span>
-                            <span>&nbsp;&nbsp;₱{{ item.base_price }}</span>
-                        </div>
+            <!-- Search Products -->
+            <div class="d-flex align-items-center justify-content-center ms-1">
+                <v-text-field v-model="searchProduct" class="search-product-input w-75" placeholder="Search product..."
+                    density="compact">
+                </v-text-field>
+                <div class="d-flex justify-center mt-10" style="z-index: 1;">
+                    <template v-if="this.selectedCategory">
+                        <v-icon @click="closeSelectedCategory" class="position-absolute"
+                            style="top: 55px; z-index: 10; cursor: pointer;">
+                            mdi-close</v-icon>
+                        <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 65px;"
+                            size="small">
+                            {{ this.selectedCategory }}
+                        </v-chip>
                     </template>
-                    <template v-slot:item.actions="{ item }">
-                        <v-btn @click="minusQuan(item)" color="#0090b6" class="mini-btn ms-3" variant="flat">
-                            <v-icon>mdi-minus</v-icon>
-                        </v-btn>
-                        <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
-                            <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                        <v-btn @click="removeProduct(item)" color="#ff0d0d" class="mini-btn" variant="flat">
-                            <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                    </template>
-                </v-data-table>
+                </div>
+                <v-btn color="#0090b6" class="ms-2 d-flex align-items-center" variant="flat"
+                    @click="showCategoriesDialog" size="small" icon>
+                    <v-icon size="medium">mdi-tune-variant</v-icon>
+                </v-btn>
             </div>
 
-            <!-- Payment Section -->
-            <v-row>
-                <v-col cols="12" lg="6" md="6" sm="12" xs="12">
-                    <v-row>
+            <!-- Products -->
+            <div class="mt-3 image-section">
+                <div v-for="product in this.filteredProducts" :key="product.id" @click="selectProduct(product)"
+                    class="image-section-item">
+                    <div class="product-card">
+                        <v-img :src="WTFImgSrc"></v-img>
+                        <div class="mt-2">
+                            <p class="product-card-text text-truncate">{{ product.product_name }}</p>
+                            <p class="product-card-text text-grey">{{ product.size_label }} {{ product.temp_label }}
+                            </p>
+                            <p>₱ {{ product.base_price }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <!--Payment Section  -->
-                        <v-col cols="12">
-                            <h3>Payment Section</h3>
-                            <div class="payment-section mt-3">
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="subtotal"
-                                    label="Sub total" variant="outlined" density="compact" type="number"
-                                    :model-value="subTotal.toFixed(2)" prepend-inner-icon="mdi-cash" readonly />
+            <!-- Selected Products -->
+            <h3 class="mt-5">Selected Products</h3>
+            <v-data-table :headers="headersSelected" :loading="loadingProducts" :items="selectedProducts"
+                density="comfortable" height="400px">
+                <!-- eslint-disable vue/valid-v-slot -->
+                <template v-slot:item.product_name="{ item }">
+                    <div class="d-flex flex-column">
+                        <span>
+                            {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }}
+                        </span>
+                        <span>₱{{ item.base_price }}</span>
+                    </div>
+                </template>
+                <template v-slot:item.actions="{ item }">
+                    <v-btn @click="minusQuan(item)" color="#0090b6" class="mini-btn ms-3" variant="flat">
+                        <v-icon>mdi-minus</v-icon>
+                    </v-btn>
+                    <span class="mx-3">{{ item.quantity }}</span>
+                    <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
+                        <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                </template>
+            </v-data-table>
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="total_amount"
-                                    label="Total amount" variant="outlined" density="compact" type="number"
-                                    :model-value="discountedSubtotal.toFixed(2)" prepend-inner-icon="mdi-cash"
-                                    readonly />
+            <!-- Payment Section and Current Orders Section -->
+            <v-row class="mb-15">
 
-                                <v-autocomplete class="payment-section-item me-2 mt-2" v-model="order_type_id"
-                                    :items="orderTypeItems" item-title="ordertype_label" item-value="ordertype_id"
-                                    label="Order type" variant="outlined" density="compact" />
+                <!--Payment Section  -->
+                <v-col cols="12">
+                    <h3>Payment Section</h3>
+                    <div class="payment-section mt-3">
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="subtotal" label="Sub total"
+                            variant="outlined" density="compact" type="number" :model-value="subTotal.toFixed(2)"
+                            prepend-inner-icon="mdi-cash" readonly />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="order_type_charge"
-                                    label="Order type charge" variant="outlined" :disabled="isOrderTypeChargeDisabled"
-                                    @input="e => order_type_charge = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric" type="number" density="compact"
-                                    prepend-inner-icon="mdi-cash-plus" />
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="total_amount" label="Total amount"
+                            variant="outlined" density="compact" type="number"
+                            :model-value="discountedSubtotal.toFixed(2)" prepend-inner-icon="mdi-cash" readonly />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model.number="customer_cash"
-                                    variant="outlined" density="compact" type="number" :disabled="eWalletPaid"
-                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
-                                    @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric" prepend-inner-icon="mdi-cash-plus" placeholder="Enter cash">
-                                    <template #label>
-                                        <span class="required-asterisk">*</span> Cash render
-                                    </template>
-                                </v-text-field>
+                        <v-autocomplete class="payment-section-item me-2 mt-2" v-model="order_type_id"
+                            :items="orderTypeItems" item-title="ordertype_label" item-value="ordertype_id"
+                            label="Order type" variant="outlined" density="compact" />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_change"
-                                    label="Change" variant="outlined" density="compact" :model-value="customerChange"
-                                    prepend-inner-icon="mdi-cash-refund" readonly />
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="order_type_charge"
+                            label="Order type charge" variant="outlined" :disabled="isOrderTypeChargeDisabled"
+                            @input="e => order_type_charge = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
+                            type="number" density="compact" prepend-inner-icon="mdi-cash-plus" />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model.number="discount_amount"
-                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                                    prepend-inner-icon="mdi-cash-minus"
-                                    @input="e => discount_amount = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric">
-                                    <template #label>
-                                        <span class="required-asterisk">*</span> Discount (₱)
-                                    </template>
-                                </v-text-field>
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model.number="customer_cash"
+                            variant="outlined" density="compact" type="number" :disabled="eWalletPaid"
+                            :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
+                            @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
+                            prepend-inner-icon="mdi-cash-plus" placeholder="Enter cash">
+                            <template #label>
+                                <span class="required-asterisk">*</span> Cash render
+                            </template>
+                        </v-text-field>
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note"
-                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                                    prepend-inner-icon="mdi-note" placeholder="Enter note">
-                                    <template #label>
-                                        <span class="required-asterisk">*</span> Note
-                                    </template>
-                                </v-text-field>
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_change" label="Change"
+                            variant="outlined" density="compact" :model-value="customerChange"
+                            prepend-inner-icon="mdi-cash-refund" readonly />
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_name"
-                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                                    prepend-inner-icon="mdi-account" placeholder="Enter customer name">
-                                    <template #label>
-                                        <span class="required-asterisk">*</span> Customer name
-                                    </template>
-                                </v-text-field>
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model.number="discount_amount"
+                            variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
+                            prepend-inner-icon="mdi-cash-minus"
+                            @input="e => discount_amount = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric">
+                            <template #label>
+                                <span class="required-asterisk">*</span> Discount (₱)
+                            </template>
+                        </v-text-field>
 
-                                <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number"
-                                    variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                                    prepend-inner-icon="mdi-table-chair" inputmode="numeric"
-                                    placeholder="Enter table number">
-                                    <template #label>
-                                        <span class="required-asterisk">*</span> Table number
-                                    </template>
-                                </v-text-field>
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note" variant="outlined"
+                            density="compact" type="text" :rules="[v => !!v || 'Required']"
+                            prepend-inner-icon="mdi-note" placeholder="Enter note">
+                            <template #label>
+                                <span class="required-asterisk">*</span> Note
+                            </template>
+                        </v-text-field>
 
-                            </div>
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_name" variant="outlined"
+                            density="compact" type="text" :rules="[v => !!v || 'Required']"
+                            prepend-inner-icon="mdi-account" placeholder="Enter customer name">
+                            <template #label>
+                                <span class="required-asterisk">*</span> Customer name
+                            </template>
+                        </v-text-field>
 
-                            <div class="payment-section d-flex">
-                                <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
-                                    density="compact" prepend-inner-icon="mdi-cash"
-                                    :disabled="!table_number || eWalletPaid" :items="paymentModeItems"
-                                    item-title="paymentmode_label" item-value="paymentmode_id"
-                                    label="Mode of payment" />
-                                <v-btn @click="generateQRPhCode"
-                                    :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
-                                    prepend-icon="mdi-qrcode" height="37" color="green"
-                                    class="ewallet-btn me-2 mt-2">Generate
-                                    QR</v-btn>
-                            </div>
+                        <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number" variant="outlined"
+                            density="compact" type="text" :rules="[v => !!v || 'Required']"
+                            prepend-inner-icon="mdi-table-chair" inputmode="numeric" placeholder="Enter table number">
+                            <template #label>
+                                <span class="required-asterisk">*</span> Table number
+                            </template>
+                        </v-text-field>
 
-                            <div class="d-flex justify-end me-2 ms-1">
-                                <v-btn class="bg-red-lighten-2 d-flex w-50 py-6 mt-3" variant="flat"
-                                    prepend-icon="mdi-refresh" @click="resetPaymentSection"
-                                    :disabled="loading || eWalletPaid">
-                                    Reset
-                                </v-btn>&nbsp;
-                                <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat"
-                                    append-icon="mdi-send" type="submit" :loading="loading" :disabled="!isFormValid || loading ||
-                                        (payment_method_id === 2 && !eWalletPaid) ||
-                                        Number(customer_cash) < subTotal ||
-                                        Number(customer_change) < 0 ||
-                                        subTotal <= 0 || !isOnline">
-                                    Submit
-                                </v-btn>
-                            </div>
+                    </div>
 
-                        </v-col>
+                    <div class="payment-section d-flex">
+                        <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
+                            density="compact" prepend-inner-icon="mdi-cash" :disabled="!table_number || eWalletPaid"
+                            :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
+                            label="Mode of payment" />
+                        <v-btn @click="generateQRPhCode"
+                            :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
+                            prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn me-2 mt-2">Generate
+                            QR</v-btn>
+                    </div>
 
-                        <!-- Current Orders Section -->
-                        <v-col cols="12">
-                            <span class="d-flex align-center justify-space-between mb-1">
-                                <h3>Current Orders</h3>
-                                <v-btn @click="fetchCurrentOrders" prepend-icon="mdi-refresh" variant="tonal"
-                                    color="#0090b6">
-                                    Refresh
-                                </v-btn>
-                            </span>
-                            <v-data-table :headers="headersOrders" :items="currentOrders"
-                                :loading="loadingCurrentOrders" density="comfortable" height="300px">
-                                <template v-slot:item.table_number="{ item }">
-                                    <div class="d-flex align-center justify-space-between">
-                                        <h3># {{ item.table_number }}</h3>
-                                    </div>
-                                </template>
+                    <div class="d-flex justify-end me-2 ms-1">
+                        <v-btn class="bg-red-lighten-2 d-flex w-50 py-6 mt-3" variant="flat" prepend-icon="mdi-refresh"
+                            @click="resetPaymentSection" :disabled="loading || eWalletPaid">
+                            Reset
+                        </v-btn>&nbsp;
+                        <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat" append-icon="mdi-send"
+                            type="submit" :loading="loading" :disabled="!isFormValid || loading ||
+                                (payment_method_id === 2 && !eWalletPaid) ||
+                                Number(customer_cash) < subTotal ||
+                                Number(customer_change) < 0 ||
+                                subTotal <= 0 || !isOnline">
+                            Submit
+                        </v-btn>
+                    </div>
 
-                                <!--eslint-disable-next-line -->
-                                <template v-slot:item.actions="{ item }">
-                                    <div class="d-flex" style="gap: 8px;">
-                                        <v-chip color="#0090b6" prepend-icon="mdi-eye-outline" size="small"
-                                            variant="flat" class="ps-5 pe-4 text-white" @click="toViewOrder(item)">View
-                                        </v-chip>
-                                    </div>
-                                    <ViewOrder :key="selectedReferenceNumber" v-model="viewOrderDialog"
-                                        @update:modelValue="productEditDialog = $event"
-                                        :reference-number="selectedReferenceNumber" />
-                                </template>
-
-                            </v-data-table>
-                        </v-col>
-                    </v-row>
                 </v-col>
 
+                <!-- Current Orders Section -->
+                <v-col cols="12">
+                    <span class="d-flex align-center justify-space-between mb-1">
+                        <h3>Current Orders</h3>
+                        <v-btn @click="fetchCurrentOrders" prepend-icon="mdi-refresh" variant="tonal" color="#0090b6">
+                            Refresh
+                        </v-btn>
+                    </span>
+                    <v-data-table :headers="headersOrders" :items="currentOrders" :loading="loadingCurrentOrders"
+                        density="comfortable" height="300px">
+                        <template v-slot:item.table_number="{ item }">
+                            <div class="d-flex align-center justify-space-between">
+                                <h3># {{ item.table_number }}</h3>
+                            </div>
+                        </template>
+
+                        <!--eslint-disable-next-line -->
+                        <template v-slot:item.actions="{ item }">
+                            <div class="d-flex" style="gap: 8px;">
+                                <v-chip color="#0090b6" prepend-icon="mdi-eye-outline" size="small" variant="flat"
+                                    class="ps-5 pe-4 text-white" @click="toViewOrder(item)">View
+                                </v-chip>
+                            </div>
+                            <ViewOrder :key="selectedReferenceNumber" v-model="viewOrderDialog"
+                                @update:modelValue="productEditDialog = $event"
+                                :reference-number="selectedReferenceNumber" />
+                        </template>
+
+                    </v-data-table>
+                </v-col>
             </v-row>
 
             <!-- Categories -->
             <v-dialog v-model="categoriesDialog" width="500" height="500" class="rounded-10">
                 <v-btn @click="categoriesDialog = false" color="#0090b6" class="position-absolute" size="small"
-                    style="top: -17px; left: -17px; z-index: 10;" icon>
+                    style="top: -17px; right: -17px; z-index: 10;" icon>
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
                 <v-card>
@@ -825,10 +810,6 @@ export default {
             }
         },
 
-        removeProduct(product) {
-            this.selectedProducts = this.selectedProducts.filter(p => p.product_id !== product.product_id);
-        },
-
         capitalizeFirstLetter(text) {
             if (!text) return '';
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -1154,11 +1135,6 @@ export default {
     border-radius: 15px !important;
 }
 
-.category-btn {
-    padding: 20px;
-    border-radius: 20px;
-}
-
 .v-icon--size-default {
     font-size: 20px !important;
 }
@@ -1247,9 +1223,13 @@ export default {
 }
 
 .image-section .product-card:hover {
-    background-color: rgb(228, 243, 255) !important;
+    background-color: rgb(225, 232, 237) !important;
     transition: 0.5s ease;
 }
+
+/* .image-section .product-card .product-card-text {
+    font-size: 15px;
+} */
 
 .image-section .v-img {
     border-radius: 10px;

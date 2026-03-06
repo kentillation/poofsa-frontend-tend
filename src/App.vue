@@ -9,12 +9,12 @@
       </div>
     </div>
     <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
-      <div class="payment-indication" style="background-color: #a9a9a9;">
+      <!-- <div class="payment-indication" style="background-color: #a9a9a9;">
         <p class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</p>
         <p class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</p>
-      </div>
-      <!-- <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Checkout &bull; ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</v-btn> -->
-      <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Checkout</v-btn>
+      </div> -->
+      <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error" :class="{ 'd-none' : this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute" style="top: 5px; right: 13%; z-index: 1010 !important;"></v-badge>
+      <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Checkout<span :class="{ 'd-none' : this.ordersStore.currentTotalOrderQuantity === 0 }"> &bull; ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</span></v-btn>
     </div>
     <v-main>
       <template v-if="!isNotFoundPage">
