@@ -46,7 +46,7 @@ p,
 }
 
 .v-icon--size-default {
-  font-size: calc(var(--v-icon-size-multiplier) * 1.3em) !important;
+  font-size: calc(var(--v-icon-size-multiplier) * 1.6em) !important;
 }
 
 .v-btn--size-default {
@@ -67,7 +67,7 @@ thead .v-data-table__th .v-data-table-header__content {
 
 .payment-indication-container {
   position: fixed;
-  bottom: 20px;
+  bottom: 10px;
   width: 100%;
   display: flex;
   flex-direction: column;

@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <v-snackbar v-model="snackbar.visible" :color="snackbar.color" location="top" class="mt-10" timeout="10000"
+    <v-snackbar v-model="snackbar.visible" :color="snackbar.color" location="top" class="mt-10" timeout="5000"
       persistent>
       <div class="d-flex align-items-center px-3">
         <span style="font-size: 16px;"><v-icon icon="mdi-information-outline"></v-icon></span>

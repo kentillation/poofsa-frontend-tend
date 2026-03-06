@@ -6,36 +6,74 @@
 
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
-            <div class="d-flex align-items-center justify-content-center ms-1">
+            <div class="mb-2 d-flex align-items-center justify-content-center">
                 <v-text-field v-model="searchProduct" class="search-product-input w-75" placeholder="Search product..."
-                    density="compact">
+                    density="compact" variant="flat">
                 </v-text-field>
-                <div class="d-flex justify-center mt-10" style="z-index: 1;">
+                <!-- <div class="d-flex justify-center mt-10" style="z-index: 1;">
                     <template v-if="this.selectedCategory">
                         <v-icon @click="closeSelectedCategory" class="position-absolute"
-                            style="top: 55px; z-index: 10; cursor: pointer;">
+                            style="top: 40px; z-index: 10; cursor: pointer;">
                             mdi-close</v-icon>
-                        <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 65px;"
+                        <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 50px;"
                             size="small">
                             {{ this.selectedCategory }}
                         </v-chip>
                     </template>
-                </div>
-                <v-btn color="#0090b6" class="ms-2 d-flex align-items-center" variant="flat"
-                    @click="showCategoriesDialog" size="small" icon>
+</div> -->
+                <v-btn color="#0090b6" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
+                    size="small" icon>
                     <v-icon size="medium">mdi-tune-variant</v-icon>
                 </v-btn>
             </div>
 
+            <!-- Categories -->
+            <v-slide-group class="my-3">
+                <v-slide-group-item>
+                    <v-chip @click="reloadProducts" :color="!selectedCategory ? '#0090b6' : '#fff'" variant="flat"
+                        size="small" class="me-1 category-chip">
+                        All
+                    </v-chip>
+                </v-slide-group-item>
+                <v-slide-group-item>
+                    <v-chip v-for="(category, index) in productsStore.getCategories" :key="index"
+                        @click="handleCategorySelect(category)" color="#fff" variant="flat" size="small"
+                        class="me-1 category-chip">
+                        {{ category.label }}
+                    </v-chip>
+                </v-slide-group-item>
+            </v-slide-group>
+
             <!-- Products -->
-            <div class="mt-3 image-section">
-                <div v-for="product in this.filteredProducts" :key="product.id" @click="selectProduct(product)"
+            <div v-if="loadingCategories" class="image-section">
+                <div v-for="n in 8" :key="n" class="image-section-item">
+                    <div class="product-card">
+                        <v-skeleton-loader type="text" width="60%" class="mb-2"></v-skeleton-loader>
+                        <v-skeleton-loader type="text" width="60%" class="mb-2"></v-skeleton-loader>
+                        <v-skeleton-loader type="button" height="120"></v-skeleton-loader>
+                        <v-skeleton-loader type="text" width="60%" class="mt-2"></v-skeleton-loader>
+                    </div>
+                </div>
+            </div>
+            
+            <v-alert v-else-if="filteredProducts.length === 0" variant="tonal" type="info" class="my-3">
+                No available product.
+            </v-alert>
+
+            <div v-else class="image-section">
+                <div v-for="product in filteredProducts" :key="product.id" @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card">
-                        <p class="product-card-text text-truncate">{{ product.product_name }}</p>
-                        <p class="product-card-text text-grey">{{ product.size_label }}</p>
+                        <p class="product-card-text text-truncate">
+                            {{ product.product_name }}
+                        </p>
+                        <p class="product-card-text text-grey">
+                            {{ product.size_label }}
+                        </p>
                         <v-img :src="WTFImgSrc" class="my-2"></v-img>
-                        <p class="text-grey"><strong>₱{{ product.base_price }}</strong></p>
+                        <p class="text-grey-darken-1">
+                            <strong>₱{{ product.base_price }}</strong>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -46,7 +84,8 @@
                 <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
                     <div class="selected-products-card mb-3">
                         <div class="d-flex flex-start">
-                            <v-img :src="WTFImgSrc" width="80" height="80" style="border-radius: 10px !important;"></v-img>
+                            <v-img :src="WTFImgSrc" width="80" height="80"
+                                style="border-radius: 10px !important;"></v-img>
                         </div>
                         <div class="d-flex flex-column mx-3">
                             <p class="text-truncate">{{ selectedProduct.product_name }}</p>
@@ -54,11 +93,13 @@
                             <div class="d-flex align-center">
                                 <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
                                 <div class="ms-8">
-                                    <v-btn @click="minusQuan(selectedProduct)" color="#0090b6" class="mini-btn ms-3" variant="flat">
+                                    <v-btn @click="minusQuan(selectedProduct)" color="#0090b6" class="mini-btn ms-3"
+                                        variant="flat">
                                         <v-icon style="font-size: 10px;">mdi-minus</v-icon>
                                     </v-btn>
                                     <span class="mx-3">{{ selectedProduct.quantity }}</span>
-                                    <v-btn @click="addQuan(selectedProduct)" color="#0090b6" class="mini-btn mx-1" variant="flat">
+                                    <v-btn @click="addQuan(selectedProduct)" color="#0090b6" class="mini-btn mx-1"
+                                        variant="flat">
                                         <v-icon style="font-size: 10px;">mdi-plus</v-icon>
                                     </v-btn>
                                 </div>
@@ -203,7 +244,8 @@
             </v-row>
 
             <!-- Categories -->
-            <v-dialog v-model="categoriesDialog" width="500" height="500" class="rounded-10">
+            <!-- <v-dialog v-model="categoriesDialog" width="500" height="500" transition="dialog-bottom-transition"
+                class="rounded-10">
                 <v-btn @click="categoriesDialog = false" color="#0090b6" class="position-absolute" size="small"
                     style="top: -17px; right: -17px; z-index: 10;" icon>
                     <v-icon>mdi-close</v-icon>
@@ -226,7 +268,7 @@
                                 class="text-primary" style="cursor: pointer;">Tap to reload</span> </p>
                     </v-sheet>
                 </v-card>
-            </v-dialog>
+            </v-dialog> -->
 
             <!-- e-Wallet Payment -->
             <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" transition="dialog-bottom-transition"
@@ -732,7 +774,7 @@ export default {
         },
 
         async fetchCategories() {
-            this.loadingCategories = true;
+            // this.loadingCategories = true;
             this.progressCircular = true;
             try {
                 await this.productsStore.fetchAllCategoriesStore();
@@ -742,7 +784,7 @@ export default {
                 this.showError("Error fetching categories!");
                 this.progressCircular = false;
             } finally {
-                this.loadingCategories = false;
+                // this.loadingCategories = false;
                 this.progressCircular = false;
             }
         },
@@ -756,26 +798,34 @@ export default {
             this.categories = this.productsStore.categories;
         },
 
-        showCategoriesDialog() {
-            this.categoriesDialog = true;
+        showCategories() {
+            // this.categoriesDialog = true;
             this.categories = this.productsStore.categories;
         },
 
-        handleCategorySelect(category) {
-            this.categoriesDialog = false;
+        async handleCategorySelect(category) {
             if (!category || !category.label) {
-                this.showError("Invalid category selected!");
+                this.showTopAlertError("Invalid category selected!");
                 return;
             }
-            this.products = this.productsStore.products.filter(
+
+            // Show loading
+            this.loadingCategories = true;
+
+            // Allow Vue to render the loading state
+            await this.$nextTick();
+
+            // Simulate processing / filtering
+            const filtered = this.productsStore.products.filter(
                 product => product.category_label === category.label
             );
+
+            this.products = filtered;
             this.selectedCategory = category.label;
-            if (this.products.length === 0) {
-                this.showError(`No products in ${category.label} category`);
-            } else {
-                this.searchProduct = '';
-            }
+            this.searchProduct = '';
+
+            // Hide loading
+            this.loadingCategories = false;
         },
 
         selectProduct(product) {
@@ -1131,6 +1181,13 @@ export default {
 
 .search-product-input {
     border-radius: 15px !important;
+    background-color: #fffcfc
+}
+
+.category-chip:hover {
+    background-color: #0090b6 !important;
+    color: #fff !important;
+    transition: 0.5s ease-in-out;
 }
 
 .v-icon--size-default {
@@ -1172,14 +1229,6 @@ export default {
     display: none;
 }
 
-.indication {
-    display: flex;
-    justify-content: space-between;
-    position: sticky;
-    border-radius: 8px !important;
-    background: #696969;
-}
-
 .mini-btn {
     font-size: 13px;
     width: 20px !important;
@@ -1199,7 +1248,6 @@ export default {
 .payment-section-item {
     width: 200px;
 }
-
 
 .image-section {
     display: flex;
@@ -1257,10 +1305,6 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
-}
-
-.v-input__details {
-    display: none;
 }
 
 /* QR Dialog Styles */
