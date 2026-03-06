@@ -20,6 +20,7 @@ p,
 }
 
 .v-list-item:hover {
+  /* background-color: #00afdf; */
   background-color: #0090b6;
   color: #e8faff;
   transition: all 0.3s ease-in-out;
@@ -82,7 +83,7 @@ thead .v-data-table__th .v-data-table-header__content {
   align-items: center;
   justify-content: space-between;
   border-radius: 30px !important;
-  color: #fff9f9;
+  color: #e0e7e9;
   font-size: 16px !important;
 }
 

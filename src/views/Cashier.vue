@@ -32,44 +32,44 @@
                 <div v-for="product in this.filteredProducts" :key="product.id" @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card">
-                        <v-img :src="WTFImgSrc"></v-img>
-                        <div class="mt-2">
-                            <p class="product-card-text text-truncate">{{ product.product_name }}</p>
-                            <p class="product-card-text text-grey">{{ product.size_label }} {{ product.temp_label }}
-                            </p>
-                            <p>₱ {{ product.base_price }}</p>
-                        </div>
+                        <p class="product-card-text text-truncate">{{ product.product_name }}</p>
+                        <p class="product-card-text text-grey">{{ product.size_label }}</p>
+                        <v-img :src="WTFImgSrc" class="my-2"></v-img>
+                        <p class="text-grey"><strong>₱{{ product.base_price }}</strong></p>
                     </div>
                 </div>
             </div>
 
             <!-- Selected Products -->
             <h3 class="mt-5">Selected Products</h3>
-            <v-data-table :headers="headersSelected" :loading="loadingProducts" :items="selectedProducts"
-                density="comfortable" height="400px">
-                <!-- eslint-disable vue/valid-v-slot -->
-                <template v-slot:item.product_name="{ item }">
-                    <div class="d-flex flex-column">
-                        <span>
-                            {{ item.product_name }}{{ item.temp_label }}{{ item.size_label }}
-                        </span>
-                        <span>₱{{ item.base_price }}</span>
-                    </div>
-                </template>
-                <template v-slot:item.actions="{ item }">
-                    <v-btn @click="minusQuan(item)" color="#0090b6" class="mini-btn ms-3" variant="flat">
-                        <v-icon>mdi-minus</v-icon>
-                    </v-btn>
-                    <span class="mx-3">{{ item.quantity }}</span>
-                    <v-btn @click="addQuan(item)" color="#0090b6" class="mini-btn mx-1" variant="flat">
-                        <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                </template>
-            </v-data-table>
+            <div class="mb-3 selected-products-container">
+                <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
+                    <v-card class="selected-products-card">
+                        <div class="d-flex flex-start">
+                            <v-img :src="WTFImgSrc" width="80" height="80" style="border-radius: 10px !important;"></v-img>
+                        </div>
+                        <div class="d-flex flex-column mx-3">
+                            <p class="text-truncate">{{ selectedProduct.product_name }}</p>
+                            <p class="text-grey my-1" style="font-size: 13px;">{{ selectedProduct.size_label }}</p>
+                            <div class="d-flex align-center">
+                                <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
+                                <div class="ms-8">
+                                    <v-btn @click="minusQuan(selectedProduct)" color="#0090b6" class="mini-btn ms-3" variant="flat">
+                                        <v-icon style="font-size: 10px;">mdi-minus</v-icon>
+                                    </v-btn>
+                                    <span class="mx-3">{{ selectedProduct.quantity }}</span>
+                                    <v-btn @click="addQuan(selectedProduct)" color="#0090b6" class="mini-btn mx-1" variant="flat">
+                                        <v-icon style="font-size: 10px;">mdi-plus</v-icon>
+                                    </v-btn>
+                                </div>
+                            </div>
+                        </div>
+                    </v-card>
+                </div>
+            </div>
 
             <!-- Payment Section and Current Orders Section -->
             <v-row class="mb-15">
-
                 <!--Payment Section  -->
                 <v-col cols="12">
                     <h3>Payment Section</h3>
@@ -178,6 +178,8 @@
                     </span>
                     <v-data-table :headers="headersOrders" :items="currentOrders" :loading="loadingCurrentOrders"
                         density="comfortable" height="300px">
+
+                        <!--eslint-disable-next-line -->
                         <template v-slot:item.table_number="{ item }">
                             <div class="d-flex align-center justify-space-between">
                                 <h3># {{ item.table_number }}</h3>
@@ -409,10 +411,6 @@ export default {
             headersDisplay: [
                 { title: '', value: 'product_name' },
                 { title: '', value: 'base_price' },
-            ],
-            headersSelected: [
-                { title: '', value: 'product_name', width: '50%' },
-                { title: '', value: 'actions', sortable: false, width: '50%' },
             ],
             headersOrders: [
                 { title: 'Table Number', value: 'table_number', width: '50%' },
@@ -1183,9 +1181,9 @@ export default {
 }
 
 .mini-btn {
-    font-size: 15px;
-    width: 35px !important;
-    height: 27px !important;
+    font-size: 13px;
+    width: 20px !important;
+    height: 25px !important;
 }
 
 .required-asterisk {
@@ -1216,10 +1214,13 @@ export default {
 
 .image-section .product-card {
     margin: 5px;
-    padding: 16px;
+    padding: 8px;
     cursor: pointer;
     background-color: #fff;
     border-radius: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
 
 .image-section .product-card:hover {
@@ -1227,19 +1228,35 @@ export default {
     transition: 0.5s ease;
 }
 
-/* .image-section .product-card .product-card-text {
-    font-size: 15px;
-} */
-
 .image-section .v-img {
     border-radius: 10px;
+    width: 75%;
 }
 
-.text-truncate {
-    width: 130px;
+.product-card-text {
+    font-size: 14px;
+}
+
+.selected-products-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-products-container .selected-products-card {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    background-color: #fff;
+}
+
+.product-card .text-truncate {
+    width: 145px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
 }
 
 .v-input__details {
