@@ -44,7 +44,7 @@
             <h3 class="mt-5">Selected Products</h3>
             <div class="mb-3 selected-products-container">
                 <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
-                    <v-card class="selected-products-card">
+                    <div class="selected-products-card mb-3">
                         <div class="d-flex flex-start">
                             <v-img :src="WTFImgSrc" width="80" height="80" style="border-radius: 10px !important;"></v-img>
                         </div>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-                    </v-card>
+                    </div>
                 </div>
             </div>
 
@@ -1243,7 +1243,7 @@ export default {
 }
 
 .selected-products-container .selected-products-card {
-    padding: 10px;
+    padding: 12px;
     display: flex;
     align-items: center;
     border-radius: 10px;
