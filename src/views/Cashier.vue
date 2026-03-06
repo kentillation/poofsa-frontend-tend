@@ -1243,7 +1243,7 @@ export default {
 }
 
 .selected-products-container .selected-products-card {
-    padding: 12px;
+    padding: 10px;
     display: flex;
     align-items: center;
     border-radius: 10px;
