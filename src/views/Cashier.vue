@@ -79,8 +79,11 @@
             </div>
 
             <!-- Selected Products -->
-            <h3 class="mt-5">Selected Products</h3>
+            <h3 class="mt-5">Your order</h3>
             <div class="mb-3 selected-products-container">
+                <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
+                    You have an empty order.
+                </v-alert>
                 <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
                     <div class="selected-products-card mb-3">
                         <div class="d-flex flex-start">
