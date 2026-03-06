@@ -64,6 +64,42 @@ thead .v-data-table__th .v-data-table-header__content {
   color: #a2a0a0;
 }
 
+.payment-indication-container {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1010 !important;
+}
+
+.payment-indication-container .v-btn {
+  font-weight: normal !important;
+  font-size: 20px !important;
+}
+
+.payment-indication-container .payment-indication {
+  height: 50px;
+  width: 90%;
+  margin: 10px auto;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px !important;
+  color: #fff
+}
+
+.payment-indication-container .payment-indication h3 {
+  font-weight: normal;
+}
+
+@media (max-width: 1280px) {
+  .payment-indication-container {
+    width: 100%;
+  }
+}
+
 .to-show-head {
   display: none;
 }
@@ -117,14 +153,17 @@ thead .v-data-table__th .v-data-table-header__content {
   align-items: center;
   justify-content: center;
 }
+
 .connection-banner.offline {
   background: linear-gradient(135deg, #690000 0%, #e22e2e 100%);
   color: #fffafa;
 }
+
 .connection-banner.slow {
   background: linear-gradient(135deg, #583f00 0%, #e2b032 100%);
   color: #fffafa;
 }
+
 .connection-banner.waiting {
   background: linear-gradient(135deg, #005e6e 0%, #31bcd4 100%);
   color: #fffafa;

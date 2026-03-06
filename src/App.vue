@@ -8,6 +8,13 @@
         <span>&nbsp;{{ connectionStatusText }}</span>
       </div>
     </div>
+    <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
+          <div class="payment-indication" style="background-color: #a9a9a9;">
+            <h3 class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</h3>
+            <h3 class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</h3>
+          </div>
+          <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Check out</v-btn>
+        </div>
     <v-main>
       <template v-if="!isNotFoundPage">
         <v-app-bar v-if="showMenu" prominent>
@@ -29,6 +36,7 @@
             <v-icon @click="toSettings">mdi-account-circle-outline</v-icon>
           </v-btn>
         </v-app-bar>
+        
         <v-navigation-drawer class="h-screen pa-3" v-model="drawer" v-if="showSidebar">
           <v-list density="compact" nav>
             <v-list-subheader size="30">Menu</v-list-subheader>
@@ -42,13 +50,7 @@
               Out</v-list-item>
           </v-list>
         </v-navigation-drawer>
-        <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
-          <div class="payment-indication" style="background-color: #a9a9a9;">
-            <h3 class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</h3>
-            <h3 class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</h3>
-          </div>
-          <v-btn class="payment-indication d-flex justify-center" color="#0090b6">Place order</v-btn>
-        </div>
+        
       </template>
       <v-layout>
         <router-view />
@@ -214,33 +216,5 @@ export default {
   font-weight: 700 !important;
   padding: 2px 4px !important;
   min-width: 0 !important;
-}
-
-.payment-indication-container {
-    position: fixed;
-    bottom: 20px;
-    width: 100%;
-    z-index: 1000;
-}
-
-.payment-indication-container .v-btn {
-  font-weight: normal !important;
-  font-size: 20px !important;
-}
-
-.payment-indication {
-  height: 50px;
-  width: 90%;
-  margin: 10px auto;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 8px !important;
-  color: #fff
-}
-
-.payment-indication h3 {
-  font-weight: normal;
 }
 </style>

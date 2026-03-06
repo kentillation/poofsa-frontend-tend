@@ -5,8 +5,6 @@
         </v-btn> -->
 
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
-
-            
             <v-container>
                 <!-- Search Products -->
                 <div class="d-flex align-items-center flex-column">
