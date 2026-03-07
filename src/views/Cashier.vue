@@ -461,13 +461,11 @@ export default {
 
     beforeUnmount() {
         if (this.paymentStore) {
-            this.paymentStore._onStatusUpdate = null;
-            this.paymentStore._onPaymentSuccess = null;
-            this.paymentStore.stopPaymentPolling();
             this.paymentStore.resetPaymentState();
         }
 
         echo.leave('newOrderChannel');
+        echo.leave('payments');
 
         window.removeEventListener('online', this.onOnline);
         window.removeEventListener('offline', this.onOffline);
@@ -665,17 +663,18 @@ export default {
             // this.fetchCurrentOrders(),
             this.fetchCategories(),
             window.addEventListener('online', this.onOnline),
-            window.addEventListener('offline', this.onOffline)
+            window.addEventListener('offline', this.onOffline),
+            echo.channel('payments')
+                .listen('PaymentSucceeded', (e) => {
+                    if (e.referenceNumber === this.referenceNumber) {
+                        this.eWalletPaid = true;
+                        this.showSuccess("Payment received!");
+                        this.submitForm();
+                    }
+                })
         ]);
 
-        echo.channel('payments')
-            .listen('PaymentSucceeded', (e) => {
-                if (e.referenceNumber === this.referenceNumber) {
-                    this.eWalletPaid = true;
-                    this.showSuccess("Payment received!");
-                    this.submitForm();
-                }
-            });
+
     },
 
     methods: {
