@@ -315,9 +315,6 @@
                             </p>
                             <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
                             <!-- <v-chip @click="downloadQR" color="#0090b6" size="small" variant="flat" prepend-icon="mdi-download">Download QR</v-chip> -->
-                            <p class="text-center mt-2">
-                                QR will expire in {{ qrTimerDisplay }}
-                            </p>
                         </div>
 
                         <div v-else class="d-flex justify-center">
@@ -331,14 +328,11 @@
 
                     <!-- Show payment status -->
                     <div class="payment-status w-100">
-                        <v-alert v-if="paymentStore.isPollingActive || eWalletPaid" :type="paymentStatusType"
-                            variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
+                        <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'" variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
                             <div class="d-flex align-center justify-space-between">
-                                <span v-if="!paymentStatus">Waiting for Payment</span>
-                                <span v-else>{{ paymentStatusText }}</span>
-                                <v-progress-circular v-if="paymentStore.isPollingActive && !eWalletPaid" indeterminate
-                                    size="20" width="2"></v-progress-circular>
-                                <v-icon v-else-if="eWalletPaid" color="success">mdi-check-circle</v-icon>
+                                <span>{{ !eWalletPaid ? 'Waiting for payment' : 'Payment successful' }}</span>
+                                <v-progress-circular v-if="!eWalletPaid" size="20" width="2" indeterminate></v-progress-circular>
+                                <v-icon v-else color="success">mdi-check-circle</v-icon>
                             </div>
                         </v-alert>
                     </div>
@@ -410,13 +404,8 @@ export default {
             eWalletDialog: false,
             eWalletPaid: false,
             eWalletImgSrc: null,
-            qrTimer: 180, // 3 minutes
-            qrTimerInterval: null,
-            qrTimerDisplay: "03:00",
             selectedEwalletOption: 'qrph',
             isOnline: navigator.onLine,
-            onPaymentSuccessCallback: null,
-            onStatusUpdateCallback: null,
             referenceNumber: '',
             total_quantity: '',
             subtotal: null,
@@ -431,7 +420,6 @@ export default {
             table_number: null,
             customer_name: '-',
             order_note: '-',
-            redirectUrl: '',
             orderTypeItems: [
                 { ordertype_id: 1, ordertype_label: 'Dine-in' },
                 { ordertype_id: 2, ordertype_label: 'Delivery' },
@@ -514,7 +502,6 @@ export default {
             ewalletImageStore,
             formatCurrentDate
         };
-        // paymentModeItems: computed(() => paymentStore.paymentModeOptions), };
     },
 
     watch: {
@@ -585,17 +572,16 @@ export default {
             if (status === 'succeeded') return 'success';
             if (status === 'failed' || status === 'cancelled' || status === 'error') return 'error';
             return 'warning';
-            // return 'info';
         },
 
         paymentStatusText() {
             const status = this.paymentStatus;
             const texts = {
-                'awaiting_next_action': 'Waiting for Payment',
-                'succeeded': 'Payment Successful',
-                'failed': 'Payment Failed',
-                'cancelled': 'Payment Cancelled',
-                'error': 'Error Checking Status'
+                'awaiting_next_action': 'Waiting for payment',
+                'succeeded': 'Payment successful',
+                'failed': 'Payment failed',
+                'cancelled': 'Payment cancelled',
+                'error': 'Error checking status'
             };
             return texts[status] || status;
         },
@@ -685,13 +671,8 @@ export default {
 
         onOffline() {
             this.isOnline = false;
-
-            // Stop polling immediately
-            this.paymentStore.stopPaymentPolling();
-
-            // If payment not yet completed
             if (!this.eWalletPaid && this.eWalletDialog) {
-                this.showError("Internet connection disconnected.");
+                this.showTopAlertError("Internet connection disconnected.");
                 this.closeEwalletDialog();
             }
         },
@@ -892,8 +873,6 @@ export default {
             this.eWalletDialog = true;
 
             try {
-                this.setupPaymentCallbacks();
-
                 const referenceNumber = await this.generateReferenceNumber();
 
                 const amountToPay = this.discountedSubtotal;
@@ -908,7 +887,6 @@ export default {
                 this.referenceNumber = referenceNumber;
                 this.customer_cash = amountToPay;
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-                this.startQrTimer();
 
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
@@ -929,90 +907,8 @@ export default {
         //     document.body.removeChild(link);
         // },
 
-        setupPaymentCallbacks() {
-            this.paymentStore._onStatusUpdate = (statusResult) => {
-                console.log('Payment status update:', statusResult);
-                this.handlePaymentStatus(statusResult);
-            };
-            this.paymentStore._onPaymentSuccess = (details) => {
-                console.log('Payment success! Details:', details);
-                this.handlePaymentSuccess();
-            };
-        },
-
-        handlePaymentStatus(statusResult) {
-            if (!statusResult?.ok) {
-                this.showError("Error checking payment status.");
-                return;
-            }
-
-            switch (statusResult.original_status) {
-                case 'awaiting_next_action':
-                    // waiting for user scan — do nothing
-                    break;
-
-                case 'succeeded':
-                    this.eWalletPaid = true;
-                    this.showSuccess("e-Wallet payment received successfully!");
-                    setTimeout(() => {
-                        this.closeEwalletDialog();
-                    }, 1000);
-                    this.submitForm();
-                    break;
-
-                case 'failed':
-                case 'cancelled':
-                    this.showError("Payment failed. Please try again.");
-                    this.closeEwalletDialog();
-                    break;
-            }
-        },
-
-        handlePaymentSuccess() {
-            this.eWalletPaid = true;
-        },
-
-        startQrTimer() {
-            this.qrTimer = 180; // 3 minutes
-            this.updateQrTimerDisplay();
-
-            if (this.qrTimerInterval) clearInterval(this.qrTimerInterval);
-
-            this.qrTimerInterval = setInterval(() => {
-                if (!this.isOnline) {
-                    this.stopQrTimer();
-                    this.showError("QR expired due to lost connection.");
-                    this.closeEwalletDialog();
-                    return;
-                }
-
-                if (this.qrTimer > 0) {
-                    this.qrTimer--;
-                    this.updateQrTimerDisplay();
-                } else {
-                    this.stopQrTimer();
-                    this.showError("QR expired. You can regenerate again!");
-                    this.closeEwalletDialog();
-                }
-            }, 1000);
-        },
-
-        stopQrTimer() {
-            if (this.qrTimerInterval) {
-                clearInterval(this.qrTimerInterval);
-                this.qrTimerInterval = null;
-            }
-        },
-
-        updateQrTimerDisplay() {
-            const minutes = Math.floor(this.qrTimer / 60).toString().padStart(2, "0");
-            const seconds = (this.qrTimer % 60).toString().padStart(2, "0");
-            this.qrTimerDisplay = `${minutes}:${seconds}`;
-        },
-
         closeEwalletDialog() {
             this.eWalletDialog = false;
-            this.stopQrTimer();
             this.paymentStore.resetPaymentState();
         },
 
