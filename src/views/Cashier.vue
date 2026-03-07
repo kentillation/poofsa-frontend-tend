@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <v-alert v-else-if="filteredProducts.length === 0" variant="tonal" type="info" class="my-3">
                 No available product.
             </v-alert>
@@ -328,10 +328,12 @@
 
                     <!-- Show payment status -->
                     <div class="payment-status w-100">
-                        <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'" variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
+                        <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'" variant="tonal"
+                            style="border-radius: 15px;" class="mt-1 px-3">
                             <div class="d-flex align-center justify-space-between">
                                 <span>{{ !eWalletPaid ? 'Waiting for payment' : 'Payment successful' }}</span>
-                                <v-progress-circular v-if="!eWalletPaid" size="20" width="2" indeterminate></v-progress-circular>
+                                <v-progress-circular v-if="!eWalletPaid" size="20" width="2"
+                                    indeterminate></v-progress-circular>
                                 <v-icon v-else color="success">mdi-check-circle</v-icon>
                             </div>
                         </v-alert>
@@ -665,6 +667,15 @@ export default {
             window.addEventListener('online', this.onOnline),
             window.addEventListener('offline', this.onOffline)
         ]);
+
+        echo.channel('payments')
+            .listen('PaymentSucceeded', (e) => {
+                if (e.referenceNumber === this.referenceNumber) {
+                    this.eWalletPaid = true;
+                    this.showSuccess("Payment received!");
+                    this.submitForm();
+                }
+            });
     },
 
     methods: {
