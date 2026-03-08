@@ -619,7 +619,7 @@ export default {
         window.addEventListener('online', this.onOnline),
         window.addEventListener('offline', this.onOffline),
         echo.private(`payments.${this.referenceNumber}`)
-            .listen('.payment.succeeded', () => {
+            .listen('.payment.paid', () => {
                 this.eWalletPaid = true;
                 this.showSuccess("Payment successful.");
                 this.submitForm();
