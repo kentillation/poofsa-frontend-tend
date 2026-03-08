@@ -14,7 +14,7 @@ const echo = new Echo({
     enabledTransports: ['ws', 'wss'],
     enableStats: true,
     logToConsole: true,
-    authEndpoint: 'http://127.0.0.1:8000/broadcasting/auth',
+    authEndpoint: `${VUE_APP_API_BASE_URL}/broadcasting/auth`,
     auth: {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('auth_token')}`
