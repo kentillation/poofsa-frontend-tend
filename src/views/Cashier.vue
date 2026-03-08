@@ -612,18 +612,17 @@ export default {
         await Promise.all([
             this.fetchProducts(),
             // this.fetchCurrentOrders(),
+            this.generateReferenceNumber(),
             this.fetchCategories(),
         ]);
 
         window.addEventListener('online', this.onOnline),
         window.addEventListener('offline', this.onOffline),
         echo.private(`payments.${this.referenceNumber}`)
-            .listen('PaymentSucceeded', (e) => {
-                if (e.private === this.referenceNumber) {
-                    this.eWalletPaid = true;
-                    this.showSuccess("Payment received!");
-                    this.submitForm();
-                }
+            .listen('.payment.succeeded', () => {
+                this.eWalletPaid = true;
+                this.showSuccess("Payment successful.");
+                this.submitForm();
             })
     },
 
@@ -689,7 +688,8 @@ export default {
 
         async generateReferenceNumber() {
             const generatedNumber = Math.random().toString().slice(2, 14);
-            return generatedNumber;
+            this.referenceNumber = generatedNumber;
+            return this.referenceNumber;
         },
 
         async fetchProducts() {
@@ -842,7 +842,6 @@ export default {
             this.eWalletDialog = true;
 
             try {
-                const referenceNumber = await this.generateReferenceNumber();
 
                 const amountToPay = this.discountedSubtotal;
 
@@ -851,9 +850,8 @@ export default {
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
                     selectedEWallet,
-                    referenceNumber
+                    this.referenceNumber
                 );
-                this.referenceNumber = referenceNumber;
                 this.customer_cash = amountToPay;
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
 
@@ -898,8 +896,7 @@ export default {
                     }
                 }
 
-                const refNumber = await this.generateReferenceNumber();
-                if (!refNumber) {
+                if (!this.referenceNumber) {
                     this.showError("Error in reference number. Refresh the page!");
                     this.loadingStore.hide();
                     return;
@@ -908,7 +905,7 @@ export default {
                 this.computed_discount = this.subTotal * (this.discount_amount / 100);
 
                 const formData = new FormData();
-                formData.append("transactions[0][reference_number]", refNumber);
+                formData.append("transactions[0][reference_number]", this.referenceNumber);
                 formData.append("transactions[0][total_quantity]", this.totalQuantity);
                 formData.append("transactions[0][total_amount]", parseFloat(this.discountedSubtotal) || 0);
                 formData.append("transactions[0][subtotal]", parseFloat(this.subTotal) || 0);
