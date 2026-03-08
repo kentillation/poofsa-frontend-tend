@@ -618,7 +618,7 @@ export default {
     async mounted() {
         await Promise.all([
             this.fetchProducts(),
-            // this.fetchCurrentOrders(),
+            this.fetchCurrentOrders(),
             this.generateReferenceNumber(),
             this.fetchCategories(),
         ]);
