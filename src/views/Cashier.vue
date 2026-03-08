@@ -216,7 +216,7 @@
                         <!--eslint-disable-next-line -->
                         <template v-slot:item.table_number="{ item }">
                             <div class="d-flex align-center justify-space-between">
-                                <h3># {{ item.table_number }}</h3>
+                                <h3># {{ item.order_number }}</h3>
                             </div>
                         </template>
 
@@ -500,6 +500,13 @@ export default {
                 this.order_type_charge = 0;
             }
         },
+        eWalletPaid(newVal) {
+            if (newVal) {
+                setTimeout(() => {
+                    this.closeEwalletDialog();
+                }, 3000);
+            }
+        },
     },
 
     computed: {
@@ -621,7 +628,6 @@ export default {
         echo.private(`payments.${this.referenceNumber}`)
             .listen('.payment.paid', () => {
                 this.eWalletPaid = true;
-                this.showSuccess("Payment successful.");
                 this.submitForm();
             })
     },
