@@ -459,18 +459,6 @@ export default {
         };
     },
 
-    beforeUnmount() {
-        if (this.paymentStore) {
-            this.paymentStore.resetPaymentState();
-        }
-
-        echo.leave('newOrderChannel');
-        echo.leave('payments');
-
-        window.removeEventListener('online', this.onOnline);
-        window.removeEventListener('offline', this.onOffline);
-    },
-
     setup() {
         const authStore = useAuthStore();
         const branchStore = useBranchStore();
@@ -662,19 +650,30 @@ export default {
             this.fetchProducts(),
             // this.fetchCurrentOrders(),
             this.fetchCategories(),
-            window.addEventListener('online', this.onOnline),
-            window.addEventListener('offline', this.onOffline),
-            echo.channel('payments')
-                .listen('PaymentSucceeded', (e) => {
-                    if (e.referenceNumber === this.referenceNumber) {
-                        this.eWalletPaid = true;
-                        this.showSuccess("Payment received!");
-                        this.submitForm();
-                    }
-                })
         ]);
 
+        window.addEventListener('online', this.onOnline),
+        window.addEventListener('offline', this.onOffline),
+        echo.channel('payments')
+            .listen('PaymentSucceeded', (e) => {
+                if (e.referenceNumber === this.referenceNumber) {
+                    this.eWalletPaid = true;
+                    this.showSuccess("Payment received!");
+                    this.submitForm();
+                }
+            })
+    },
 
+    beforeUnmount() {
+        if (this.paymentStore) {
+            this.paymentStore.resetPaymentState();
+        }
+
+        window.removeEventListener('online', this.onOnline);
+        window.removeEventListener('offline', this.onOffline);
+
+        echo.leave('newOrderChannel');
+        echo.leave('payments');
     },
 
     methods: {
