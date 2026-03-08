@@ -618,7 +618,7 @@ export default {
 
         window.addEventListener('online', this.onOnline),
         window.addEventListener('offline', this.onOffline),
-        echo.private(`payments.${this.referenceNumber}`)
+        echo.private(`private-payments.${this.referenceNumber}`)
             .listen('.payment.paid', () => {
                 this.eWalletPaid = true;
                 this.showSuccess("Payment successful.");
