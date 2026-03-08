@@ -7,20 +7,10 @@
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
             <div class="mb-2 d-flex align-items-center justify-content-center">
-                <v-text-field v-model="searchProduct" class="search-product-input w-75" placeholder="Search product..."
-                    density="compact" variant="flat">
+                <v-text-field v-model="searchProduct" class="search-product-input w-75" style="background: #ccc;" placeholder="Search product..."
+                    density="compact">
                 </v-text-field>
-                <!-- <div class="d-flex justify-center mt-10" style="z-index: 1;">
-                    <template v-if="this.selectedCategory">
-                        <v-icon @click="closeSelectedCategory" class="position-absolute"
-                            style="top: 40px; z-index: 10; cursor: pointer;">
-                            mdi-close</v-icon>
-                        <v-chip color="#696969" variant="flat" class="position-absolute" style="top: 50px;"
-                            size="small">
-                            {{ this.selectedCategory }}
-                        </v-chip>
-                    </template>
-</div> -->
+
                 <v-btn color="#0090b6" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
                     size="small" icon>
                     <v-icon size="medium">mdi-tune-variant</v-icon>
@@ -245,33 +235,6 @@
                     </v-data-table>
                 </v-col>
             </v-row>
-
-            <!-- Categories -->
-            <!-- <v-dialog v-model="categoriesDialog" width="500" height="500" transition="dialog-bottom-transition"
-                class="rounded-10">
-                <v-btn @click="categoriesDialog = false" color="#0090b6" class="position-absolute" size="small"
-                    style="top: -17px; right: -17px; z-index: 10;" icon>
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-card>
-                    <h3 class="bg-grey-lighten-4 position-fixed pa-2 w-100"
-                        style="z-index: 2; border-radius: 3px 3px 0 0;">
-                        <p class="ms-3">Categories</p>
-                    </h3>
-                    <div class="d-flex align-center flex-column pa-8 mt-6">
-                        <v-list-item v-for="(category, i) in productsStore.getCategories" :key="i"
-                            :prepend-icon="category.icon" class="text-white mt-2 w-100"
-                            style="border-radius: 20px !important; background: #0090b6;"
-                            @click="handleCategorySelect(category)">
-                            <span>{{ category.label }}</span>
-                        </v-list-item>
-                    </div>
-                    <v-sheet v-if="productsStore.getCategories.length === 0" class="mt-5 text-center">
-                        <p style="font-size: 15px;">No categories found. <span @click="reloadCategories"
-                                class="text-primary" style="cursor: pointer;">Tap to reload</span> </p>
-                    </v-sheet>
-                </v-card>
-            </v-dialog> -->
 
             <!-- e-Wallet Payment -->
             <v-dialog v-model="eWalletDialog" width="500" class="qr-dialog" transition="dialog-bottom-transition"
@@ -654,9 +617,9 @@ export default {
 
         window.addEventListener('online', this.onOnline),
         window.addEventListener('offline', this.onOffline),
-        echo.channel('payments')
+        echo.private(`payments.${this.referenceNumber}`)
             .listen('PaymentSucceeded', (e) => {
-                if (e.referenceNumber === this.referenceNumber) {
+                if (e.private === this.referenceNumber) {
                     this.eWalletPaid = true;
                     this.showSuccess("Payment received!");
                     this.submitForm();
@@ -767,7 +730,6 @@ export default {
         },
 
         async fetchCategories() {
-            // this.loadingCategories = true;
             this.progressCircular = true;
             try {
                 await this.productsStore.fetchAllCategoriesStore();
@@ -777,7 +739,6 @@ export default {
                 this.showError("Error fetching categories!");
                 this.progressCircular = false;
             } finally {
-                // this.loadingCategories = false;
                 this.progressCircular = false;
             }
         },
@@ -792,7 +753,6 @@ export default {
         },
 
         showCategories() {
-            // this.categoriesDialog = true;
             this.categories = this.productsStore.categories;
         },
 
@@ -1087,9 +1047,10 @@ export default {
     margin-left: 0 !important;
 }
 
-.search-product-input {
+.v-field--variant-filled, .search-product-input {
     border-radius: 15px !important;
-    background-color: #fffcfc
+    background-color: #fffcfc !important;
+    border: none !important;
 }
 
 .category-chip:hover {

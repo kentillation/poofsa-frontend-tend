@@ -12,7 +12,7 @@ const echo = new Echo({
     enabledTransports: ['ws', 'wss'],
     enableStats: true,
     logToConsole: true,
-    authEndpoint: '/broadcasting/auth', // for local development 
+    authEndpoint: '/broadcasting/auth', 
     auth: {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('auth_token')}`
