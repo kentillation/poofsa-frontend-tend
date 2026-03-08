@@ -1,6 +1,8 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 
+window.Pusher = Pusher
+
 Pusher.logToConsole = process.env.NODE_ENV === 'development'
 
 const echo = new Echo({
@@ -12,7 +14,7 @@ const echo = new Echo({
     enabledTransports: ['ws', 'wss'],
     enableStats: true,
     logToConsole: true,
-    authEndpoint: '/broadcasting/auth', 
+    authEndpoint: 'http://127.0.0.1:8000/broadcasting/auth',
     auth: {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('auth_token')}`
