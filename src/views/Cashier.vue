@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <!-- Selected Products -->
+            <!-- Order -->
             <h3 class="mt-5">Your order</h3>
             <div class="mb-3 selected-products-container">
                 <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
