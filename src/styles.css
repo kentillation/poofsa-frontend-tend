@@ -39,11 +39,19 @@ p,
   min-height: 16px !important;
   font-size: 10px !important;
   padding-top: 0 !important;
-  /* display: none; */
 }
 
-.v-input--density-compact {
-  --v-input-padding-top: 0 !important;
+/* .v-input--density-compact input {
+  background-color: #fff !important;
+} */
+
+.v-field--variant-outlined {
+  border-radius: 10px !important;
+  outline: none !important;
+}
+
+.v-field__overlay {
+  background-color: #fff !important;
 }
 
 .v-btn--size-default,

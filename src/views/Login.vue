@@ -1,7 +1,7 @@
 <template>
     <div class="login-bg">
         <v-container class="fill-height d-flex align-center justify-center">
-            <v-sheet class="pa-6 mx-auto ma-4" max-width="500" rounded="lg" width="100%">
+            <v-sheet class="pa-6 mx-auto ma-4" style="background-color: #e8faff;" max-width="500" rounded="lg" width="100%">
                 <div class="d-flex justify-center my-4">
                     <img :src="logo" style="border-radius: 50%;" loading="lazy" alt="Poofsa Logo" />
                 </div>
@@ -19,6 +19,7 @@
                         prepend-inner-icon="mdi-email-outline"
                         variant="outlined"
                         density="compact"
+                        class="mb-1"
                         autocomplete="username" />
 
                     <div class="text-subtitle-1 text-medium-emphasis">Password</div>
@@ -27,7 +28,7 @@
                         placeholder="Type here..."
                         prepend-inner-icon="mdi-lock-outline" 
                         variant="outlined"
-                        density="compact" 
+                        density="compact"
                         autocomplete="current-password"
                         :type="showPassword ? 'text' : 'password'"
                         :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye-outline'" 

@@ -23,7 +23,7 @@
                     class="w-75"
                     placeholder="Search product..."
                     density="compact"
-                    variant="plain">
+                    variant="outlined">
                 </v-text-field>
 
                 <v-btn color="#fff" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
@@ -165,20 +165,20 @@
                             QR</v-btn>
                     </div>
 
-                    <div class="d-flex justify-end me-2 ms-1">
+                    <!-- <div class="d-flex justify-end me-2 ms-1">
                         <v-btn class="bg-red-lighten-2 d-flex w-50 py-6 mt-3" variant="flat" prepend-icon="mdi-refresh"
                             @click="resetPaymentSection" :disabled="loading || eWalletPaid">
                             Reset
                         </v-btn>&nbsp;
-                        <!-- <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat" append-icon="mdi-send"
+                        <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat" append-icon="mdi-send"
                             type="submit" :loading="loading" :disabled="!isFormValid || loading ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
                                 Number(customer_cash) < subTotal ||
                                 Number(customer_change) < 0 ||
                                 subTotal <= 0 || !isOnline">
                             Submit
-                        </v-btn> -->
-                    </div>
+                        </v-btn>
+                    </div> -->
 
                 </v-col>
 
@@ -386,11 +386,12 @@
                             </div>
                         </div>
 
+                        <!-- Inputs -->
                         <div class="mb-5">
                             <div class="mb-3">
                                 <span class="required-asterisk mt-2">*</span> Cash render
                                 <v-text-field v-model.number="customer_cash"
-                                    variant="plain"
+                                    variant="outlined"
                                     density="compact"
                                     type="number"
                                     :disabled="eWalletPaid"
@@ -405,7 +406,7 @@
                             <div class="mb-3">
                                 Note (optional)
                                 <v-text-field v-model="order_note"
-                                    variant="plain"
+                                    variant="outlined"
                                     density="compact"
                                     type="text"
                                     placeholder="Enter note">
@@ -415,7 +416,7 @@
                             <div class="mb-3">
                                 Customer name (optional)
                                 <v-text-field v-model="customer_name" 
-                                    variant="plain"
+                                    variant="outlined"
                                     density="compact"
                                     type="text"
                                     placeholder="Enter customer name">
@@ -446,12 +447,13 @@
                             </div>
                         </div>
 
-                        <v-btn @click="submitForm" :loading="loading" class="place-order-btn"
-                            color="#0090b6" :disabled="!isFormValid || loading ||
+                        <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn mb-7"
+                            color="#0090b6" :disabled="!isFormValid || placingOrder ||
                             (payment_method_id === 2 && !eWalletPaid) ||
                             Number(customer_cash) < subTotal ||
                             Number(customer_change) < 0 ||
-                            subTotal <= 0 || !isOnline">
+                            subTotal <= 0 ||
+                            !isOnline">
                             Place order
                             <span>&nbsp;&bull;&nbsp;₱ {{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
@@ -514,6 +516,7 @@ export default {
             progressCircular: false,
 
             // Payment
+            placingOrder: false,
             selectedOrderDialog: false,
             isFormValid: false,
             eWalletDialog: false,
@@ -555,7 +558,6 @@ export default {
             createdAt: '',
             updatedAt: '',
             tableNumber: 'N/A',
-            loading: false,
             headersDisplay: [
                 { title: '', value: 'product_name' },
                 { title: '', value: 'base_price' },
@@ -1022,24 +1024,24 @@ export default {
 
         async submitForm() {
             try {
-                this.loadingStore.show("Submitting...");
+                this.placingOrder = true;
 
                 if (!this.$refs.transactionForm.validate()) {
-                    this.loadingStore.hide();
+                    this.placingOrder = false;
                     return;
                 }
 
                 if (Number(this.payment_method_id) === 2) {
                     if (!this.eWalletPaid) {
                         this.showError('Please complete e-Wallet payment first');
-                        this.loadingStore.hide();
+                        this.placingOrder = false;
                         return;
                     }
                 }
 
                 if (!this.referenceNumber) {
                     this.showError("Error in reference number. Refresh the page!");
-                    this.loadingStore.hide();
+                    this.placingOrder = false;
                     return;
                 }
 
@@ -1072,6 +1074,7 @@ export default {
                 this.subTotal = 0;
                 this.totalQuantity = 0;
                 this.selectedProducts = [];
+                this.selectedOrderDialog = false;
 
                 await Promise.all([
                     this.fetchProducts(),
@@ -1088,7 +1091,7 @@ export default {
                 this.showError(error);
                 console.error(error);
             } finally {
-                this.loadingStore.hide();
+                this.placingOrder = false;
             }
         },
 
@@ -1144,21 +1147,23 @@ export default {
 </script>
 
 <style scoped>
-.v-text-field {
+/* .v-text-field {
     padding-top: 7px !important;
 }
 
-.v-text-field,
-.search-product-input {
-    border-radius: 10px !important;
-    background-color: #fff !important;
-    padding-left: 15px;
-    /* padding-bottom: 10px; */
+.v-input--density-compact {
+    --v-input-padding-top: 0 !important;
 }
 
 .search-product-input .v-input__details {
     display: flex !important;
-}
+} */
+
+/* .v-text-field {
+    background-color: #fff !important;
+    padding-left: 15px !important;
+    border-radius: 10px !important;
+} */
 
 .category-chip:hover {
     background-color: #0090b6 !important;
