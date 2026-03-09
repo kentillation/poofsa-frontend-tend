@@ -19,8 +19,11 @@
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
             <div class="mb-2 d-flex align-items-center justify-content-center">
-                <v-text-field v-model="searchProduct" class="w-75"
-                    placeholder="Search product..." density="compact" variant="plain">
+                <v-text-field v-model="searchProduct" 
+                    class="w-75"
+                    placeholder="Search product..."
+                    density="compact"
+                    variant="plain">
                 </v-text-field>
 
                 <v-btn color="#fff" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
@@ -388,14 +391,14 @@
                                 <span class="required-asterisk mt-2">*</span> Cash render
                                 <v-text-field v-model.number="customer_cash"
                                     variant="plain"
-                                    class="order-input"
-                                    density="comfortable"
+                                    density="compact"
                                     type="number"
                                     :disabled="eWalletPaid"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric"
                                     placeholder="Enter cash">
+                                    
                                 </v-text-field>
                             </div>
 
@@ -403,8 +406,7 @@
                                 Note (optional)
                                 <v-text-field v-model="order_note"
                                     variant="plain"
-                                    class="order-input"
-                                    density="comfortable"
+                                    density="compact"
                                     type="text"
                                     placeholder="Enter note">
                                 </v-text-field>
@@ -414,8 +416,7 @@
                                 Customer name (optional)
                                 <v-text-field v-model="customer_name" 
                                     variant="plain"
-                                    class="order-input"
-                                    density="comfortable"
+                                    density="compact"
                                     type="text"
                                     placeholder="Enter customer name">
                                 </v-text-field>
@@ -1143,21 +1144,20 @@ export default {
 </script>
 
 <style scoped>
-/* .v-text-field input {
-    margin-left: 0 !important;
-} */
+.v-text-field {
+    padding-top: 7px !important;
+}
 
 .v-text-field,
 .search-product-input {
     border-radius: 10px !important;
     background-color: #fff !important;
-    border: none !important;
     padding-left: 15px;
-    font-size: 13px !important;
+    /* padding-bottom: 10px; */
 }
 
-.order-input {
-    padding-bottom: 15px;
+.search-product-input .v-input__details {
+    display: flex !important;
 }
 
 .category-chip:hover {
