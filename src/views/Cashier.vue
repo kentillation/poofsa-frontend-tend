@@ -1,4 +1,17 @@
 <template>
+    <!-- Checkout -->
+    <div class="payment-indication-container">
+        <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error"
+            :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute"
+            style="top: 5px; right: 13%; z-index: 1010 !important;"></v-badge>
+        <v-btn class="payment-indication d-flex justify-center" color="#0090b6"
+            :disabled="this.ordersStore.currentTotalOrderQuantity === 0">
+            Checkout
+            <span :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }"> &bull; ₱{{
+                this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
+            </span>
+        </v-btn>
+    </div>
     <v-container style="background-color: #e8faff;">
         <!-- <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
             <v-icon>mdi-refresh</v-icon>
@@ -7,8 +20,8 @@
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
             <div class="mb-2 d-flex align-items-center justify-content-center">
-                <v-text-field v-model="searchProduct" class="search-product-input w-75" style="background: #ccc;" placeholder="Search product..."
-                    density="compact" variant="plain">
+                <v-text-field v-model="searchProduct" class="search-product-input w-75" style="background: #ccc;"
+                    placeholder="Search product..." density="compact" variant="plain">
                 </v-text-field>
 
                 <v-btn color="#fff" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
@@ -27,8 +40,7 @@
                 </v-slide-group-item>
                 <v-slide-group-item>
                     <v-chip v-for="(category, index) in productsStore.getCategories" :key="index"
-                        @click="handleCategorySelect(category)" color="#fff" variant="flat" 
-                        class="me-1 category-chip">
+                        @click="handleCategorySelect(category)" color="#fff" variant="flat" class="me-1 category-chip">
                         {{ category.label }}
                     </v-chip>
                 </v-slide-group-item>
@@ -86,8 +98,8 @@
                             <div class="d-flex align-center justify-space-between">
                                 <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
                                 <div class="">
-                                    <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6" class="mini-btn ms-3"
-                                        variant="flat">
+                                    <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
+                                        class="mini-btn ms-3" variant="flat">
                                         <v-icon style="font-size: 10px;">mdi-minus</v-icon>
                                     </v-btn>
                                     <span class="mx-3">{{ selectedProduct.quantity }}</span>
@@ -624,12 +636,12 @@ export default {
         ]);
 
         window.addEventListener('online', this.onOnline),
-        window.addEventListener('offline', this.onOffline),
-        echo.private(`payments.${this.referenceNumber}`)
-            .listen('.payment.paid', () => {
-                this.eWalletPaid = true;
-                this.submitForm();
-            })
+            window.addEventListener('offline', this.onOffline),
+            echo.private(`payments.${this.referenceNumber}`)
+                .listen('.payment.paid', () => {
+                    this.eWalletPaid = true;
+                    this.submitForm();
+                })
     },
 
     beforeUnmount() {
@@ -1004,7 +1016,8 @@ export default {
     margin-left: 0 !important;
 }
 
-.v-field--variant-filled, .search-product-input {
+.v-field--variant-filled,
+.search-product-input {
     border-radius: 10px !important;
     background-color: #fffcfc !important;
     border: none !important;

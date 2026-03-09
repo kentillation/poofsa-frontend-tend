@@ -76,8 +76,8 @@ thead .v-data-table__th .v-data-table-header__content {
 
 .payment-indication-container .payment-indication {
   height: 50px;
-  width: 50%;
-  margin: 5px auto;
+  width: 100%;
+  margin: auto;
   padding: 0 13px;
   display: flex;
   align-items: center;

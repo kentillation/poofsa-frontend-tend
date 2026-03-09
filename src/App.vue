@@ -8,7 +8,7 @@
         <span>&nbsp;{{ connectionStatusText }}</span>
       </div>
     </div>
-    <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
+    <!-- <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
       <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error"
         :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute"
         style="top: 5px; right: 13%; z-index: 1010 !important;"></v-badge>
@@ -19,7 +19,7 @@
           this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
         </span>
       </v-btn>
-    </div>
+    </div> -->
     <v-main>
       <template v-if="!isNotFoundPage">
         <v-app-bar v-if="showMenu" prominent>
