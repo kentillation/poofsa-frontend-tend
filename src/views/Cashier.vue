@@ -7,9 +7,8 @@
             <span :class="{ 'd-none': totalQuantity === 0 }"> &bull; ₱{{
                 this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
             </span>
-            <v-badge :content="totalQuantity" color="error"
-                :class="{ 'd-none': totalQuantity === 0 }" class="position-absolute"
-                style="top: 1px; right: 30px; z-index: 1010 !important;"></v-badge>
+            <v-badge :content="totalQuantity" color="error" :class="{ 'd-none': totalQuantity === 0 }"
+                class="position-absolute" style="top: 1px; right: 30px; z-index: 1010 !important;"></v-badge>
         </v-btn>
     </div>
     <v-container style="background-color: #e8faff;">
@@ -168,14 +167,14 @@
                             @click="resetPaymentSection" :disabled="loading || eWalletPaid">
                             Reset
                         </v-btn>&nbsp;
-                        <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat" append-icon="mdi-send"
+                        <!-- <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat" append-icon="mdi-send"
                             type="submit" :loading="loading" :disabled="!isFormValid || loading ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
                                 Number(customer_cash) < subTotal ||
                                 Number(customer_change) < 0 ||
                                 subTotal <= 0 || !isOnline">
                             Submit
-                        </v-btn>
+                        </v-btn> -->
                     </div>
 
                 </v-col>
@@ -295,7 +294,7 @@
 
                         <!-- Orders -->
                         <p class="ms-2 mb-1"><strong>Your order</strong></p>
-                        <div class="mb-5 pa-2 overflow-auto" 
+                        <div class="mb-5 pa-2 overflow-auto"
                             style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
                             <div class="selected-products-container">
                                 <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info"
@@ -338,12 +337,12 @@
                         <p class="ms-2 mb-1"><strong>Order type</strong></p>
                         <div class="mb-5 ga-2 d-flex justify-center">
                             <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 65px; border-radius: 10px; border: 1px solid #0090b6;">
+                                style="width: 75px; height: 60px; border-radius: 10px; border: 1px solid #0090b6;">
                                 <v-icon>mdi-coffee</v-icon>
                                 <p style="font-size: 12px;">Dine-in</p>
                             </div>
                             <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 65px; border-radius: 10px;">
+                                style="width: 75px; height: 60px; border-radius: 10px;">
                                 <v-icon>mdi-beer-outline</v-icon>
                                 <p style="font-size: 12px;">Take-out</p>
                             </div>
@@ -384,6 +383,44 @@
                             </div>
                         </div>
 
+                        <div class="mb-5">
+                            <div class="mb-3">
+                                <span class="required-asterisk mt-2">*</span> Cash render
+                                <v-text-field v-model.number="customer_cash"
+                                    variant="plain"
+                                    density="comfortable"
+                                    type="number"
+                                    :disabled="eWalletPaid"
+                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
+                                    @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
+                                    inputmode="numeric"
+                                    placeholder="Enter cash">
+                                </v-text-field>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="required-asterisk mt-2">*</span> Note
+                                <v-text-field v-model="order_note"
+                                    variant="plain"
+                                    density="comfortable"
+                                    type="text"
+                                    :rules="[v => !!v || 'Required']"
+                                    placeholder="Enter note">
+                                </v-text-field>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="required-asterisk mt-2">*</span> Customer name
+                                <v-text-field v-model="customer_name" 
+                                    variant="plain"
+                                    density="comfortable"
+                                    type="text"
+                                    :rules="[v => !!v || 'Required']"
+                                    placeholder="Enter customer name">
+                                </v-text-field>
+                            </div>
+                        </div>
+
                         <!-- Amounts -->
                         <div class="mb-5 payment-amounts">
                             <div class="d-flex align-center justify-space-between">
@@ -392,15 +429,30 @@
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Change</p>
+                                <p>₱ {{ customerChange }}</p>
+                            </div>
+                            <v-divider class="my-3"></v-divider>
+                            <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Subtotal</p>
                                 <p>₱ {{ subTotal.toFixed(2) }}</p>
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
-                                <p style="font-weight: 500;">Total</p>
-                                <p style="font-weight: 500; color: #0090b6">₱ {{ discountedSubtotal.toFixed(2) }}</p>
+                                <p style="font-weight: 500; font-size: 18px;">Total</p>
+                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{ discountedSubtotal.toFixed(2) }}</p>
                             </div>
                         </div>
+
+                        <v-btn  type="submit" :loading="loading" class="place-order-btn"
+                            color="#0090b6" :disabled="!isFormValid || loading ||
+                            (payment_method_id === 2 && !eWalletPaid) ||
+                            Number(customer_cash) < subTotal ||
+                            Number(customer_change) < 0 ||
+                            subTotal <= 0 || !isOnline">
+                            Place order
+                            <span>&nbsp;&bull;&nbsp;₱ {{ discountedSubtotal.toFixed(2) }}</span>
+                        </v-btn>
                     </v-container>
                 </v-card>
             </v-bottom-sheet>
@@ -1094,6 +1146,7 @@ export default {
     margin-left: 0 !important;
 }
 
+.v-text-field,
 .v-field--variant-filled,
 .search-product-input {
     border-radius: 10px !important;
@@ -1287,6 +1340,16 @@ export default {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
+}
+
+.place-order-btn {
+    width: 100% !important;
+    height: 50px !important;
+    margin: auto !important;
+    padding: 0 13px !important;
+    align-items: center !important;
+    border-radius: 30px !important;
+    font-size: 16px !important;
 }
 
 .refresh {
