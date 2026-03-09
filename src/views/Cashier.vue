@@ -446,7 +446,7 @@
                             </div>
                         </div>
 
-                        <v-btn  type="submit" :loading="loading" class="place-order-btn"
+                        <v-btn @click="submitForm" :loading="loading" class="place-order-btn"
                             color="#0090b6" :disabled="!isFormValid || loading ||
                             (payment_method_id === 2 && !eWalletPaid) ||
                             Number(customer_cash) < subTotal ||
