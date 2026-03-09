@@ -1,15 +1,16 @@
 <template>
     <!-- Checkout -->
     <div class="payment-indication-container">
-        <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error"
-            :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute"
-            style="top: 5px; right: 13%; z-index: 1010 !important;"></v-badge>
+        
         <v-btn class="payment-indication d-flex justify-center" color="#0090b6"
             :disabled="this.ordersStore.currentTotalOrderQuantity === 0">
             Checkout
             <span :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }"> &bull; ₱{{
                 this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
             </span>
+            <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error"
+                :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute"
+                style="top: 1px; right: 30px; z-index: 1010 !important;"></v-badge>
         </v-btn>
     </div>
     <v-container style="background-color: #e8faff;">

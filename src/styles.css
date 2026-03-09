@@ -70,18 +70,15 @@ thead .v-data-table__th .v-data-table-header__content {
   bottom: 10px;
   width: 100%;
   display: flex;
-  flex-direction: column;
   z-index: 1010 !important;
 }
 
 .payment-indication-container .payment-indication {
   height: 50px;
-  width: 100%;
+  width: 50%;
   margin: auto;
   padding: 0 13px;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
   border-radius: 30px !important;
   color: #e0e7e9;
   font-size: 16px !important;
