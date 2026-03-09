@@ -70,7 +70,7 @@ thead .v-data-table__th .v-data-table-header__content {
   bottom: 10px;
   width: 100%;
   display: flex;
-  z-index: 1010 !important;
+  z-index: 11 !important;
 }
 
 .payment-indication-container .payment-indication {

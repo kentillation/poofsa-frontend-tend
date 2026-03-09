@@ -1,8 +1,7 @@
 <template>
     <!-- Checkout -->
     <div class="payment-indication-container">
-        
-        <v-btn class="payment-indication d-flex justify-center" color="#0090b6"
+        <v-btn @click="showSelectedOrderDialog" class="payment-indication d-flex justify-center" color="#0090b6"
             :disabled="this.ordersStore.currentTotalOrderQuantity === 0">
             Checkout
             <span :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }"> &bull; ₱{{
@@ -114,6 +113,48 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Order Dialog -->
+            <v-dialog v-model="selectedOrderDialog" width="700" transition="dialog-bottom-transition" scrollable>
+                <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
+                    style="top: -17px; left: -17px; z-index: 10;" icon>
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-card class=" pa-6">
+                    <div class="mb-3 selected-products-container">
+                        <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
+                            You have an empty order.
+                        </v-alert>
+                        <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
+                            <div class="selected-products-card mb-3">
+                                <div class="d-flex flex-start">
+                                    <v-img :src="WTFImgSrc" width="80" height="80"
+                                        style="border-radius: 10px !important;"></v-img>
+                                </div>
+                                <div class="d-flex flex-column w-100 mx-3">
+                                    <p class="text-truncate">{{ selectedProduct.product_name }}</p>
+                                    <p class="text-grey my-1" style="font-size: 13px;">{{ selectedProduct.size_label }}
+                                    </p>
+                                    <div class="d-flex align-center justify-space-between">
+                                        <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
+                                        <div class="">
+                                            <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
+                                                class="mini-btn ms-3" variant="flat">
+                                                <v-icon style="font-size: 10px;">mdi-minus</v-icon>
+                                            </v-btn>
+                                            <span class="mx-3">{{ selectedProduct.quantity }}</span>
+                                            <v-btn @click="addQuantity(selectedProduct)" color="#0090b6"
+                                                class="mini-btn mx-1" variant="flat">
+                                                <v-icon style="font-size: 10px;">mdi-plus</v-icon>
+                                            </v-btn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </v-card>
+            </v-dialog>
 
             <!-- Payment Section and Current Orders Section -->
             <v-row class="mb-15">
@@ -378,6 +419,7 @@ export default {
             progressCircular: false,
 
             // Payment
+            selectedOrderDialog: false,
             isFormValid: false,
             eWalletDialog: false,
             eWalletPaid: false,
@@ -724,16 +766,6 @@ export default {
             }
         },
 
-        // async fetchOrderStatus() {
-        //     try {
-        //         await this.transactStore.fetchAllOrderStatusStore();
-        //         this.order_statuses = this.transactStore.orderStatuses;
-        //     } catch (error) {
-        //         console.error('Error fetching order status:', error);
-        //         this.showError("Error fetching order status!");
-        //     }
-        // },
-
         async fetchCurrentOrders() {
             this.loadingCurrentOrders = true;
             try {
@@ -883,6 +915,10 @@ export default {
         //     link.click();
         //     document.body.removeChild(link);
         // },
+
+        showSelectedOrderDialog() {
+            this.selectedOrderDialog = true;
+        },
 
         closeEwalletDialog() {
             this.eWalletDialog = false;
