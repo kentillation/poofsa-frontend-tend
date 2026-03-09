@@ -9,10 +9,6 @@
       </div>
     </div>
     <div v-if="this.$route.name === 'Cashier'" class="payment-indication-container">
-      <!-- <div class="payment-indication" style="background-color: #a9a9a9;">
-        <p class="me-5 text-white">Quantity: {{ this.ordersStore.currentTotalOrderQuantity }}</p>
-        <p class="text-white">Charge: ₱{{ this.ordersStore.currentTotalOrderCharge.toFixed(2) }}</p>
-      </div> -->
       <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error"
         :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute"
         style="top: 5px; right: 13%; z-index: 1010 !important;"></v-badge>
@@ -59,7 +55,6 @@
               Out</v-list-item>
           </v-list>
         </v-navigation-drawer>
-
       </template>
       <v-layout>
         <router-view />

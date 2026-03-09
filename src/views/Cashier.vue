@@ -8,26 +8,26 @@
             <!-- Search Products -->
             <div class="mb-2 d-flex align-items-center justify-content-center">
                 <v-text-field v-model="searchProduct" class="search-product-input w-75" style="background: #ccc;" placeholder="Search product..."
-                    density="compact">
+                    density="compact" variant="plain">
                 </v-text-field>
 
-                <v-btn color="#0090b6" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
+                <v-btn color="#fff" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
                     size="small" icon>
-                    <v-icon size="medium">mdi-tune-variant</v-icon>
+                    <v-icon size="large">mdi-bell-outline</v-icon>
                 </v-btn>
             </div>
 
             <!-- Categories -->
-            <v-slide-group class="my-3">
+            <v-slide-group class="my-3 ms-1">
                 <v-slide-group-item>
                     <v-chip @click="reloadProducts" :color="!selectedCategory ? '#0090b6' : '#fff'" variant="flat"
-                        size="small" class="me-1 category-chip">
+                        class="me-1 category-chip">
                         All
                     </v-chip>
                 </v-slide-group-item>
                 <v-slide-group-item>
                     <v-chip v-for="(category, index) in productsStore.getCategories" :key="index"
-                        @click="handleCategorySelect(category)" color="#fff" variant="flat" size="small"
+                        @click="handleCategorySelect(category)" color="#fff" variant="flat" 
                         class="me-1 category-chip">
                         {{ category.label }}
                     </v-chip>
@@ -86,12 +86,12 @@
                             <div class="d-flex align-center justify-space-between">
                                 <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
                                 <div class="">
-                                    <v-btn @click="minusQuan(selectedProduct)" color="#0090b6" class="mini-btn ms-3"
+                                    <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6" class="mini-btn ms-3"
                                         variant="flat">
                                         <v-icon style="font-size: 10px;">mdi-minus</v-icon>
                                     </v-btn>
                                     <span class="mx-3">{{ selectedProduct.quantity }}</span>
-                                    <v-btn @click="addQuan(selectedProduct)" color="#0090b6" class="mini-btn mx-1"
+                                    <v-btn @click="addQuantity(selectedProduct)" color="#0090b6" class="mini-btn mx-1"
                                         variant="flat">
                                         <v-icon style="font-size: 10px;">mdi-plus</v-icon>
                                     </v-btn>
@@ -768,13 +768,10 @@ export default {
                 return;
             }
 
-            // Show loading
             this.loadingCategories = true;
 
-            // Allow Vue to render the loading state
             await this.$nextTick();
 
-            // Simulate processing / filtering
             const filtered = this.productsStore.products.filter(
                 product => product.category_label === category.label
             );
@@ -783,7 +780,6 @@ export default {
             this.selectedCategory = category.label;
             this.searchProduct = '';
 
-            // Hide loading
             this.loadingCategories = false;
         },
 
@@ -800,7 +796,7 @@ export default {
             }
         },
 
-        minusQuan(product) {
+        deductQuantity(product) {
             const index = this.selectedProducts.findIndex(p => p.product_id === product.product_id);
             if (this.selectedProducts[index].quantity > -1) {
                 this.selectedProducts[index].quantity--;
@@ -810,16 +806,11 @@ export default {
             }
         },
 
-        addQuan(product) {
+        addQuantity(product) {
             const index = this.selectedProducts.findIndex(p => p.product_id === product.product_id);
             if (this.selectedProducts[index].quantity > -1) {
                 this.selectedProducts[index].quantity++;
             }
-        },
-
-        capitalizeFirstLetter(text) {
-            if (!text) return '';
-            return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         },
 
         async generateQRPhCode() {
@@ -966,50 +957,13 @@ export default {
             this.viewOrderDialog = true;
         },
 
-        closeSelectedCategory() {
-            this.selectedCategory = '';
-            this.products = this.productsStore.products;
-        },
-
-        formatOrder(order) {
-            return {
-                ...order,
-                product_name: order.product_name || '',
-                base_price: order.base_price ? parseFloat(order.base_price) : 0,
-                subtotal: order.subtotal ? parseFloat(order.subtotal) : 0,
-                quantity: order.quantity ? parseInt(order.quantity, 10) : 0,
-                temp_label: order.temp_label || '',
-                size_label: order.size_label || '',
-                total_quantity: order.total_quantity ? parseInt(order.total_quantity, 10) : 0,
-                total_amount: order.total_amount ? parseFloat(order.total_amount) : 0,
-                customer_cash: order.customer_cash ? parseFloat(order.customer_cash) : 0,
-                customer_change: order.customer_change ? parseFloat(order.customer_change) : 0,
-                table_number: order.table_number || 'N/A',
-                created_at: order.created_at ? this.formatDateTime(order.created_at) : 'N/A',
-                updated_at: order.updated_at ? this.formatDateTime(order.updated_at) : 'N/A',
-            };
-        },
-
-        formatDateTime(dateString) {
-            if (!dateString) return 'N/A';
-            const date = new Date(dateString);
-            return date.toLocaleString('en-PH', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Asia/Manila'
-            });
-        },
-
         resetPaymentSection() {
             this.eWalletPaid = false;
             this.order_type_id = 1;
-            this.order_type_charge = '0';
+            this.order_type_charge = 0;
             this.customer_cash = '';
-            this.customer_change = '0';
-            this.discount_amount = '0';
+            this.customer_change = 0;
+            this.discount_amount = 0;
             this.computed_discount = null;
             this.payment_method_id = 1;
             this.table_number = null;
@@ -1051,9 +1005,11 @@ export default {
 }
 
 .v-field--variant-filled, .search-product-input {
-    border-radius: 15px !important;
+    border-radius: 10px !important;
     background-color: #fffcfc !important;
     border: none !important;
+    padding-left: 15px;
+    font-size: 13px !important;
 }
 
 .category-chip:hover {
@@ -1128,8 +1084,20 @@ export default {
 }
 
 .image-section-item {
-    width: 50%;
+    width: 20%;
     min-width: 140px;
+}
+
+@media (max-width: 880px) {
+    .image-section-item {
+        width: 30%;
+    }
+}
+
+@media (max-width: 620px) {
+    .image-section-item {
+        width: 50%;
+    }
 }
 
 .image-section .product-card {

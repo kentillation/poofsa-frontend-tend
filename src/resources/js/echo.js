@@ -3,7 +3,7 @@ import Pusher from 'pusher-js'
 
 window.Pusher = Pusher
 
-Pusher.logToConsole = process.env.NODE_ENV === 'development'
+// Pusher.logToConsole = process.env.NODE_ENV === 'development'
 
 const echo = new Echo({
     broadcaster: 'pusher',
