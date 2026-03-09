@@ -19,7 +19,7 @@
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
             <div class="mb-2 d-flex align-items-center justify-content-center">
-                <v-text-field v-model="searchProduct" class="search-product-input w-75" style="background: #ccc;"
+                <v-text-field v-model="searchProduct" class="w-75"
                     placeholder="Search product..." density="compact" variant="plain">
                 </v-text-field>
 
@@ -388,10 +388,11 @@
                                 <span class="required-asterisk mt-2">*</span> Cash render
                                 <v-text-field v-model.number="customer_cash"
                                     variant="plain"
+                                    class="order-input"
                                     density="comfortable"
                                     type="number"
                                     :disabled="eWalletPaid"
-                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
+                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric"
                                     placeholder="Enter cash">
@@ -399,23 +400,23 @@
                             </div>
 
                             <div class="mb-3">
-                                <span class="required-asterisk mt-2">*</span> Note
+                                Note (optional)
                                 <v-text-field v-model="order_note"
                                     variant="plain"
+                                    class="order-input"
                                     density="comfortable"
                                     type="text"
-                                    :rules="[v => !!v || 'Required']"
                                     placeholder="Enter note">
                                 </v-text-field>
                             </div>
 
                             <div class="mb-3">
-                                <span class="required-asterisk mt-2">*</span> Customer name
+                                Customer name (optional)
                                 <v-text-field v-model="customer_name" 
                                     variant="plain"
+                                    class="order-input"
                                     density="comfortable"
                                     type="text"
-                                    :rules="[v => !!v || 'Required']"
                                     placeholder="Enter customer name">
                                 </v-text-field>
                             </div>
@@ -531,8 +532,8 @@ export default {
             computed_discount: null,
             payment_method_id: 1,
             table_number: null,
-            customer_name: '-',
-            order_note: '-',
+            customer_name: '',
+            order_note: '',
             orderTypeItems: [
                 { ordertype_id: 1, ordertype_label: 'Dine-in' },
                 { ordertype_id: 2, ordertype_label: 'Delivery' },
@@ -1109,8 +1110,8 @@ export default {
             this.computed_discount = null;
             this.payment_method_id = 1;
             this.table_number = null;
-            this.customer_name = '-';
-            this.order_note = '-';
+            this.customer_name = '';
+            this.order_note = '';
         },
 
         showTopAlertError(message) {
@@ -1142,18 +1143,21 @@ export default {
 </script>
 
 <style scoped>
-.v-text-field input {
+/* .v-text-field input {
     margin-left: 0 !important;
-}
+} */
 
 .v-text-field,
-.v-field--variant-filled,
 .search-product-input {
     border-radius: 10px !important;
-    background-color: #fffcfc !important;
+    background-color: #fff !important;
     border: none !important;
     padding-left: 15px;
     font-size: 13px !important;
+}
+
+.order-input {
+    padding-bottom: 15px;
 }
 
 .category-chip:hover {
@@ -1195,10 +1199,6 @@ export default {
     100% {
         background-color: rgba(224, 247, 250, 0);
     }
-}
-
-::v-deep .v-input__details {
-    display: none;
 }
 
 .mini-btn {

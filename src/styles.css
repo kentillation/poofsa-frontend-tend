@@ -35,9 +35,10 @@ p,
   font-weight: normal !important;
 }
 
-.v-messages {
+.v-input__details {
   min-height: 16px !important;
   font-size: 10px !important;
+  display: none;
 }
 
 .v-btn--size-default,
