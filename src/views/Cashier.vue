@@ -2,13 +2,13 @@
     <!-- Checkout -->
     <div class="payment-indication-container">
         <v-btn @click="showSelectedOrderDialog" class="payment-indication d-flex justify-center" color="#0090b6"
-            :disabled="this.ordersStore.currentTotalOrderQuantity === 0">
+            :disabled="totalQuantity === 0">
             Checkout
-            <span :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }"> &bull; ₱{{
+            <span :class="{ 'd-none': totalQuantity === 0 }"> &bull; ₱{{
                 this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
             </span>
-            <v-badge :content="this.ordersStore.currentTotalOrderQuantity" color="error"
-                :class="{ 'd-none': this.ordersStore.currentTotalOrderQuantity === 0 }" class="position-absolute"
+            <v-badge :content="totalQuantity" color="error"
+                :class="{ 'd-none': totalQuantity === 0 }" class="position-absolute"
                 style="top: 1px; right: 30px; z-index: 1010 !important;"></v-badge>
         </v-btn>
     </div>
@@ -79,82 +79,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Order -->
-            <h3 class="mt-5">Your order</h3>
-            <div class="mb-3 selected-products-container">
-                <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
-                    You have an empty order.
-                </v-alert>
-                <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
-                    <div class="selected-products-card mb-3">
-                        <div class="d-flex flex-start">
-                            <v-img :src="WTFImgSrc" width="80" height="80"
-                                style="border-radius: 10px !important;"></v-img>
-                        </div>
-                        <div class="d-flex flex-column w-100 mx-3">
-                            <p class="text-truncate">{{ selectedProduct.product_name }}</p>
-                            <p class="text-grey my-1" style="font-size: 13px;">{{ selectedProduct.size_label }}</p>
-                            <div class="d-flex align-center justify-space-between">
-                                <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
-                                <div class="">
-                                    <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
-                                        class="mini-btn ms-3" variant="flat">
-                                        <v-icon style="font-size: 10px;">mdi-minus</v-icon>
-                                    </v-btn>
-                                    <span class="mx-3">{{ selectedProduct.quantity }}</span>
-                                    <v-btn @click="addQuantity(selectedProduct)" color="#0090b6" class="mini-btn mx-1"
-                                        variant="flat">
-                                        <v-icon style="font-size: 10px;">mdi-plus</v-icon>
-                                    </v-btn>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Order Dialog -->
-            <v-dialog v-model="selectedOrderDialog" width="700" transition="dialog-bottom-transition" scrollable>
-                <v-btn @click="closeEwalletDialog" color="#0090b6" class="position-absolute" size="small"
-                    style="top: -17px; left: -17px; z-index: 10;" icon>
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-card class=" pa-6">
-                    <div class="mb-3 selected-products-container">
-                        <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
-                            You have an empty order.
-                        </v-alert>
-                        <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
-                            <div class="selected-products-card mb-3">
-                                <div class="d-flex flex-start">
-                                    <v-img :src="WTFImgSrc" width="80" height="80"
-                                        style="border-radius: 10px !important;"></v-img>
-                                </div>
-                                <div class="d-flex flex-column w-100 mx-3">
-                                    <p class="text-truncate">{{ selectedProduct.product_name }}</p>
-                                    <p class="text-grey my-1" style="font-size: 13px;">{{ selectedProduct.size_label }}
-                                    </p>
-                                    <div class="d-flex align-center justify-space-between">
-                                        <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
-                                        <div class="">
-                                            <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
-                                                class="mini-btn ms-3" variant="flat">
-                                                <v-icon style="font-size: 10px;">mdi-minus</v-icon>
-                                            </v-btn>
-                                            <span class="mx-3">{{ selectedProduct.quantity }}</span>
-                                            <v-btn @click="addQuantity(selectedProduct)" color="#0090b6"
-                                                class="mini-btn mx-1" variant="flat">
-                                                <v-icon style="font-size: 10px;">mdi-plus</v-icon>
-                                            </v-btn>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </v-card>
-            </v-dialog>
 
             <!-- Payment Section and Current Orders Section -->
             <v-row class="mb-15">
@@ -363,6 +287,123 @@
                     </div>
                 </v-card>
             </v-dialog>
+
+            <!-- Order Sheet -->
+            <v-bottom-sheet v-model="selectedOrderDialog">
+                <v-card style="background-color: #e8faff;">
+                    <v-container class="overflow-auto" style="height: 900px;">
+
+                        <!-- Orders -->
+                        <p class="ms-2 mb-1"><strong>Your order</strong></p>
+                        <div class="mb-5 pa-2 overflow-auto" 
+                            style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
+                            <div class="selected-products-container">
+                                <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info"
+                                    class="my-3">
+                                    You have an empty order.
+                                </v-alert>
+                                <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
+                                    <div class="selected-products-card">
+                                        <div class="d-flex flex-start">
+                                            <v-img :src="WTFImgSrc" width="70" height="70"
+                                                style="border-radius: 10px !important;">
+                                            </v-img>
+                                        </div>
+                                        <div class="d-flex flex-column w-100 mx-3">
+                                            <p class="text-truncate">{{ selectedProduct.product_name }}</p>
+                                            <p class="text-grey my-1" style="font-size: 13px;">{{
+                                                selectedProduct.size_label }}
+                                            </p>
+                                            <div class="d-flex align-center justify-space-between">
+                                                <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
+                                                <div class="">
+                                                    <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
+                                                        class="mini-btn ms-3" variant="flat">
+                                                        <v-icon style="font-size: 10px;">mdi-minus</v-icon>
+                                                    </v-btn>
+                                                    <span class="mx-2">{{ selectedProduct.quantity }}</span>
+                                                    <v-btn @click="addQuantity(selectedProduct)" color="#0090b6"
+                                                        class="mini-btn mx-1" variant="flat">
+                                                        <v-icon style="font-size: 10px;">mdi-plus</v-icon>
+                                                    </v-btn>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order type -->
+                        <p class="ms-2 mb-1"><strong>Order type</strong></p>
+                        <div class="mb-5 ga-2 d-flex justify-center">
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 75px; height: 65px; border-radius: 10px; border: 1px solid #0090b6;">
+                                <v-icon>mdi-coffee</v-icon>
+                                <p style="font-size: 12px;">Dine-in</p>
+                            </div>
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 75px; height: 65px; border-radius: 10px;">
+                                <v-icon>mdi-beer-outline</v-icon>
+                                <p style="font-size: 12px;">Take-out</p>
+                            </div>
+                        </div>
+
+                        <!-- Customer type -->
+                        <p class="ms-2 mb-1"><strong>Customer type</strong></p>
+                        <div class="mb-5 ga-2 d-flex justify-center">
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 75px; height: 75px; border-radius: 10px; border: 1px solid #0090b6;">
+                                <v-icon>mdi-account-circle-outline</v-icon>
+                                <p style="font-size: 12px;">Regular</p>
+                            </div>
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 75px; height: 75px; border-radius: 10px;">
+                                <v-icon>mdi-wheelchair</v-icon>
+                                <p style="font-size: 12px;">PWD</p>
+                            </div>
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 75px; height: 75px; border-radius: 10px;">
+                                <v-icon>mdi-human-cane</v-icon>
+                                <p style="font-size: 12px;" class="text-center">Senior Citizen</p>
+                            </div>
+                        </div>
+
+                        <!-- Payment method -->
+                        <p class="ms-2 mb-1"><strong>Payment method</strong></p>
+                        <div class="mb-5 ga-2 d-flex justify-center">
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 160px; height: 80px; border-radius: 10px; border: 1px solid #0090b6;">
+                                <v-icon>mdi-cash</v-icon>
+                                <p class="text-center" style="font-size: 12px;">Cash <br /> (Over-the-counter)</p>
+                            </div>
+                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                                style="width: 160px; height: 80px; border-radius: 10px;">
+                                <v-icon>mdi-wallet</v-icon>
+                                <p class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
+                            </div>
+                        </div>
+
+                        <!-- Amounts -->
+                        <div class="mb-5 payment-amounts">
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Quantity</p>
+                                <p>x{{ totalQuantity }}</p>
+                            </div>
+                            <v-divider class="my-3"></v-divider>
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Subtotal</p>
+                                <p>₱ {{ subTotal.toFixed(2) }}</p>
+                            </div>
+                            <v-divider class="my-3"></v-divider>
+                            <div class="d-flex align-center justify-space-between">
+                                <p style="font-weight: 500;">Total</p>
+                                <p style="font-weight: 500; color: #0090b6">₱ {{ discountedSubtotal.toFixed(2) }}</p>
+                            </div>
+                        </div>
+                    </v-container>
+                </v-card>
+            </v-bottom-sheet>
         </v-form>
         <Snackbar ref="snackbarRef" />
         <Alert ref="alertRef" />
@@ -1195,6 +1236,12 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
+}
+
+.v-bottom-sheet .payment-amounts {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 14px;
 }
 
 /* QR Dialog Styles */
