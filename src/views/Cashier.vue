@@ -291,7 +291,7 @@
                             :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                             label="Mode of payment" />
                         
-                        <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-2">
+                        <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-4">
                             <div v-if="loadingQr" class="d-flex justify-center">
                                 <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                     <p class="text-grey my-3">Generating...</p>
