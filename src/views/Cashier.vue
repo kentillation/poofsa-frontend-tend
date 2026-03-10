@@ -291,7 +291,7 @@
                             :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                             label="Mode of payment" />
                         
-                        <div v-if="generateQRPhCode" class="qr-container text-center w-100 pa-2">
+                        <div v-if="this.selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
                             <div v-if="this.loadingQr === true" class="d-flex justify-center">
                                 <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                     <p class="text-grey my-3">Generating...</p>
@@ -612,11 +612,12 @@ export default {
             }
         },
 
-        /* payment_mode_id(newVal) {
+        payment_mode_id(newVal) {
             if (Number(newVal) === 2) {
                 this.selectedEwalletOption = 'qrph';
+                this.loadingQr = true;
             }
-        }, */
+        },
         
         eWalletPaid(newVal) {
             if (newVal) {
