@@ -84,22 +84,6 @@
 
             <!-- Payment Section and Current Orders Section -->
             <v-row class="mb-15">
-                <!--Payment Section  -->
-                <v-col cols="12">
-                    <h3>Payment Section</h3>
-
-                    <div class="payment-section d-flex">
-                        <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
-                            density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
-                            :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
-                            label="Mode of payment" />
-                        <v-btn @click="generateQRPhCode"
-                            :disabled="!isOnline || isNotEwallet || eWalletPaid"
-                            prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn me-2 mt-2">Generate
-                            QR</v-btn>
-                    </div>
-
-                </v-col>
 
                 <!-- Current Orders Section -->
                 <v-col cols="12">
@@ -301,8 +285,19 @@
                             <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
                                 <v-icon>mdi-wallet</v-icon>
-                                <p class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
+                                <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid" class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
                             </div>
+                        </div>
+
+                        <div class="payment-section d-flex">
+                            <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
+                                density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
+                                :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
+                                label="Mode of payment" />
+                            <v-btn @click="generateQRPhCode"
+                                :disabled="!isOnline || isNotEwallet || eWalletPaid"
+                                prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn me-2 mt-2">Generate
+                                QR</v-btn>
                         </div>
 
                         <!-- Inputs -->
