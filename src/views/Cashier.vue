@@ -292,14 +292,14 @@
                             label="Mode of payment" />
                         
                         <div v-if="this.selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
-                            <div v-if="this.loadingQr === true" class="d-flex justify-center">
+                            <div v-if="loadingQr" class="d-flex justify-center">
                                 <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                     <p class="text-grey my-3">Generating...</p>
                                     <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
                                 </div>
                             </div>
                             
-                            <div v-else>
+                            <div v-else-if="eWalletImgSrc">
                                 <div class="d-flex align-center justify-center">
                                     <p style="font-size: 20px;">Scan</p>
                                     <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo"
@@ -944,24 +944,18 @@ export default {
                 return;
             }
 
-            this.loadingQr = true;
-
-            if (this.payment_mode_id === 2)
-            {
-                this.selectedEwalletOption = 'qrph';
-                this.paymentStore.qrImageSrc = null;
-            }
-
             try {
-                const amountToPay = this.discountedSubtotal;
-
-                const selectedEWallet = this.selectedEwalletOption;
+                this.loadingQr = true;
+                this.paymentStore.qrImageSrc = null;
+                this.selectedEwalletOption = 'qrph';
 
                 await this.generateReferenceNumber();
+                
+                const amountToPay = this.discountedSubtotal;
 
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
-                    selectedEWallet,
+                    this.selectedEwalletOption,
                     this.referenceNumber
                 );
 
