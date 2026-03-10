@@ -618,6 +618,12 @@ export default {
                 this.selectedEwalletOption = 'qrph';
             }
         },
+
+        payment_method_id(newVal) {
+            if (Number(newVal) === 2) {
+                this.selectedEwalletOption = 'qrph';
+            }
+        },
         
         eWalletPaid(newVal) {
             if (newVal) {
