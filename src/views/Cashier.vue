@@ -293,7 +293,7 @@
                         
                         <div class="mb-5">
                             <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
-                                <div v-if="loadingQr" class="d-flex justify-center">
+                                <div v-if="this.loadingQr === true" class="d-flex justify-center">
                                     <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                         <p class="text-grey my-3">Generating...</p>
                                         <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
