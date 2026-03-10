@@ -12,9 +12,6 @@
         </v-btn>
     </div>
     <v-container style="background-color: #e8faff;">
-        <!-- <v-btn @click="this.reloadData" color="#0090b6" class="refresh" variant="flat" icon>
-            <v-icon>mdi-refresh</v-icon>
-        </v-btn> -->
 
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
