@@ -860,7 +860,7 @@ export default {
             try {
                 this.loadingQr = true;
                 this.eWalletImgSrc = null;
-                this.payment_mode_id = 2;
+                this.payment_method_id = 2;
                 this.selectedEwalletOption = 'qrph';
 
                 await this.generateReferenceNumber();
