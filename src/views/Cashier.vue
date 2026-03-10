@@ -346,7 +346,7 @@
                             
                             <div v-if="eWalletImgSrc" class="text-center">
                                 <p class="text-caption text-grey">
-                                   Please don't refresh this page until e-Wallet payment is succeeded.
+                                   Please don't refresh this page until eWallet payment is succeeded.
                                 </p>
                             </div>
                         </v-card>
