@@ -291,10 +291,15 @@
                             :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                             label="Mode of payment" />
                         
-
                         <div class="mb-5">
                             <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
-                                <div v-if="eWalletImgSrc">
+                                <div v-if="loadingQr" class="d-flex justify-center">
+                                    <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
+                                        <p class="text-grey my-3">Generating...</p>
+                                        <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
+                                    </div>
+                                </div>
+                                <div v-else>
                                     <div class="d-flex align-center justify-center">
                                         <p style="font-size: 20px;">Scan</p>
                                         <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo"
@@ -321,12 +326,6 @@
                                     <!-- <v-chip @click="downloadQR" color="#0090b6" size="small" variant="flat" prepend-icon="mdi-download">Download QR</v-chip> -->
                                 </div>
 
-                                <div v-else class="d-flex justify-center">
-                                    <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
-                                        <p class="text-grey my-3">Generating...</p>
-                                        <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
-                                    </div>
-                                </div>
                             </div>
                             
                             <!-- Show payment status -->
@@ -478,6 +477,7 @@ export default {
             progressCircular: false,
 
             // Payment
+            loadingQr: false,
             placingOrder: false,
             selectedOrderDialog: false,
             isFormValid: false,
@@ -939,6 +939,7 @@ export default {
                 return;
             }
 
+            this.loadingQr = true;
             this.paymentStore.qrImageSrc = null;
             // this.eWalletDialog = true;
 
@@ -955,12 +956,15 @@ export default {
                     selectedEWallet,
                     this.referenceNumber
                 );
+
                 this.customer_cash = amountToPay;
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
 
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
                 this.eWalletDialog = false;
+            } finally {
+                this.loadingQr = false;
             }
         },
 
