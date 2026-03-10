@@ -289,16 +289,67 @@
                             </div>
                         </div>
 
-                        <div class="payment-section d-flex">
-                            <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
-                                density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
-                                :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
-                                label="Mode of payment" />
-                            <v-btn @click="generateQRPhCode"
-                                :disabled="!isOnline || isNotEwallet || eWalletPaid"
-                                prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn me-2 mt-2">Generate
-                                QR</v-btn>
-                        </div>
+                        <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
+                            density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
+                            :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
+                            label="Mode of payment" />
+                        
+
+                        <v-card class="d-flex flex-column align-center pa-6">
+                            <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
+                                <div v-if="eWalletImgSrc">
+                                    <div class="d-flex align-center justify-center">
+                                        <p style="font-size: 20px;">Scan</p>
+                                        <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo"
+                                           style="width: 60px; height: 15px;" alt="QRPh Logo" loading="lazy">
+                                         <p style="font-size: 20px;">code to pay</p>
+                                    </div>
+                                    
+                                    <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
+                                        <img class="e-wallet" :src="this.ewalletImageStore.gcashLogo"
+                                           style="width: 50px; height: 13px;" alt="GCash Logo" loading="lazy">
+                                        <img class="e-wallet" :src="this.ewalletImageStore.mayaLogo"
+                                           style="width: 30px; height: 13px;" alt="Maya Logo" loading="lazy">
+                                        <img class="e-wallet" :src="this.ewalletImageStore.bpiLogo"
+                                           style="width: 25px; height: 13px;" alt="BPI Logo" loading="lazy">
+                                        <img class="e-wallet" :src="this.ewalletImageStore.gotymeLogo"
+                                           style="width: 40px; height: 13px;" alt="GoTyme Logo" loading="lazy">
+                                        <img class="e-wallet" :src="this.ewalletImageStore.homecreditLogo"
+                                           style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
+                                    </div>
+                                    <p class="mt-4" style="font-size: 20px;">
+                                       <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
+                                    </p>
+                                    <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
+                                    <!-- <v-chip @click="downloadQR" color="#0090b6" size="small" variant="flat" prepend-icon="mdi-download">Download QR</v-chip> -->
+                                </div>
+
+                                <div v-else class="d-flex justify-center">
+                                    <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
+                                        <p class="text-grey my-3">Generating...</p>
+                                        <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Show payment status -->
+                            <div class="payment-status w-100">
+                                <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'" variant="tonal"
+                                    style="border-radius: 15px;" class="mt-1 px-3">
+                                    <div class="d-flex align-center justify-space-between">
+                                        <span>{{ !eWalletPaid ? 'Waiting for payment' : 'Payment successful' }}</span>
+                                        <v-progress-circular v-if="!eWalletPaid" size="20" width="2" indeterminate></v-progress-circular>
+                                        <v-icon v-else color="success">mdi-check-circle</v-icon>
+                                    </div>
+                                </v-alert>
+                            </div>
+                            
+                            <div v-if="eWalletImgSrc" class="text-center">
+                                <p class="text-caption text-grey">
+                                   Please don't refresh this page until e-Wallet payment is succeeded.
+                                </p>
+                            </div>
+                        </v-card>
 
                         <!-- Inputs -->
                         <div class="mb-5">
@@ -891,8 +942,8 @@ export default {
                 return;
             }
 
-            this.eWalletImgSrc = null;
-            this.eWalletDialog = true;
+            this.paymentStore.qrImageSrc = null;
+            // this.eWalletDialog = true;
 
             try {
 
