@@ -615,7 +615,6 @@ export default {
         payment_mode_id(newVal) {
             if (Number(newVal) === 2) {
                 this.selectedEwalletOption = 'qrph';
-                this.loadingQr = true;
             }
         },
         
