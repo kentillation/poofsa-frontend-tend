@@ -900,6 +900,8 @@ export default {
 
                 const selectedEWallet = this.selectedEwalletOption;
 
+                await generateReferenceNumber():
+
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
                     selectedEWallet,
@@ -995,7 +997,7 @@ export default {
                     this.fetchCurrentOrders(),
                     this.fetchCategories(),
                     this.resetPaymentSection(),
-
+                    this.generateReferenceNumber(),
                 ]);
 
                 this.showSuccess("Success! Ready for next customer.");
