@@ -945,7 +945,7 @@ export default {
 
             try {
                 this.loadingQr = true;
-                this.paymentStore.qrImageSrc = null;
+                this.eWalletImgSrc = null;
                 this.selectedEwalletOption = 'qrph';
 
                 await this.generateReferenceNumber();
