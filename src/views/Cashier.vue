@@ -948,7 +948,7 @@ export default {
 
                 const selectedEWallet = this.selectedEwalletOption;
 
-                await this.generateReferenceNumber():
+                await this.generateReferenceNumber();
 
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
