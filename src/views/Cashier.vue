@@ -293,7 +293,7 @@
                         
                         <div class="mb-5">
                             <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
-                                <div v-if="this.loadingQr === true" class="d-flex justify-center">
+                                <div v-if="this.loadingQr = true" class="d-flex justify-center">
                                     <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                         <p class="text-grey my-3">Generating...</p>
                                         <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
@@ -484,7 +484,7 @@ export default {
             eWalletDialog: false,
             eWalletPaid: false,
             eWalletImgSrc: null,
-            selectedEwalletOption: 'qrph',
+            selectedEwalletOption: '',
             isOnline: navigator.onLine,
             referenceNumber: '',
             total_quantity: '',
@@ -498,8 +498,8 @@ export default {
             computed_discount: null,
             payment_method_id: 1,
             table_number: null,
-            customer_name: '',
-            order_note: '',
+            customer_name: '-',
+            order_note: '-',
             orderTypeItems: [
                 { ordertype_id: 1, ordertype_label: 'Dine-in' },
                 { ordertype_id: 2, ordertype_label: 'Delivery' },
@@ -613,7 +613,12 @@ export default {
             if (Number(newVal) === 1) {
                 this.order_type_charge = 0;
             }
+
+            if (Number(newVal) === 2) {
+                this.selectedEwalletOption = 'qrph';
+            }
         },
+        
         eWalletPaid(newVal) {
             if (newVal) {
                 setTimeout(() => {
@@ -1081,8 +1086,8 @@ export default {
             this.discount_amount = 0;
             this.computed_discount = null;
             this.payment_method_id = 1;
-            this.customer_name = '';
-            this.order_note = '';
+            this.customer_name = '-';
+            this.order_note = '-';
         },
 
         showTopAlertError(message) {
