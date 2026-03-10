@@ -291,7 +291,7 @@
                             :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                             label="Mode of payment" />
                         
-                        <div v-if="this.selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
+                        <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-2">
                             <div v-if="loadingQr" class="d-flex justify-center">
                                 <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                     <p class="text-grey my-3">Generating...</p>
@@ -611,12 +611,6 @@ export default {
                 this.order_type_charge = 0;
             }
         },
-
-        payment_mode_id(newVal) {
-            if (Number(newVal) === 2) {
-                this.selectedEwalletOption = 'qrph';
-            }
-        },
         
         eWalletPaid(newVal) {
             if (newVal) {
@@ -933,11 +927,6 @@ export default {
                 return;
             }
 
-            if (this.payment_method_id !== 2) {
-                this.showError("Please select e-Wallet payment.");
-                return;
-            }
-
             if (this.discountedSubtotal === 0) {
                 this.showError("No product selected.");
                 return;
@@ -946,6 +935,7 @@ export default {
             try {
                 this.loadingQr = true;
                 this.eWalletImgSrc = null;
+                this.payment_mode_id = 2;
                 this.selectedEwalletOption = 'qrph';
 
                 await this.generateReferenceNumber();
