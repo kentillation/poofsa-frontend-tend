@@ -87,98 +87,17 @@
                 <!--Payment Section  -->
                 <v-col cols="12">
                     <h3>Payment Section</h3>
-                    <div class="payment-section mt-3">
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="subtotal" label="Sub total"
-                            variant="outlined" density="compact" type="number" :model-value="subTotal.toFixed(2)"
-                            prepend-inner-icon="mdi-cash" readonly />
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="total_amount" label="Total amount"
-                            variant="outlined" density="compact" type="number"
-                            :model-value="discountedSubtotal.toFixed(2)" prepend-inner-icon="mdi-cash" readonly />
-
-                        <v-autocomplete class="payment-section-item me-2 mt-2" v-model="order_type_id"
-                            :items="orderTypeItems" item-title="ordertype_label" item-value="ordertype_id"
-                            label="Order type" variant="outlined" density="compact" />
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="order_type_charge"
-                            label="Order type charge" variant="outlined" :disabled="isOrderTypeChargeDisabled"
-                            @input="e => order_type_charge = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
-                            type="number" density="compact" prepend-inner-icon="mdi-cash-plus" />
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model.number="customer_cash"
-                            variant="outlined" density="compact" type="number" :disabled="eWalletPaid"
-                            :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total charge']"
-                            @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
-                            prepend-inner-icon="mdi-cash-plus" placeholder="Enter cash">
-                            <template #label>
-                                <span class="required-asterisk">*</span> Cash render
-                            </template>
-                        </v-text-field>
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_change" label="Change"
-                            variant="outlined" density="compact" :model-value="customerChange"
-                            prepend-inner-icon="mdi-cash-refund" readonly />
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model.number="discount_amount"
-                            variant="outlined" density="compact" type="text" :rules="[v => !!v || 'Required']"
-                            prepend-inner-icon="mdi-cash-minus"
-                            @input="e => discount_amount = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric">
-                            <template #label>
-                                <span class="required-asterisk">*</span> Discount (₱)
-                            </template>
-                        </v-text-field>
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="order_note" variant="outlined"
-                            density="compact" type="text" :rules="[v => !!v || 'Required']"
-                            prepend-inner-icon="mdi-note" placeholder="Enter note">
-                            <template #label>
-                                <span class="required-asterisk">*</span> Note
-                            </template>
-                        </v-text-field>
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="customer_name" variant="outlined"
-                            density="compact" type="text" :rules="[v => !!v || 'Required']"
-                            prepend-inner-icon="mdi-account" placeholder="Enter customer name">
-                            <template #label>
-                                <span class="required-asterisk">*</span> Customer name
-                            </template>
-                        </v-text-field>
-
-                        <v-text-field class="payment-section-item me-2 mt-2" v-model="table_number" variant="outlined"
-                            density="compact" type="text" :rules="[v => !!v || 'Required']"
-                            prepend-inner-icon="mdi-table-chair" inputmode="numeric" placeholder="Enter table number">
-                            <template #label>
-                                <span class="required-asterisk">*</span> Table number
-                            </template>
-                        </v-text-field>
-
-                    </div>
 
                     <div class="payment-section d-flex">
                         <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
-                            density="compact" prepend-inner-icon="mdi-cash" :disabled="!table_number || eWalletPaid"
+                            density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
                             :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
                             label="Mode of payment" />
                         <v-btn @click="generateQRPhCode"
-                            :disabled="!isOnline || isNotEwallet || !table_number || eWalletPaid"
+                            :disabled="!isOnline || isNotEwallet || eWalletPaid"
                             prepend-icon="mdi-qrcode" height="37" color="green" class="ewallet-btn me-2 mt-2">Generate
                             QR</v-btn>
                     </div>
-
-                    <!-- <div class="d-flex justify-end me-2 ms-1">
-                        <v-btn class="bg-red-lighten-2 d-flex w-50 py-6 mt-3" variant="flat" prepend-icon="mdi-refresh"
-                            @click="resetPaymentSection" :disabled="loading || eWalletPaid">
-                            Reset
-                        </v-btn>&nbsp;
-                        <v-btn class="d-flex w-50 py-6 mt-3" color="#0090b6" variant="flat" append-icon="mdi-send"
-                            type="submit" :loading="loading" :disabled="!isFormValid || loading ||
-                                (payment_method_id === 2 && !eWalletPaid) ||
-                                Number(customer_cash) < subTotal ||
-                                Number(customer_change) < 0 ||
-                                subTotal <= 0 || !isOnline">
-                            Submit
-                        </v-btn>
-                    </div> -->
 
                 </v-col>
 
@@ -293,7 +212,7 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
-                    <v-container class="overflow-auto" style="height: 900px;">
+                    <v-container class="overflow-auto pb-10" style="height: 700px;">
 
                         <!-- Orders -->
                         <p class="ms-2 mb-1"><strong>Your order</strong></p>
@@ -447,7 +366,7 @@
                             </div>
                         </div>
 
-                        <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn mb-7"
+                        <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn"
                             color="#0090b6" :disabled="!isFormValid || placingOrder ||
                             (payment_method_id === 2 && !eWalletPaid) ||
                             Number(customer_cash) < subTotal ||
@@ -1113,7 +1032,6 @@ export default {
             this.discount_amount = 0;
             this.computed_discount = null;
             this.payment_method_id = 1;
-            this.table_number = null;
             this.customer_name = '';
             this.order_note = '';
         },
