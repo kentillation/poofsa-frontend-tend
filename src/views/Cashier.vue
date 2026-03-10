@@ -838,6 +838,9 @@ export default {
 
         cashPayment () {
             this.payment_method_id = 1;
+            this.loadingQr = false;
+            this.eWalletImgSrc = null;
+            this.selectedEwalletOption = '';
         },
 
         async generateQRPhCode() {
