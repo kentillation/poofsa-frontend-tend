@@ -295,7 +295,7 @@
                             label="Mode of payment" />
                         
 
-                        <v-card class="d-flex flex-column align-center pa-6">
+                        <v-card v-if="this.payment_method_id === 2" class="d-flex flex-column align-center pa-6">
                             <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
                                 <div v-if="eWalletImgSrc">
                                     <div class="d-flex align-center justify-center">
