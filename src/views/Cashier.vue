@@ -292,7 +292,7 @@
                             label="Mode of payment" />
                         
 
-                        <v-card v-if="this.payment_method_id === 2" class="d-flex flex-column align-center pa-6">
+                        <div class="mb-5">
                             <div v-if="selectedEwalletOption === 'qrph'" class="qr-container text-center w-100 pa-2">
                                 <div v-if="eWalletImgSrc">
                                     <div class="d-flex align-center justify-center">
@@ -346,7 +346,7 @@
                                    Please don't refresh this page until eWallet payment is succeeded.
                                 </p>
                             </div>
-                        </v-card>
+                        </div>
 
                         <!-- Inputs -->
                         <div class="mb-5">
