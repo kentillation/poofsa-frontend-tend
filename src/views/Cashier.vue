@@ -275,21 +275,16 @@
                         <p class="ms-2 mb-1"><strong>Payment method</strong></p>
                         <div class="mb-5 ga-2 d-flex justify-center">
                             <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 160px; height: 80px; border-radius: 10px; border: 1px solid #0090b6;">
+                                style="width: 160px; height: 80px; border-radius: 10px;">
                                 <v-icon>mdi-cash</v-icon>
                                 <p class="text-center" style="font-size: 12px;">Cash <br /> (Over-the-counter)</p>
                             </div>
                             <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 160px; height: 80px; border-radius: 10px;">
+                                style="width: 160px; height: 80px; border-radius: 10px; border: 1px solid #0090b6;">
                                 <v-icon>mdi-wallet</v-icon>
                                 <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid" class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
                             </div>
                         </div>
-
-                        <v-autocomplete class="me-2 mt-2" v-model="payment_method_id" variant="outlined"
-                            density="compact" prepend-inner-icon="mdi-cash" :disabled="eWalletPaid"
-                            :items="paymentModeItems" item-title="paymentmode_label" item-value="paymentmode_id"
-                            label="Mode of payment" />
                         
                         <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-4">
                             <div v-if="loadingQr" class="d-flex justify-center">
