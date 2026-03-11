@@ -875,6 +875,18 @@ export default {
             this.order_type_id = 3;
         },
 
+        customerRegular() {
+            this.customer_type_id = 1;
+        },
+
+        customerPwd() {
+            this.customer_type_id = 2;
+        },
+
+        customerSenior() {
+            this.customer_type_id = 3;
+        },
+
         cashPayment () {
             this.payment_method_id = 1;
             this.loadingQr = false;
