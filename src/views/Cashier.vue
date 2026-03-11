@@ -204,12 +204,12 @@
                         <div class="mb-5 ga-2 d-flex justify-center">
                             <div :class="{ 'selected' : this.payment_method_id === 1 }" class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
-                                <v-icon>mdi-cash</v-icon>
+                                <v-icon style="font-size: 15px;">mdi-cash</v-icon>
                                 <p @click="cashPayment" class="text-center" style="font-size: 12px;">Cash <br /> (Over-the-counter)</p>
                             </div>
                             <div :class="{ 'selected' : this.payment_method_id === 2 }" class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
-                                <v-icon>mdi-wallet</v-icon>
+                                <v-icon style="font-size: 15px;">mdi-qrcode-scan</v-icon>
                                 <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid" class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
                             </div>
                         </div>
