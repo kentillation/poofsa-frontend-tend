@@ -165,30 +165,35 @@
                         <!-- Order type -->
                         <p class="ms-2 mb-1"><strong>Order type</strong></p>
                         <div class="mb-5 ga-2 d-flex justify-center">
-                            <div :class="{ 'selected' : this.order_type_id === 1 }"
+                            <div @click="dineIn" :class="{ 'selected' : this.order_type_id === 1 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-coffee</v-icon>
                                 <p style="font-size: 12px;">Dine-in</p>
                             </div>
-                            <div :class="{ 'selected' : this.order_type_id === 2 }"
+                            <div @click="takeOut" :class="{ 'selected' : this.order_type_id === 2 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-beer-outline</v-icon>
                                 <p style="font-size: 12px;">Take-out</p>
+                            </div>
+                            <div @click="deliveryOrder" :class="{ 'selected' : this.order_type_id === 3 }"
+                                class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                                <v-icon>mdi-bicycle</v-icon>
+                                <p style="font-size: 12px;">Delivery</p>
                             </div>
                         </div>
 
                         <!-- Customer type -->
                         <p class="ms-2 mb-1"><strong>Customer type</strong></p>
                         <div class="mb-5 ga-2 d-flex justify-center">
-                            <div :class="{ 'selected' : this.customer_type_id === 1 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                            <div @click="customerRegular" :class="{ 'selected' : this.customer_type_id === 1 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-account-circle-outline</v-icon>
                                 <p style="font-size: 12px;">Regular</p>
                             </div>
-                            <div :class="{ 'selected' : this.customer_type_id === 2 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                            <div @click="customerPwd" :class="{ 'selected' : this.customer_type_id === 2 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-wheelchair</v-icon>
                                 <p style="font-size: 12px;">PWD</p>
                             </div>
-                            <div :class="{ 'selected' : this.customer_type_id === 3 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                            <div @click="customerSenior" :class="{ 'selected' : this.customer_type_id === 3 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-human-cane</v-icon>
                                 <p style="font-size: 12px;" class="text-center">Senior Citizen</p>
                             </div>
@@ -529,6 +534,15 @@ export default {
         order_type_id(newVal) {
             if (Number(newVal) === 1) {
                 this.order_type_charge = 0;
+                this.order_type_id = 1;
+            }
+            if (Number(newVal) === 2) {
+                this.order_type_charge = 0;
+                this.order_type_id = 2;
+            }
+            if (Number(newVal) === 3) {
+                this.order_type_charge = 5; // Delivery
+                this.order_type_id = 3;
             }
         },
 
@@ -847,6 +861,18 @@ export default {
             if (this.selectedProducts[index].quantity > -1) {
                 this.selectedProducts[index].quantity++;
             }
+        },
+
+        dineIn() {
+            this.order_type_id = 1;
+        },
+
+        takeOut() {
+            this.order_type_id = 2;
+        },
+
+        deliveryOrder() {
+            this.order_type_id = 3;
         },
 
         cashPayment () {
