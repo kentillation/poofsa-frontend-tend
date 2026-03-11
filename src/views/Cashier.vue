@@ -405,6 +405,7 @@ export default {
             selectedEwalletOption: '',
             isOnline: navigator.onLine,
             referenceNumber: '',
+            eWalletRef: '',
             total_quantity: '',
             subtotal: null,
             total_amount: 0,
@@ -728,7 +729,7 @@ export default {
         async generateReferenceNumber() {
             const generatedNumber = Math.random().toString().slice(2, 14);
             this.referenceNumber = generatedNumber;
-            return this.referenceNumber;
+            return generatedNumber;
         },
 
         async fetchProducts() {
@@ -864,13 +865,14 @@ export default {
                 this.loadingQr = true;
                 this.payment_method_id = 2;
                 this.selectedEwalletOption = 'qrph';
+                this.eWalletRef = this.generateReferenceNumber();
                 
                 const amountToPay = this.discountedSubtotal;
 
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
                     this.selectedEwalletOption,
-                    this.referenceNumber
+                    this.eWalletRef
                 );
 
                 this.customer_cash = amountToPay;
@@ -931,7 +933,7 @@ export default {
                 this.computed_discount = this.subTotal * (this.discount_amount / 100);
 
                 const formData = new FormData();
-                formData.append("transactions[0][reference_number]", this.referenceNumber);
+                formData.append("transactions[0][reference_number]", this.referenceNumber ?? this.eWalletRef);
                 formData.append("transactions[0][total_quantity]", this.totalQuantity);
                 formData.append("transactions[0][total_amount]", parseFloat(this.discountedSubtotal) || 0);
                 formData.append("transactions[0][subtotal]", parseFloat(this.subTotal) || 0);
