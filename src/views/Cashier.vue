@@ -315,6 +315,13 @@
                                 <p class="text-grey">Change</p>
                                 <p>₱{{ customerChange }}</p>
                             </div>
+                            <div :class="this.order_type_charge > 0 ? 'd-block' : 'd-none'">
+                                <v-divider class="my-3"></v-divider>
+                                <div class="d-flex align-center justify-space-between">
+                                    <p class="text-grey">Delivery</p>
+                                    <p>₱{{ this.order_type_charge }}</p>
+                                </div>
+                            </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Subtotal</p>
