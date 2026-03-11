@@ -876,12 +876,11 @@ export default {
 
                 this.customer_cash = amountToPay;
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
+                this.loadingQr = false;
 
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
                 this.eWalletDialog = false;
-            } finally {
-                this.loadingQr = false;
             }
         },
 
