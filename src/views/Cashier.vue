@@ -122,8 +122,8 @@
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
 
                         <!-- Orders -->
-                        <p class="ms-2 mb-1">Your order</p>
-                        <div class="mb-5 pa-2 overflow-auto"
+                        <p class="mb-1">Your order:</p>
+                        <div class="mb-7 pa-2 overflow-auto"
                             style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
                             <div class="selected-products-container">
                                 <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info"
@@ -163,8 +163,8 @@
                         </div>
 
                         <!-- Order type -->
-                        <p class="ms-2 mb-1">Order type</p>
-                        <div class="mb-5 ga-2 d-flex justify-center">
+                        <p class="mb-1">Order type:</p>
+                        <div class="mb-7 ga-2 d-flex justify-center">
                             <div @click="dineIn" :class="{ 'selected' : this.order_type_id === 1 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-coffee</v-icon>
@@ -183,8 +183,8 @@
                         </div>
 
                         <!-- Customer type -->
-                        <p class="ms-2 mb-1">Customer type</p>
-                        <div class="mb-5 ga-2 d-flex justify-center">
+                        <p class="mb-1">Customer type:</p>
+                        <div class="mb-7 ga-2 d-flex justify-center">
                             <div @click="customerRegular" :class="{ 'selected' : this.customer_type_id === 1 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-account-circle-outline</v-icon>
                                 <p style="font-size: 12px;">Regular</p>
@@ -200,8 +200,8 @@
                         </div>
 
                         <!-- Payment method -->
-                        <p class="ms-2 mb-1">Payment method</p>
-                        <div class="mb-5 ga-2 d-flex justify-center">
+                        <p class="mb-1">Payment method:</p>
+                        <div class="mb-7 ga-2 d-flex justify-center">
                             <div :class="{ 'selected' : this.payment_method_id === 1 }" class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
                                 <v-icon style="font-size: 15px;">mdi-cash</v-icon>
