@@ -215,7 +215,7 @@
                         </div>
                         
                         <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-4">
-                            <div :class="loadingQr ? 'd-flex' : 'd-none'" class="justify-center mt-7">
+                            <div :class="loadingQr ? 'd-flex' : 'd-none'" class="justify-center mt-10">
                                 <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                     <p class="text-grey my-3">Generating...</p>
                                     <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
@@ -1311,7 +1311,6 @@ export default {
 }
 
 .selected {
-    border: 1px solid #0090b6;
     color: #fff !important;
     background-color: #78C0E0 !important;
 }
