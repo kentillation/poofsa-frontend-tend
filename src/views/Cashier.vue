@@ -1313,7 +1313,7 @@ export default {
 .selected {
     border: 1px solid #0090b6;
     color: #fff !important;
-    background-color: cyan !important;
+    background-color: #78C0E0 !important;
 }
 
 .refresh {
