@@ -215,8 +215,8 @@
                         </div>
                         
                         <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-4">
-                            <div :class="loadingQr ? 'd-flex' : 'd-none'" class="justify-center mt-10">
-                                <div class="d-flex align-center flex-column" style="width: 200px; height: 260px;">
+                            <div :class="loadingQr ? 'd-grid' : 'd-none'" class="place-center" style="width: 200px; height: 260px;">
+                                <div class="d-flex align-center flex-column">
                                     <p class="text-grey my-3">Generating QR...</p>
                                     <v-progress-circular color="grey" indeterminate size="60" width="2"></v-progress-circular>
                                 </div>
