@@ -165,13 +165,13 @@
                         <!-- Order type -->
                         <p class="ms-2 mb-1"><strong>Order type</strong></p>
                         <div class="mb-5 ga-2 d-flex justify-center">
-                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 60px; border-radius: 10px; border: 1px solid #0090b6;">
+                            <div :class="{ 'selected' : this.order_type_id === 1 }"
+                                class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-coffee</v-icon>
                                 <p style="font-size: 12px;">Dine-in</p>
                             </div>
-                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 60px; border-radius: 10px;">
+                            <div :class="{ 'selected' : this.order_type_id === 2 }"
+                                class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-beer-outline</v-icon>
                                 <p style="font-size: 12px;">Take-out</p>
                             </div>
@@ -180,18 +180,15 @@
                         <!-- Customer type -->
                         <p class="ms-2 mb-1"><strong>Customer type</strong></p>
                         <div class="mb-5 ga-2 d-flex justify-center">
-                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 75px; border-radius: 10px; border: 1px solid #0090b6;">
+                            <div :class="{ 'selected' : this.customer_type_id === 1 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-account-circle-outline</v-icon>
                                 <p style="font-size: 12px;">Regular</p>
                             </div>
-                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 75px; border-radius: 10px;">
+                            <div :class="{ 'selected' : this.customer_type_id === 2 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-wheelchair</v-icon>
                                 <p style="font-size: 12px;">PWD</p>
                             </div>
-                            <div class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 75px; height: 75px; border-radius: 10px;">
+                            <div :class="{ 'selected' : this.customer_type_id === 3 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-human-cane</v-icon>
                                 <p style="font-size: 12px;" class="text-center">Senior Citizen</p>
                             </div>
@@ -410,6 +407,7 @@ export default {
             subtotal: null,
             total_amount: 0,
             order_type_id: 1,
+            customer_type_id: 1,
             order_type_charge: '0',
             customer_cash: '',
             customer_change: '0',
@@ -531,6 +529,20 @@ export default {
         order_type_id(newVal) {
             if (Number(newVal) === 1) {
                 this.order_type_charge = 0;
+            }
+        },
+
+        customer_type_id(newVal) {
+            if (Number(newVal) === 1) {
+                this.customer_type_id = 1;
+            }
+
+            if (Number(newVal) === 2) {
+                this.customer_type_id = 2;
+            }
+
+            if (Number(newVal) === 3) {
+                this.customer_type_id = 3;
             }
         },
         
@@ -1240,6 +1252,18 @@ export default {
     align-items: center !important;
     border-radius: 30px !important;
     font-size: 16px !important;
+}
+
+.order-type-card {
+    width: 75px;
+    height: 60px;
+    border-radius: 10px;
+}
+
+.customer-type-card {
+    width: 75px;
+    height: 75px;
+    border-radius: 10px;
 }
 
 .selected {
