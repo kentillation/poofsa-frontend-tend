@@ -122,7 +122,7 @@
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
 
                         <!-- Orders -->
-                        <p class="ms-2 mb-1"><strong>Your order</strong></p>
+                        <p class="ms-2 mb-1">Your order</p>
                         <div class="mb-5 pa-2 overflow-auto"
                             style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
                             <div class="selected-products-container">
@@ -163,7 +163,7 @@
                         </div>
 
                         <!-- Order type -->
-                        <p class="ms-2 mb-1"><strong>Order type</strong></p>
+                        <p class="ms-2 mb-1">Order type</p>
                         <div class="mb-5 ga-2 d-flex justify-center">
                             <div @click="dineIn" :class="{ 'selected' : this.order_type_id === 1 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
@@ -183,7 +183,7 @@
                         </div>
 
                         <!-- Customer type -->
-                        <p class="ms-2 mb-1"><strong>Customer type</strong></p>
+                        <p class="ms-2 mb-1">Customer type</p>
                         <div class="mb-5 ga-2 d-flex justify-center">
                             <div @click="customerRegular" :class="{ 'selected' : this.customer_type_id === 1 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-account-circle-outline</v-icon>
@@ -200,7 +200,7 @@
                         </div>
 
                         <!-- Payment method -->
-                        <p class="ms-2 mb-1"><strong>Payment method</strong></p>
+                        <p class="ms-2 mb-1">Payment method</p>
                         <div class="mb-5 ga-2 d-flex justify-center">
                             <div :class="{ 'selected' : this.payment_method_id === 1 }" class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
@@ -280,7 +280,6 @@
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
                                     inputmode="numeric"
                                     placeholder="Enter cash">
-                                    
                                 </v-text-field>
                             </div>
 
@@ -314,12 +313,12 @@
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Change</p>
-                                <p>₱ {{ customerChange }}</p>
+                                <p>₱{{ customerChange }}</p>
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Subtotal</p>
-                                <p>₱ {{ subTotal.toFixed(2) }}</p>
+                                <p>₱{{ subTotal.toFixed(2) }}</p>
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
@@ -336,7 +335,7 @@
                             subTotal <= 0 ||
                             !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱ {{ discountedSubtotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
