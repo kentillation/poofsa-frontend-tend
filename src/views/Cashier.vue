@@ -865,7 +865,7 @@ export default {
                 this.loadingQr = true;
                 this.payment_method_id = 2;
                 this.selectedEwalletOption = 'qrph';
-                this.eWalletRef = this.generateReferenceNumber();
+                this.eWalletRef = await this.generateReferenceNumber();
                 
                 const amountToPay = this.discountedSubtotal;
 
