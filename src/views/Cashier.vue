@@ -16,10 +16,7 @@
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
             <div class="mb-2 d-flex align-items-center justify-content-center">
-                <v-text-field v-model="searchProduct" 
-                    class="w-75"
-                    placeholder="Search product..."
-                    density="compact"
+                <v-text-field v-model="searchProduct" class="w-75" placeholder="Search product..." density="compact"
                     variant="outlined">
                 </v-text-field>
 
@@ -165,17 +162,17 @@
                         <!-- Order type -->
                         <p class="mb-1">Order type:</p>
                         <div class="mb-7 ga-2 d-flex justify-center">
-                            <div @click="dineIn" :class="{ 'selected' : this.order_type_id === 1 }"
+                            <div @click="dineIn" :class="{ 'selected': this.order_type_id === 1 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-coffee</v-icon>
                                 <p style="font-size: 12px;">Dine-in</p>
                             </div>
-                            <div @click="takeOut" :class="{ 'selected' : this.order_type_id === 2 }"
+                            <div @click="takeOut" :class="{ 'selected': this.order_type_id === 2 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-beer-outline</v-icon>
                                 <p style="font-size: 12px;">Take-out</p>
                             </div>
-                            <div @click="deliveryOrder" :class="{ 'selected' : this.order_type_id === 3 }"
+                            <div @click="deliveryOrder" :class="{ 'selected': this.order_type_id === 3 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-bicycle</v-icon>
                                 <p style="font-size: 12px;">Delivery</p>
@@ -185,15 +182,18 @@
                         <!-- Customer type -->
                         <p class="mb-1">Customer type:</p>
                         <div class="mb-7 ga-2 d-flex justify-center">
-                            <div @click="customerRegular" :class="{ 'selected' : this.customer_type_id === 1 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                            <div @click="customerRegular" :class="{ 'selected': this.customer_type_id === 1 }"
+                                class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-account-circle-outline</v-icon>
                                 <p style="font-size: 12px;">Regular</p>
                             </div>
-                            <div @click="customerPwd" :class="{ 'selected' : this.customer_type_id === 2 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                            <div @click="customerPwd" :class="{ 'selected': this.customer_type_id === 2 }"
+                                class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-wheelchair</v-icon>
                                 <p style="font-size: 12px;">PWD</p>
                             </div>
-                            <div @click="customerSenior" :class="{ 'selected' : this.customer_type_id === 3 }" class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
+                            <div @click="customerSenior" :class="{ 'selected': this.customer_type_id === 3 }"
+                                class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-human-cane</v-icon>
                                 <p style="font-size: 12px;" class="text-center">Senior Citizen</p>
                             </div>
@@ -202,26 +202,36 @@
                         <!-- Payment method -->
                         <p class="mb-1">Payment method:</p>
                         <div class="mb-7 ga-2 d-flex justify-center">
-                            <div :class="{ 'selected' : this.payment_method_id === 1 }" class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                            <div :class="{ 'selected': this.payment_method_id === 1 }"
+                                class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
                                 <v-icon style="font-size: 15px;">mdi-cash</v-icon>
-                                <p @click="cashPayment" class="text-center" style="font-size: 12px;">Cash <br /> (Over-the-counter)</p>
+                                <p @click="cashPayment" class="text-center" style="font-size: 12px;">Cash <br />
+                                    (Over-the-counter)
+                                </p>
                             </div>
-                            <div :class="{ 'selected' : this.payment_method_id === 2 }" class="pa-2 d-flex align-center justify-center flex-column bg-white"
+                            <div :class="{ 'selected': this.payment_method_id === 2 }"
+                                class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
                                 <v-icon style="font-size: 15px;">mdi-qrcode-scan</v-icon>
-                                <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid" class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
+                                <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid"
+                                    class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
                             </div>
                         </div>
-                        
-                        <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-4">
-                            <div :class="[ loadingQr ? 'd-flex' : 'd-none', 'justify-center' ]" style="width: 200px; height: 280px;">
-                                <div style="display: grid; place-items: center;">
-                                    <p class="text-grey">Generating QR...</p>
-                                    <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
+
+                        <div v-if="this.selectedEwalletOption === 'qrph'"
+                            class="mb-5 qr-container text-center w-100 pa-4">
+
+                            <div :class="[loadingQr ? 'd-flex' : 'd-none', 'align-center justify-center']">
+                                <div style="display: grid; place-items: center; width: 200px; height: 410px;">
+                                    <div class="text-center">
+                                        <p class="text-grey my-3">Generating QR...</p>
+                                        <v-progress-circular color="grey" indeterminate size="50"
+                                            width="2"></v-progress-circular>
+                                    </div>
                                 </div>
                             </div>
-                            
+
                             <div v-if="eWalletImgSrc">
                                 <div class="d-flex align-center justify-center">
                                     <p style="font-size: 20px;">Scan</p>
@@ -245,24 +255,25 @@
                                 <p class="mt-4" style="font-size: 20px;">
                                     <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
                                 </p>
-                                <v-img :src="eWalletImgSrc" width="250" height="250" class="mx-auto"></v-img>
+                                <v-img :src="eWalletImgSrc" width="220" height="220" class="mx-auto"></v-img>
                             </div>
-                            
+
                             <!-- Show payment status -->
                             <div class="payment-status w-100">
-                                <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'" variant="tonal"
-                                    style="border-radius: 15px;" class="mt-1 px-3">
+                                <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'"
+                                    variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
                                     <div class="d-flex align-center justify-space-between">
                                         <span>{{ !eWalletPaid ? 'Waiting for payment' : 'Payment successful' }}</span>
-                                        <v-progress-circular v-if="!eWalletPaid" size="20" width="2" indeterminate></v-progress-circular>
+                                        <v-progress-circular v-if="!eWalletPaid" size="20" width="2"
+                                            indeterminate></v-progress-circular>
                                         <v-icon v-else color="success">mdi-check-circle</v-icon>
                                     </div>
                                 </v-alert>
                             </div>
-                            
+
                             <div v-if="eWalletImgSrc" class="text-center">
                                 <p class="text-caption text-grey">
-                                   Please don't refresh this page until eWallet payment is succeeded.
+                                    Please don't refresh this page until eWallet payment is succeeded.
                                 </p>
                             </div>
                         </div>
@@ -271,34 +282,24 @@
                         <div class="mb-5">
                             <div class="mb-3">
                                 <span class="required-asterisk mt-2">*</span> Cash render
-                                <v-text-field v-model.number="customer_cash"
-                                    variant="outlined"
-                                    density="compact"
-                                    type="number"
-                                    :disabled="eWalletPaid"
+                                <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
+                                    type="number" :disabled="eWalletPaid"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
                                     @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric"
-                                    placeholder="Enter cash">
+                                    inputmode="numeric" placeholder="Enter cash">
                                 </v-text-field>
                             </div>
 
                             <div class="mb-3">
                                 Note (optional)
-                                <v-text-field v-model="order_note"
-                                    variant="outlined"
-                                    density="compact"
-                                    type="text"
+                                <v-text-field v-model="order_note" variant="outlined" density="compact" type="text"
                                     placeholder="Enter note">
                                 </v-text-field>
                             </div>
 
                             <div class="mb-3">
                                 Customer name (optional)
-                                <v-text-field v-model="customer_name" 
-                                    variant="outlined"
-                                    density="compact"
-                                    type="text"
+                                <v-text-field v-model="customer_name" variant="outlined" density="compact" type="text"
                                     placeholder="Enter customer name">
                                 </v-text-field>
                             </div>
@@ -330,17 +331,19 @@
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p style="font-weight: 500; font-size: 18px;">Total</p>
-                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{ discountedSubtotal.toFixed(2) }}</p>
+                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{
+                                    discountedSubtotal.toFixed(2) }}
+                                </p>
                             </div>
                         </div>
 
-                        <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn"
-                            color="#0090b6" :disabled="!isFormValid || placingOrder ||
-                            (payment_method_id === 2 && !eWalletPaid) ||
-                            Number(customer_cash) < subTotal ||
-                            Number(customer_change) < 0 ||
-                            subTotal <= 0 ||
-                            !isOnline">
+                        <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
+                            :disabled="!isFormValid || placingOrder ||
+                                (payment_method_id === 2 && !eWalletPaid) ||
+                                Number(customer_cash) < subTotal ||
+                                Number(customer_change) < 0 ||
+                                subTotal <= 0 ||
+                                !isOnline">
                             Place order
                             <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
@@ -565,7 +568,7 @@ export default {
                 this.customer_type_id = 3;
             }
         },
-        
+
         eWalletPaid(newVal) {
             if (newVal) {
                 setTimeout(() => {
@@ -893,7 +896,7 @@ export default {
             this.customer_type_id = 3;
         },
 
-        cashPayment () {
+        cashPayment() {
             this.payment_method_id = 1;
             this.loadingQr = false;
             this.eWalletImgSrc = null;
