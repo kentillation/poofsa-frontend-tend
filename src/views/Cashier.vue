@@ -213,14 +213,14 @@
                         </div>
                         
                         <div v-if="this.selectedEwalletOption === 'qrph'" class="mb-5 qr-container text-center w-100 pa-4">
-                            <div v-if="loadingQr" class="d-flex justify-center">
+                            <div :class="this.loadingQr === true ? 'd-flex' : 'd-none'" class="justify-center mt-7">
                                 <div class="d-flex align-center flex-column" style="width: 200px; height: 200px;">
                                     <p class="text-grey my-3">Generating...</p>
                                     <v-progress-circular color="grey" indeterminate size="50" width="2"></v-progress-circular>
                                 </div>
                             </div>
                             
-                            <div v-else-if="eWalletImgSrc">
+                            <div v-if="eWalletImgSrc">
                                 <div class="d-flex align-center justify-center">
                                     <p style="font-size: 20px;">Scan</p>
                                     <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo"
@@ -877,11 +877,11 @@ export default {
 
                 this.customer_cash = amountToPay;
                 this.eWalletImgSrc = this.paymentStore.qrImageSrc;
-                this.loadingQr = false;
 
             } catch (err) {
                 this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
-                this.eWalletDialog = false;
+            } finally {
+                this.loadingQr = false;
             }
         },
 
