@@ -116,7 +116,7 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
-                    <v-stepper style="background-color: #e8faff; border: none;" class="pb-4" alt-labels>
+                    <v-stepper class="pb-4 no-shadow" alt-labels>
                         <v-stepper-header>
                             <v-stepper-item title="Order" value="1" class="bg-grey" complete></v-stepper-item>
                             <v-divider></v-divider>
@@ -1333,8 +1333,9 @@ export default {
     border-radius: 10px;
 }
 
-.generate-qr-card {
-    
+.no-shadow {
+  background-color: #e8faff;
+  box-shadow: none !important;
 }
 
 .selected {
