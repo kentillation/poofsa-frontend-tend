@@ -116,7 +116,7 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
-                    <v-stepper class="pb-4 modern-stepper" elevation="0" alt-labels>
+                    <v-stepper v-model="orderStep" class="pb-4 modern-stepper" elevation="0" alt-labels>
                         <v-stepper-header>
                             <v-stepper-item title="Order" complete></v-stepper-item>
                             <v-divider></v-divider>
@@ -426,6 +426,7 @@ export default {
             progressCircular: false,
 
             // Payment
+            orderStep: 2,
             loadingQr: false,
             placingOrder: false,
             selectedOrderDialog: false,
