@@ -69,7 +69,7 @@
                             {{ product.size_label }}
                         </p>
                         <v-img :src="WTFImgSrc" class="my-2"></v-img>
-                        <p class="text-grey-darken-1">
+                        <p>
                             <strong>₱{{ product.base_price }}</strong>
                         </p>
                     </div>
@@ -115,7 +115,7 @@
 
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
-                <v-card style="background-color: #e8faff;">
+                <v-card class="pa-2" style="background-color: #e8faff; border-radius: 60px 60px 0 0;">
                     <!-- <v-stepper v-model="orderStep" class="pb-4 modern-stepper" elevation="0" alt-labels>
                         <v-stepper-header>
                             <v-stepper-item title="Order" :value="1" complete></v-stepper-item>
@@ -125,10 +125,10 @@
                             <v-stepper-item title="Place order" :value="3"></v-stepper-item>
                         </v-stepper-header>
                     </v-stepper> -->
-                    
+
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
                         <!-- Orders -->
-                        <p class="mb-1">Your order:</p>
+                        <p class="my-1">Your order:</p>
                         <div class="mb-7 pa-2 overflow-auto"
                             style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
                             <div class="selected-products-container">
@@ -241,24 +241,27 @@
                             <div :class="{ 'selected': this.payment_method_id === 1 }"
                                 class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
-                                <v-icon style="font-size: 15px;">mdi-cash</v-icon>
+                                <v-icon style="font-size: 30px !important;">mdi-cash</v-icon>
                                 <p @click="cashPayment" class="text-center" style="font-size: 12px;">Cash <br />
-                                    (Over-the-counter)
+                                    <span class="text-grey-darken-1">(Over-the-counter)</span>
                                 </p>
                             </div>
                             <div :class="{ 'selected': this.payment_method_id === 2 }"
                                 class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
-                                <v-icon style="font-size: 15px;">mdi-qrcode-scan</v-icon>
+                                <v-icon style="font-size: 20px;">mdi-qrcode-scan</v-icon>
                                 <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid"
-                                    class="text-center" style="font-size: 12px;">e-Wallet <br /> (GCash, Maya, etc.)</p>
+                                    class="text-center" style="font-size: 12px;">e-Wallet <br /> 
+                                    <span class="text-grey-darken-1">(GCash, Maya, etc.)</span>
+                                </p>
                             </div>
                         </div>
 
                         <div v-if="this.selectedEwalletOption === 'qrph'"
                             class="mb-5 qr-container text-center w-100 pa-4">
 
-                            <div :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
+                            <div
+                                :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
                                 <div style="width: 200px; height: 410px;">
                                     <div class="text-center d-flex align-center flex-column">
                                         <!-- <p class="text-grey my-3">Generating QR...</p>
@@ -307,8 +310,8 @@
 
                             <!-- Show payment status -->
                             <div class="payment-status w-100">
-                                <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'warning' : 'success'"
-                                    variant="tonal" style="border-radius: 15px;" class="mt-1 px-3">
+                                <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'info' : 'success'" variant="tonal"
+                                    style="border-radius: 15px;" class="mt-1 px-3">
                                     <div class="d-flex align-center justify-space-between">
                                         <span>{{ !eWalletPaid ? 'Waiting for payment' : 'Payment successful' }}</span>
                                         <v-progress-circular v-if="!eWalletPaid" size="20" width="2"
@@ -884,8 +887,12 @@ export default {
             if (this.selectedProducts[index].quantity === 0) {
                 this.selectedProducts.splice(index, 1);
             }
-            this.customer_charge = 0;
+            this.customer_cash = 0;
             this.payment_method_id = 1;
+            this.eWalletPaid = false;
+            this.loadingQr = false;
+            this.eWalletImgSrc = null;
+            this.selectedEwalletOption = '';
         },
 
         addQuantity(product) {
@@ -893,8 +900,12 @@ export default {
             if (this.selectedProducts[index].quantity > -1) {
                 this.selectedProducts[index].quantity++;
             }
-            this.customer_charge = 0;
+            this.customer_cash = 0;
             this.payment_method_id = 1;
+            this.eWalletPaid = false;
+            this.loadingQr = false;
+            this.eWalletImgSrc = null;
+            this.selectedEwalletOption = '';
         },
 
         dineIn() {
@@ -951,7 +962,7 @@ export default {
                 this.payment_method_id = 2;
                 this.selectedEwalletOption = 'qrph';
                 this.eWalletRef = await this.generateReferenceNumber();
-                
+
                 const amountToPay = this.discountedSubtotal;
 
                 await this.paymentStore.generateQRPhCodeStore(
@@ -1230,8 +1241,17 @@ export default {
 }
 
 .image-section .product-card:hover {
-    background-color: rgb(225, 232, 237) !important;
+    color: #fff !important;
+    background-color: #0090b6 !important;
     transition: 0.5s ease;
+}
+
+.image-section .product-card:hover .text-truncate, .image-section .product-card:hover strong {
+    color: #fff !important;
+}
+
+.image-section .product-card:hover .text-grey {
+    color: #c2c2c2 !important;
 }
 
 .image-section .v-img {
@@ -1280,7 +1300,6 @@ export default {
 .qr-container {
     background: #fffcfc;
     border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .ewallet-btn {
@@ -1324,6 +1343,7 @@ export default {
     align-items: center !important;
     border-radius: 30px !important;
     font-size: 16px !important;
+    font-weight: normal;
 }
 
 .order-type-card {
@@ -1352,12 +1372,16 @@ export default {
 }
 
 .modern-stepper .v-divider {
-  opacity: 0.3;
+    opacity: 0.3;
 }
 
 .selected {
     color: #fff !important;
-    background-color: #78C0E0 !important;
+    background-color: #0090b6 !important;
+}
+
+.selected span{
+    color: #dfdfdf !important;
 }
 
 .refresh {
