@@ -1334,7 +1334,7 @@ export default {
 }
 
 .no-shadow {
-    background-color: #e8faff !important;
+    /*background-color: #e8faff !important;*/
     box-shadow: none !important;
     border-radius: none !important;
 }
