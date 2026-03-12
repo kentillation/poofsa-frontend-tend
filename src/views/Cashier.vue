@@ -116,6 +116,15 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
+                    <v-stepper alt-labels>
+                        <v-stepper-header>
+                            <v-stepper-item title="Order" value="1" complete></v-stepper-item>
+                            <v-divider></v-divider>
+                            <v-stepper-item title="Place order" value="2"></v-stepper-item>
+                            <v-divider></v-divider>
+                            <v-stepper-item title="Checkout" value="3"></v-stepper-item>
+                        </v-stepper-header>
+                    </v-stepper>
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
 
                         <!-- Orders -->
@@ -196,6 +205,33 @@
                                 class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-human-cane</v-icon>
                                 <p style="font-size: 12px;" class="text-center">Senior Citizen</p>
+                            </div>
+                        </div>
+
+                        <!-- Inputs -->
+                        <div class="mb-5">
+                            <div class="mb-3">
+                                <span class="required-asterisk mt-2">*</span> Cash render
+                                <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
+                                    type="number" :disabled="eWalletPaid"
+                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
+                                    @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
+                                    inputmode="numeric" placeholder="Enter cash">
+                                </v-text-field>
+                            </div>
+
+                            <div class="mb-3">
+                                Note (optional)
+                                <v-text-field v-model="order_note" variant="outlined" density="compact" type="text"
+                                    placeholder="Enter note">
+                                </v-text-field>
+                            </div>
+
+                            <div class="mb-3">
+                                Customer name (optional)
+                                <v-text-field v-model="customer_name" variant="outlined" density="compact" type="text"
+                                    placeholder="Enter customer name">
+                                </v-text-field>
                             </div>
                         </div>
 
@@ -286,33 +322,6 @@
                                 <p class="text-caption text-grey">
                                     Please don't refresh this page until eWallet payment is succeeded.
                                 </p>
-                            </div>
-                        </div>
-
-                        <!-- Inputs -->
-                        <div class="mb-5">
-                            <div class="mb-3">
-                                <span class="required-asterisk mt-2">*</span> Cash render
-                                <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
-                                    type="number" :disabled="eWalletPaid"
-                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
-                                    @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric" placeholder="Enter cash">
-                                </v-text-field>
-                            </div>
-
-                            <div class="mb-3">
-                                Note (optional)
-                                <v-text-field v-model="order_note" variant="outlined" density="compact" type="text"
-                                    placeholder="Enter note">
-                                </v-text-field>
-                            </div>
-
-                            <div class="mb-3">
-                                Customer name (optional)
-                                <v-text-field v-model="customer_name" variant="outlined" density="compact" type="text"
-                                    placeholder="Enter customer name">
-                                </v-text-field>
                             </div>
                         </div>
 
