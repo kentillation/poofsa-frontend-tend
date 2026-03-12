@@ -116,7 +116,7 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
-                    <v-stepper class="pb-4 no-shadow" alt-labels>
+                    <v-stepper class="pb-4 no-shadow" elevation="0" alt-labels>
                         <v-stepper-header>
                             <v-stepper-item title="Order" value="1" class="bg-grey" complete></v-stepper-item>
                             <v-divider></v-divider>
