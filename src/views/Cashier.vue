@@ -116,7 +116,7 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
-                    <v-stepper class="pb-4 no-shadow" elevation="0" alt-labels>
+                    <v-stepper class="pb-4 modern-stepper" elevation="0" alt-labels>
                         <v-stepper-header>
                             <v-stepper-item title="Order" value="1" class="bg-grey" complete></v-stepper-item>
                             <v-divider></v-divider>
@@ -1333,10 +1333,23 @@ export default {
     border-radius: 10px;
 }
 
-.no-shadow {
-    background-color: #e8faff !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
+.modern-stepper {
+  background-color: #e8faff;
+  border-radius: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 10px;
+}
+
+/* Remove default header border */
+.modern-stepper .v-stepper-header {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Softer divider */
+.modern-stepper .v-divider {
+  opacity: 0.3;
 }
 
 .selected {
