@@ -118,9 +118,9 @@
                 <v-card style="background-color: #e8faff;">
                     <v-stepper v-model="orderStep" class="pb-4 modern-stepper" elevation="0" alt-labels>
                         <v-stepper-header>
-                            <v-stepper-item title="Order" complete></v-stepper-item>
+                            <v-stepper-item title="Order" value="1" complete></v-stepper-item>
                             <v-divider></v-divider>
-                            <v-stepper-item title="Checkout" complete></v-stepper-item>
+                            <v-stepper-item title="Checkout" value="2"></v-stepper-item>
                             <v-divider></v-divider>
                             <v-stepper-item title="Place order" value="3"></v-stepper-item>
                         </v-stepper-header>
