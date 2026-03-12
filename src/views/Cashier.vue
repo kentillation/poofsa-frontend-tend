@@ -1335,7 +1335,7 @@ export default {
 
 .modern-stepper {
     background-color: #e8faff !important;
-    border-radius: none !important;
+    border-radius: 0px !important;
     box-shadow: none !important;
     border: none !important;
 }
