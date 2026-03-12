@@ -1334,20 +1334,18 @@ export default {
 }
 
 .modern-stepper {
-  background-color: #e8faff;
-  border-radius: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  padding: 10px;
+    background-color: #e8faff !important;
+    border-radius: none !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-/* Remove default header border */
 .modern-stepper .v-stepper-header {
-  box-shadow: none !important;
-  border: none !important;
+    background-color: #e8faff !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-/* Softer divider */
 .modern-stepper .v-divider {
   opacity: 0.3;
 }
