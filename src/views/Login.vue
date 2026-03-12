@@ -11,10 +11,11 @@
                     <v-chip color="#0090b6" size="x-small" class="position-absolute">BETA</v-chip>
                 </h1>
                 <p class="text-center my-3">Cashier personnel only can log in.</p>
-                <v-form ref="form" @submit.prevent="handleLogin" v-model="isFormValid" class="pa-4">
+                <v-form ref="loginForm" @submit.prevent="handleLogin" v-model="isFormValid" class="pa-4">
                     <div class="text-subtitle-1 text-medium-emphasis">Email</div>
                     <v-text-field v-model="cashier_email" 
                         :rules="[requiredRule, emailFormatRule]"
+                        :disabled="loggingIn"
                         placeholder="Type here..."
                         prepend-inner-icon="mdi-email-outline"
                         variant="outlined"
@@ -25,6 +26,7 @@
                     <div class="text-subtitle-1 text-medium-emphasis">Password</div>
                     <v-text-field v-model="cashier_password" 
                         :rules="[requiredRule]"
+                        :disabled="loggingIn"
                         placeholder="Type here..."
                         prepend-inner-icon="mdi-lock-outline" 
                         variant="outlined"
@@ -34,8 +36,8 @@
                         :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye-outline'" 
                         @click:append-inner="showPassword = !showPassword" />
 
-                    <v-btn :disabled="!isFormValid || loading" type="submit" color="#0090b6" size="large" class="mt-5" height="45" block rounded>
-                        Proceed
+                    <v-btn :disabled="!isFormValid || loggingIn" :loading="loggingIn" type="submit" color="#0090b6" size="large" class="mt-5" height="45" block rounded>
+                        Login
                     </v-btn>
                 </v-form>
                 <div class="text-center mb-5">
@@ -70,6 +72,7 @@ export default {
             cashier_password: '',
             showPassword: false,
             isFormValid: false,
+            loggingIn: false,
             loading: false,
             snackbar: {
                 visible: false,
@@ -87,22 +90,22 @@ export default {
             return pattern.test(v) || 'Invalid email format';
         },
         async handleLogin() {
-            const isValid = await this.$refs.form.validate();
-            if (!isValid) return;
-
-            this.loading = true;
             try {
-                this.loadingStore.show('');
+                this.loggingIn = true;
+
+                if (!this.$refs.loginForm.validate()) {
+                    this.loggingIn = false;
+                    return;
+                }
+
                 const authStore = useAuthStore();
                 await authStore.login({ cashier_email: this.cashier_email, cashier_password: this.cashier_password });
 
-                // this.$router.push('/dashboard');
                 window.location.href = '/cashier';
             } catch (error) {
-                this.loadingStore.hide();
                 this.showSnackbar(error || 'Login failed. Please try again!', 'error');
             } finally {
-                this.loading = false;
+                this.loggingIn = false;
             }
         },
         showSnackbar(message, color) {

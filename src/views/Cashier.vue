@@ -222,12 +222,23 @@
                         <div v-if="this.selectedEwalletOption === 'qrph'"
                             class="mb-5 qr-container text-center w-100 pa-4">
 
-                            <div :class="[loadingQr ? 'd-flex' : 'd-none', 'align-center justify-center']">
-                                <div style="display: grid; place-items: center; width: 200px; height: 410px;">
-                                    <div class="text-center">
-                                        <p class="text-grey my-3">Generating QR...</p>
-                                        <v-progress-circular color="grey" indeterminate size="50"
-                                            width="2"></v-progress-circular>
+                            <div :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
+                                <div style="width: 200px; height: 410px;">
+                                    <div class="text-center d-flex align-center flex-column">
+                                        <!-- <p class="text-grey my-3">Generating QR...</p>
+                                        <v-progress-circular color="grey" size="100"
+                                            width="2" indeterminate></v-progress-circular> -->
+                                        <v-skeleton-loader type="text" width="220"></v-skeleton-loader>
+                                        <div class="d-flex">
+                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
+                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
+                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
+                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
+                                        </div>
+                                        <v-skeleton-loader type="text" width="150"></v-skeleton-loader>
+                                        <v-skeleton-loader type="image" width="190"></v-skeleton-loader>
+                                        <v-skeleton-loader type="text" width="300"></v-skeleton-loader>
+                                        <v-skeleton-loader type="text" width="300"></v-skeleton-loader>
                                     </div>
                                 </div>
                             </div>
@@ -1311,6 +1322,10 @@ export default {
     width: 75px;
     height: 75px;
     border-radius: 10px;
+}
+
+.generate-qr-card {
+    
 }
 
 .selected {
