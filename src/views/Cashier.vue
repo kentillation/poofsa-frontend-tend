@@ -120,7 +120,7 @@
                         <v-stepper-header>
                             <v-stepper-item title="Order" value="1" complete></v-stepper-item>
                             <v-divider></v-divider>
-                            <v-stepper-item title="Checkout" value="2" completed></v-stepper-item>
+                            <v-stepper-item title="Checkout" value="2" complete></v-stepper-item>
                             <v-divider></v-divider>
                             <v-stepper-item title="Place order" value="3"></v-stepper-item>
                         </v-stepper-header>
