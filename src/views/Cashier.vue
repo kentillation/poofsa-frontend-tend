@@ -1334,8 +1334,9 @@ export default {
 }
 
 .no-shadow {
-  background-color: #e8faff;
-  box-shadow: none !important;
+    background-color: #e8faff !important;
+    box-shadow: none !important;
+    border-radius: none !important;
 }
 
 .selected {
