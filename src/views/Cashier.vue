@@ -116,7 +116,7 @@
             <!-- Order Sheet -->
             <v-bottom-sheet v-model="selectedOrderDialog">
                 <v-card style="background-color: #e8faff;">
-                    <v-stepper class="pb-4 modern-stepper" elevation="0" alt-labels>
+                    <v-stepper class="pb-4 modern-stepper" elevation="0">
                         <v-stepper-header>
                             <v-stepper-item title="Order" value="1" complete></v-stepper-item>
                             <v-divider></v-divider>
@@ -125,8 +125,8 @@
                             <v-stepper-item title="Place order" value="3"></v-stepper-item>
                         </v-stepper-header>
                     </v-stepper>
+                    
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
-
                         <!-- Orders -->
                         <p class="mb-1">Your order:</p>
                         <div class="mb-7 pa-2 overflow-auto"
