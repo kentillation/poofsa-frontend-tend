@@ -884,6 +884,8 @@ export default {
             if (this.selectedProducts[index].quantity === 0) {
                 this.selectedProducts.splice(index, 1);
             }
+            this.customer_charge = 0;
+            this.payment_method_id = 1;
         },
 
         addQuantity(product) {
@@ -891,6 +893,8 @@ export default {
             if (this.selectedProducts[index].quantity > -1) {
                 this.selectedProducts[index].quantity++;
             }
+            this.customer_charge = 0;
+            this.payment_method_id = 1;
         },
 
         dineIn() {
