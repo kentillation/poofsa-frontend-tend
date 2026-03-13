@@ -3,7 +3,7 @@
     <div class="payment-indication-container">
         <v-btn @click="showSelectedOrderDialog" class="payment-indication d-flex justify-center" color="#0090b6"
             :disabled="totalQuantity === 0">
-            Checkout
+            Order
             <span :class="{ 'd-none': totalQuantity === 0 }"> &bull; ₱{{
                 this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
             </span>
@@ -374,14 +374,14 @@
                             </div>
                         </div>
 
-                        <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
-                            :disabled="!isFormValid || placingOrder ||
+                        <v-btn @click="submitForm" :loading="checkingOut" class="place-order-btn" color="#0090b6"
+                            :disabled="!isFormValid || checkingOut ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
                                 Number(customer_cash) < subTotal ||
                                 Number(customer_change) < 0 ||
                                 subTotal <= 0 ||
                                 !isOnline">
-                            Place order
+                            Checkout
                             <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
@@ -445,6 +445,7 @@ export default {
             // Payment
             orderStep: 3,
             loadingQr: false,
+            checkingOut: false,
             placingOrder: false,
             selectedOrderDialog: false,
             isFormValid: false,
@@ -1019,24 +1020,24 @@ export default {
 
         async submitForm() {
             try {
-                this.placingOrder = true;
+                this.checkingOut = true;
 
                 if (!this.$refs.transactionForm.validate()) {
-                    this.placingOrder = false;
+                    this.checkingOut = false;
                     return;
                 }
 
                 if (Number(this.payment_method_id) === 2) {
                     if (!this.eWalletPaid) {
                         this.showError('Please complete e-Wallet payment first');
-                        this.placingOrder = false;
+                        this.checkingOut = false;
                         return;
                     }
                 }
 
                 if (!this.referenceNumber) {
                     this.showError("Error in reference number. Refresh the page!");
-                    this.placingOrder = false;
+                    this.checkingOut = false;
                     return;
                 }
 
@@ -1086,7 +1087,7 @@ export default {
                 this.showError(error);
                 console.error(error);
             } finally {
-                this.placingOrder = false;
+                this.checkingOut = false;
             }
         },
 
