@@ -27,7 +27,7 @@
             </div>
 
             <!-- Categories -->
-            <v-slide-group class="mb-3 mt-2 ms-1">
+            <v-slide-group class="mb-3 ms-1">
                 <v-slide-group-item>
                     <v-chip @click="reloadProducts" :color="!selectedCategory ? '#0090b6' : '#fff'" variant="flat"
                         class="me-1 category-chip">
