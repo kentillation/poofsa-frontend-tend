@@ -58,7 +58,7 @@
                 No available product.
             </v-alert>
 
-            <div v-else class="image-section">
+            <div v-else class="image-section mb-4">
                 <div v-for="product in filteredProducts" :key="product.id" @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card">
@@ -81,8 +81,8 @@
                 </div>
             </div>
 
-            <!-- Payment Section and Current Orders Section -->
-            <v-row class="mb-15">
+            <!-- Current Orders Section -->
+            <v-row>
 
                 <!-- Current Orders Section -->
                 <v-col cols="12">
