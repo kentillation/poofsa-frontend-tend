@@ -82,7 +82,7 @@
             </div>
 
             <!-- Current Orders Section -->
-            <v-row>
+            <v-row class="mb-15">
 
                 <!-- Current Orders Section -->
                 <v-col cols="12">
@@ -486,7 +486,7 @@ export default {
                 { title: '', value: 'base_price' },
             ],
             headersOrders: [
-                { title: 'Table Number', value: 'table_number', width: '50%' },
+                { title: 'Order Number', value: 'table_number', width: '50%' },
                 { title: 'Status', value: 'actions', sortable: false, width: '50%' },
             ],
             headersOrderDetails: [
