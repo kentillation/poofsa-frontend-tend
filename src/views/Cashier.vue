@@ -15,7 +15,7 @@
 
         <v-form ref="transactionForm" @submit.prevent="submitForm" v-model="isFormValid">
             <!-- Search Products -->
-            <div class="mb-2 d-flex align-items-center justify-content-center">
+            <div class="d-flex align-items-center justify-content-center">
                 <v-text-field v-model="searchProduct" class="w-75" placeholder="Search product..." density="compact"
                     variant="outlined">
                 </v-text-field>
