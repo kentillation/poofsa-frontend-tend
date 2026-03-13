@@ -264,7 +264,7 @@
                         </div>
 
                         <div v-if="this.selectedEwalletOption === 'qrph'"
-                            class="mb-5 qr-container text-center w-100 pa-4">
+                            class="mb-7 qr-container text-center w-100 pa-4">
 
                             <div
                                 :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
