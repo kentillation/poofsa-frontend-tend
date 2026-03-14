@@ -279,7 +279,7 @@
                             </div>
 
                             <!-- Cash render -->
-                            <div class="mb-3" :class="{ 'd-none' : this.payment_method_id === 1 }">
+                            <div class="mb-3" :class="{ 'd-none' : this.payment_method_id === 2 }">
                                 <span class="required-asterisk mt-2">*</span> Cash render
                                 <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
                                     type="number" :disabled="eWalletPaid"
