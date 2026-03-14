@@ -61,7 +61,9 @@
             <div v-else class="image-section mb-4">
                 <div v-for="product in filteredProducts" :key="product.id" @click="selectProduct(product)"
                     class="image-section-item">
-                    <div class="product-card">
+                    <div class="product-card"
+                        :class="{ active: selectedCard === item.id }"
+                        @click="selectedCard = item.id" >
                         <p class="product-card-text text-truncate">
                             {{ product.product_name }}
                         </p>
@@ -426,6 +428,7 @@ export default {
             // Products
             products: [],
             selectedProducts: [],
+            selectedCard: null,
             loadingProducts: false,
             searchProduct: '',
             tempLabel: '',
@@ -1142,24 +1145,7 @@ export default {
 </script>
 
 <style scoped>
-/* .v-text-field {
-    padding-top: 7px !important;
-}
-
-.v-input--density-compact {
-    --v-input-padding-top: 0 !important;
-}
-
-.search-product-input .v-input__details {
-    display: flex !important;
-} */
-
-/* .v-text-field {
-    background-color: #fff !important;
-    padding-left: 15px !important;
-    border-radius: 10px !important;
-} */
-
+    
 .category-chip:hover {
     background-color: #0090b6 !important;
     color: #fff !important;
@@ -1255,17 +1241,17 @@ export default {
     flex-direction: column;
 }
 
-.image-section .product-card:hover {
+.image-section .product-card:active {
     color: #fff !important;
     background-color: #0090b6 !important;
     transition: 0.5s ease;
 }
 
-.image-section .product-card:hover .text-truncate, .image-section .product-card:hover strong {
+.image-section .product-card:active .text-truncate, .image-section .product-card:hover strong {
     color: #fff !important;
 }
 
-.image-section .product-card:hover .text-grey {
+.image-section .product-card:active .text-grey {
     color: #c2c2c2 !important;
 }
 
