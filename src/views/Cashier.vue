@@ -63,8 +63,7 @@
                     @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card"
-                        :class="{ active : selectedCard === product.id }"
-                        @click="selectedCard === product.id">
+                        :class="{ active : selectedCard === product.id }">
                         <p class="product-card-text text-truncate">
                             {{ product.product_name }}
                         </p>
@@ -896,6 +895,7 @@ export default {
             } else {
                 this.selectedProducts[index].quantity++;
             }
+            this.selectedCard = product.product_id;
         },
 
         deductQuantity(product) {
