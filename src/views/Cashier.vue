@@ -257,7 +257,7 @@
                             <!-- Orders -->
                             <p class="my-1">Your order:</p>
                             <div class="mb-7 pa-2 overflow-auto"
-                                style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
+                                style="height: 350px;">
                                 <div class="selected-products-container">
                                     <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
                                        You have an empty order.
