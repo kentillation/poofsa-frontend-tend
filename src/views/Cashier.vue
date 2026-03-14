@@ -129,7 +129,7 @@
             </v-row>
 
             <!-- Order Sheet -->
-            <v-bottom-sheet v-model="selectedOrderDialog">
+            <v-bottom-sheet v-model="checkoutSheet">
                 <v-card class="pa-2" style="background-color: #e8faff; border-radius: 60px 60px 0 0;">
                     <!-- <v-stepper v-model="orderStep" class="pb-4 modern-stepper" elevation="0" alt-labels>
                         <v-stepper-header>
@@ -242,12 +242,7 @@
                         </div>
 
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
-                            :disabled="!isFormValid ||
-                                (payment_method_id === 2 && !eWalletPaid) ||
-                                Number(customer_cash) < subTotal ||
-                                Number(customer_change) < 0 ||
-                                subTotal <= 0 ||
-                                !isOnline">
+                            :disabled="subTotal <= 0 || !isOnline">
                             Checkout
                             <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
@@ -255,7 +250,7 @@
                 </v-card>
             </v-bottom-sheet>
 
-            <v-bottom-sheet v-model="checkoutSheet">
+            <v-bottom-sheet v-model="placeOrderSheet">
                 <v-card class="pa-2" style="background-color: #e8faff; border-radius: 60px 60px 0 0;">
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
                         <div class="pa-2 overflow-auto"
@@ -470,7 +465,7 @@ export default {
             loadingQr: false,
             checkoutSheet: false,
             placingOrder: false,
-            selectedOrderDialog: false,
+            placeOrderSheet: false,
             isFormValid: false,
             eWalletDialog: false,
             eWalletPaid: false,
@@ -947,9 +942,9 @@ export default {
             this.selectedEwalletOption = '';
         },
 
-        checkingOut() {
-            this.selectedOrderDialog = false;
-            this.checkoutSheet = true;
+        checkingOut () {
+            this.checkoutSheet = false;
+            this.placeOrderSheet = true;
         },
 
         dineIn() {
@@ -1039,7 +1034,7 @@ export default {
         // },
 
         showSelectedOrderDialog() {
-            this.selectedOrderDialog = true;
+            this.checkoutSheet = true;
         },
 
         closeEwalletDialog() {
