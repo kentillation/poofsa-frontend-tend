@@ -265,7 +265,7 @@
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
                             :disabled="subTotal <= 0 || !isOnline">
                             Checkout
-                            <span>&nbsp;&bull;&nbsp;₱{{ subTotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.subtotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
@@ -646,7 +646,7 @@ export default {
                 } else {
                     this.subtotal = Number(this.subTotal);
                 }
-                this.total_amount = this.discountedSubtotal.toFixed(2);
+                // this.total_amount = this.discountedSubtotal.toFixed(2);
             },
             deep: true
         },
@@ -783,7 +783,7 @@ export default {
             return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
         },
 
-        subTotal() {
+        /*subTotal() {
             const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
             return baseTotal;
         },
@@ -791,7 +791,7 @@ export default {
         totalAmount() {
             const totalAmount = this.totalAmount + this.subTotal;
             return totalAmount;
-        },
+        }, */
 
         customerChange() {
             if (this.discountedSubtotal === 0) {
@@ -828,7 +828,7 @@ export default {
         },
 
         discountedSubtotal() {
-            let subtotal = this.subTotal;
+            let subtotal = this.subtotal;
             if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
                 return subtotal;
             }
