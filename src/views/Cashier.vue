@@ -59,10 +59,11 @@
             </v-alert>
 
             <div v-else class="image-section mb-4">
-                <div v-for="product in filteredProducts" :key="product.id" @click="selectProduct(product)"
+                <div v-for="product in filteredProducts" :key="product.id" 
+                    @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card"
-                        :class="{ 'active' : selectedCard === product.id }"
+                        :class="{ active : selectedCard === product.id }"
                         @click="selectedCard = product.id" >
                         <p class="product-card-text text-truncate">
                             {{ product.product_name }}
