@@ -302,12 +302,12 @@
                         <div class="mb-5 payment-amounts">
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Order type</p>
-                                <p>{{ }}</p>
+                                <p>{{ this.order_type }}</p>
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Customer type</p>
-                                <p>{{ }}</p>
+                                <p>{{ this.customer_type }}</p>
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
@@ -549,7 +549,9 @@ export default {
             subtotal: null,
             total_amount: 0,
             order_type_id: 1,
+            order_type: '',
             customer_type_id: 1,
+            customer_type: '',
             order_type_charge: '0',
             customer_cash: '',
             customer_change: '0',
@@ -568,7 +570,7 @@ export default {
                 { paymentmode_id: 1, paymentmode_label: 'Cash' },
                 { paymentmode_id: 2, paymentmode_label: 'e-Wallet' },
             ],
-            WTFImgSrc: require('@/assets/img/jpg/features/WTF.jpg'),
+            
 
             // Orders
             orders: [],
@@ -1024,26 +1026,32 @@ export default {
 
         dineIn() {
             this.order_type_id = 1;
+            this.order_type = 'Dine-in';
         },
 
         takeOut() {
             this.order_type_id = 2;
+            this.order_type = 'Take-out';
         },
 
         deliveryOrder() {
             this.order_type_id = 3;
+            this.order_type = 'Delivery';
         },
 
         customerRegular() {
             this.customer_type_id = 1;
+            this.customer_type = 'Regular';
         },
 
         customerPwd() {
             this.customer_type_id = 2;
+            this.customer_type = 'w/ Special needs';
         },
 
         customerSenior() {
             this.customer_type_id = 3;
+            this.customer_type = 'w/ Elder';
         },
 
         cashPayment() {
@@ -1166,11 +1174,6 @@ export default {
                 await this.transactStore.submitTransactStore(formData);
 
                 this.$refs.transactionForm.reset();
-                this.subTotal = 0;
-                this.totalQuantity = 0;
-                this.selectedProducts = [];
-                this.checkoutSheet = false;
-                this.placeOrderSheet = false;
 
                 await Promise.all([
                     this.fetchProducts(),
@@ -1203,7 +1206,10 @@ export default {
         resetPaymentSection() {
             this.eWalletPaid = false;
             this.order_type_id = 1;
+            this.order_type = 'Dine-in';
             this.order_type_charge = 0;
+            this.customer_type_id = 1;
+            this.customer_type = 'Regular';
             this.customer_cash = '';
             this.customer_change = 0;
             this.discount_amount = 0;
@@ -1211,6 +1217,11 @@ export default {
             this.payment_method_id = 1;
             this.customer_name = '-';
             this.order_note = '-';
+            this.subTotal = 0;
+            this.totalQuantity = 0;
+            this.selectedProducts = [];
+            this.checkoutSheet = false;
+            this.placeOrderSheet = false;
         },
 
         showTopAlertError(message) {
