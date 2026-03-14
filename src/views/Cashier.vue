@@ -279,12 +279,27 @@
                                 </div>
                             </div>
                         
-
-                        <!-- Selected order type -->
-                        <p class="mb-3">Order type: {{ }} </p>
-
-                        <!-- Selected customer type -->
-                        <p class="mb-3">Customer type: {{ }} </p>
+                        <div class="mb-5 payment-amounts">
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Order type</p>
+                                <p>{{  }}</p>
+                            </div>
+                            <v-divider class="my-3"></v-divider>
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Customer type</p>
+                                <p>{{  }}</p>
+                            </div>
+                            <v-divider class="my-3"></v-divider>
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Note</p>
+                                <p>{{ this.order_note }}</p>
+                            </div>
+                            <v-divider class="my-3"></v-divider>
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Customer name</p>
+                                <p>{{ this.customer_name }}</p>
+                            </div>
+                        </div>
                         
                             <!-- Payment method -->
                             <p class="mb-1">Payment method:</p>
