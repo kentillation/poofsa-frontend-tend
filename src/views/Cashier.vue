@@ -326,7 +326,7 @@
 
                             <!-- Cash render -->
                             <div class="mb-3" :class="{ 'd-none' : this.payment_method_id === 2 }">
-                                <span class="required-asterisk mt-2 text-grey">*</span> Cash render
+                                <span class="required-asterisk mt-2">*</span><span class="text-grey">Cash render</span>
                                 <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
                                     type="number" :disabled="eWalletPaid"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
@@ -337,7 +337,7 @@
 
                             <!-- QR code -->
                             <div v-if="this.selectedEwalletOption === 'qrph'"
-                                class="mb-7 qr-container text-center w-100 pa-4">
+                                class="mb-5 qr-container text-center w-100 pa-4">
                                 <div :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
                                     <div style="width: 200px; height: 410px;">
                                         <div class="text-center d-flex align-center flex-column">
