@@ -255,7 +255,7 @@
                         
                             <!-- Orders -->
                             <p class="my-1 text-grey" >Your order:</p>
-                            <div class="mb-7 pa-2 overflow-auto"
+                            <div class="mb-7 overflow-auto"
                                 style="height: 350px;">
                                 <div class="selected-products-container">
                                     <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info" class="my-3">
@@ -263,7 +263,7 @@
                                     </v-alert>
                                     <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
                                         <div class="selected-products-card">
-                                            <div class="d-flex flex-column w-100">
+                                            <div class="d-flex flex-column w-100 px-1">
                                                 <p class="text-truncate">{{ selectedProduct.product_name }}</p>
                                                 <p class="text-grey my-1" style="font-size: 13px;">{{ selectedProduct.size_label }}</p>
                                                 <div class="d-flex align-center justify-space-between">
