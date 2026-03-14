@@ -143,7 +143,7 @@
 
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
                         <!-- Orders -->
-                        <p class="my-1">Your order:</p>
+                        <p class="my-1 text-grey">Your order:</p>
                         <div class="mb-7 pa-2 overflow-auto"
                             style="height: 350px; border: 1px solid #0090b6; border-radius: 10px; ">
                             <div class="selected-products-container">
@@ -185,7 +185,7 @@
                         </div>
 
                         <!-- Order type -->
-                        <p class="mb-1">Order type:</p>
+                        <p class="mb-1 text-grey">Order type:</p>
                         <div class="mb-7 ga-2 d-flex justify-center">
                             <div @click="dineIn" :class="{ 'selected': this.order_type_id === 1 }"
                                 class="order-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
@@ -205,7 +205,7 @@
                         </div>
 
                         <!-- Customer type -->
-                        <p class="mb-1">Customer type:</p>
+                        <p class="mb-1 text-grey">Customer type:</p>
                         <div class="mb-7 ga-2 d-flex justify-center">
                             <div @click="customerRegular" :class="{ 'selected': this.customer_type_id === 1 }"
                                 class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
@@ -227,14 +227,14 @@
                         <!-- Inputs -->
                         <div class="mb-5">
                             <div class="mb-3">
-                                Note (optional)
+                                <span class="text-grey">Note (optional)</span>
                                 <v-text-field v-model="order_note" variant="outlined" density="compact" type="text"
                                     placeholder="Enter note">
                                 </v-text-field>
                             </div>
 
                             <div class="mb-3">
-                                Customer name (optional)
+                                <span class="text-grey">Customer name (optional)</span>
                                 <v-text-field v-model="customer_name" variant="outlined" density="compact" type="text"
                                     placeholder="Enter customer name">
                                 </v-text-field>
@@ -255,7 +255,7 @@
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
                         
                             <!-- Orders -->
-                            <p class="my-1">Your order:</p>
+                            <p class="my-1 text-grey" >Your order:</p>
                             <div class="mb-7 pa-2 overflow-auto"
                                 style="height: 350px;">
                                 <div class="selected-products-container">
@@ -302,7 +302,7 @@
                         </div>
                         
                             <!-- Payment method -->
-                            <p class="mb-1">Payment method:</p>
+                            <p class="mb-1 text-grey">Payment method:</p>
                             <div class="mb-7 ga-2 d-flex justify-center">
                                 <div :class="{ 'selected': this.payment_method_id === 1 }"
                                     class="pa-2 d-flex align-center justify-center flex-column bg-white"
@@ -326,7 +326,7 @@
 
                             <!-- Cash render -->
                             <div class="mb-3" :class="{ 'd-none' : this.payment_method_id === 2 }">
-                                <span class="required-asterisk mt-2">*</span> Cash render
+                                <span class="required-asterisk mt-2 text-grey">*</span> Cash render
                                 <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
                                     type="number" :disabled="eWalletPaid"
                                     :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
@@ -404,6 +404,13 @@
                             <!-- Amounts -->
                             <div class="mb-5 payment-amounts">
                                 <div class="d-flex align-center justify-space-between">
+                                    <p class="text-grey">Subtotal</p>
+                                    <p>₱{{ subTotal.toFixed(2) }}</p>
+                                </div>
+                                
+                                <v-divider class="my-3"></v-divider>
+                                
+                                <div class="d-flex align-center justify-space-between">
                                     <p class="text-grey">Quantity</p>
                                     <p>x{{ totalQuantity }}</p>
                                 </div>
@@ -421,12 +428,9 @@
                                     <p class="text-grey">Change</p>
                                     <p>₱{{ customerChange }}</p>
                                 </div>
+                                
                                 <v-divider class="my-3"></v-divider>
-                                <div class="d-flex align-center justify-space-between">
-                                    <p class="text-grey">Subtotal</p>
-                                    <p>₱{{ subTotal.toFixed(2) }}</p>
-                                </div>
-                                <v-divider class="my-3"></v-divider>
+                                
                                 <div class="d-flex align-center justify-space-between">
                                     <p style="font-weight: 500; font-size: 18px;">Total</p>
                                     <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{
