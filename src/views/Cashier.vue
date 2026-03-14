@@ -227,16 +227,6 @@
                         <!-- Inputs -->
                         <div class="mb-5">
                             <div class="mb-3">
-                                <span class="required-asterisk mt-2">*</span> Cash render
-                                <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
-                                    type="number" :disabled="eWalletPaid"
-                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
-                                    @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
-                                    inputmode="numeric" placeholder="Enter cash">
-                                </v-text-field>
-                            </div>
-
-                            <div class="mb-3">
                                 Note (optional)
                                 <v-text-field v-model="order_note" variant="outlined" density="compact" type="text"
                                     placeholder="Enter note">
@@ -248,131 +238,6 @@
                                 <v-text-field v-model="customer_name" variant="outlined" density="compact" type="text"
                                     placeholder="Enter customer name">
                                 </v-text-field>
-                            </div>
-                        </div>
-
-                        <!-- Payment method -->
-                        <p class="mb-1">Payment method:</p>
-                        <div class="mb-7 ga-2 d-flex justify-center">
-                            <div :class="{ 'selected': this.payment_method_id === 1 }"
-                                class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 160px; height: 80px; border-radius: 10px;">
-                                <v-icon style="font-size: 30px !important;">mdi-cash</v-icon>
-                                <p @click="cashPayment" class="text-center" style="font-size: 12px;">Cash <br />
-                                    <span class="text-grey-darken-1">(Over-the-counter)</span>
-                                </p>
-                            </div>
-                            <div :class="{ 'selected': this.payment_method_id === 2 }"
-                                class="pa-2 d-flex align-center justify-center flex-column bg-white"
-                                style="width: 160px; height: 80px; border-radius: 10px;">
-                                <v-icon style="font-size: 20px;">mdi-qrcode-scan</v-icon>
-                                <p @click="generateQRPhCode" :disabled="!isOnline || isNotEwallet || eWalletPaid"
-                                    class="text-center" style="font-size: 12px;">e-Wallet <br /> 
-                                    <span class="text-grey-darken-1">(GCash, Maya, etc.)</span>
-                                </p>
-                            </div>
-                        </div>
-
-                        <div v-if="this.selectedEwalletOption === 'qrph'"
-                            class="mb-7 qr-container text-center w-100 pa-4">
-
-                            <div
-                                :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
-                                <div style="width: 200px; height: 410px;">
-                                    <div class="text-center d-flex align-center flex-column">
-                                        <!-- <p class="text-grey my-3">Generating QR...</p>
-                                        <v-progress-circular color="grey" size="100"
-                                            width="2" indeterminate></v-progress-circular> -->
-                                        <v-skeleton-loader type="text" width="220"></v-skeleton-loader>
-                                        <div class="d-flex">
-                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
-                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
-                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
-                                            <v-skeleton-loader type="avatar"></v-skeleton-loader>
-                                        </div>
-                                        <v-skeleton-loader type="text" width="150"></v-skeleton-loader>
-                                        <v-skeleton-loader type="image" width="190"></v-skeleton-loader>
-                                        <v-skeleton-loader type="text" width="300"></v-skeleton-loader>
-                                        <v-skeleton-loader type="text" width="300"></v-skeleton-loader>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="eWalletImgSrc">
-                                <div class="d-flex align-center justify-center">
-                                    <p style="font-size: 20px;">Scan</p>
-                                    <img class="e-wallet mx-1" :src="this.ewalletImageStore.qrphLogo"
-                                        style="width: 60px; height: 15px;" alt="QRPh Logo" loading="lazy">
-                                    <p style="font-size: 20px;">code to pay</p>
-                                </div>
-
-                                <div class="d-flex align-center justify-space-around ga-2 mt-2 mb-1">
-                                    <img class="e-wallet" :src="this.ewalletImageStore.gcashLogo"
-                                        style="width: 50px; height: 13px;" alt="GCash Logo" loading="lazy">
-                                    <img class="e-wallet" :src="this.ewalletImageStore.mayaLogo"
-                                        style="width: 30px; height: 13px;" alt="Maya Logo" loading="lazy">
-                                    <img class="e-wallet" :src="this.ewalletImageStore.bpiLogo"
-                                        style="width: 25px; height: 13px;" alt="BPI Logo" loading="lazy">
-                                    <img class="e-wallet" :src="this.ewalletImageStore.gotymeLogo"
-                                        style="width: 40px; height: 13px;" alt="GoTyme Logo" loading="lazy">
-                                    <img class="e-wallet" :src="this.ewalletImageStore.homecreditLogo"
-                                        style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
-                                </div>
-                                <p class="mt-4" style="font-size: 20px;">
-                                    <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
-                                </p>
-                                <v-img :src="eWalletImgSrc" width="220" height="220" class="mx-auto"></v-img>
-                            </div>
-
-                            <!-- Show payment status -->
-                            <div class="payment-status w-100">
-                                <v-alert v-if="eWalletImgSrc" :type="!eWalletPaid ? 'info' : 'success'" variant="tonal"
-                                    style="border-radius: 15px;" class="mt-1 px-3">
-                                    <div class="d-flex align-center justify-space-between">
-                                        <span>{{ !eWalletPaid ? 'Waiting for payment' : 'Payment successful' }}</span>
-                                        <v-progress-circular v-if="!eWalletPaid" size="20" width="2"
-                                            indeterminate></v-progress-circular>
-                                        <v-icon v-else color="success">mdi-check-circle</v-icon>
-                                    </div>
-                                </v-alert>
-                            </div>
-
-                            <div v-if="eWalletImgSrc" class="text-center">
-                                <p class="text-caption text-grey">
-                                    Please don't refresh this page until eWallet payment is succeeded.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Amounts -->
-                        <div class="mb-5 payment-amounts">
-                            <div class="d-flex align-center justify-space-between">
-                                <p class="text-grey">Quantity</p>
-                                <p>x{{ totalQuantity }}</p>
-                            </div>
-                            <div :class="this.order_type_charge > 0 ? 'd-block' : 'd-none'">
-                                <v-divider class="my-3"></v-divider>
-                                <div class="d-flex align-center justify-space-between">
-                                    <p class="text-grey">Delivery</p>
-                                    <p>₱{{ this.order_type_charge }}</p>
-                                </div>
-                            </div>
-                            <v-divider class="my-3"></v-divider>
-                            <div class="d-flex align-center justify-space-between">
-                                <p class="text-grey">Change</p>
-                                <p>₱{{ customerChange }}</p>
-                            </div>
-                            <v-divider class="my-3"></v-divider>
-                            <div class="d-flex align-center justify-space-between">
-                                <p class="text-grey">Subtotal</p>
-                                <p>₱{{ subTotal.toFixed(2) }}</p>
-                            </div>
-                            <v-divider class="my-3"></v-divider>
-                            <div class="d-flex align-center justify-space-between">
-                                <p style="font-weight: 500; font-size: 18px;">Total</p>
-                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{
-                                    discountedSubtotal.toFixed(2) }}
-                                </p>
                             </div>
                         </div>
 
@@ -417,7 +282,19 @@
                                     </p>
                                 </div>
                             </div>
-                            
+
+                            <!-- Cash render -->
+                            <div class="mb-3" :class="{ 'd-none' : this.payment_method_id === 1 }">
+                                <span class="required-asterisk mt-2">*</span> Cash render
+                                <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
+                                    type="number" :disabled="eWalletPaid"
+                                    :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
+                                    @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')"
+                                    inputmode="numeric" placeholder="Enter cash">
+                                </v-text-field>
+                            </div>
+
+                            <!-- QR code -->
                             <div v-if="this.selectedEwalletOption === 'qrph'"
                                 class="mb-7 qr-container text-center w-100 pa-4">
                                 <div :class="[loadingQr ? 'generate-qr-card d-flex' : 'd-none', 'align-center justify-center']">
@@ -517,14 +394,14 @@
                                 </div>
                             </div>
                             
-                            <v-btn @click="submitForm" :loading="checkingOut" class="place-order-btn" color="#0090b6"
-                                :disabled="!isFormValid || checkingOut ||
+                            <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
+                                :disabled="!isFormValid || placingOrder ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
                                 Number(customer_cash) < subTotal ||
                                 Number(customer_change) < 0 ||
                                 subTotal <= 0 ||
                                 !isOnline">
-                                Checkout
+                                Place order
                                 <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                             </v-btn>
                         </div>
@@ -591,7 +468,6 @@ export default {
             // Payment
             orderStep: 3,
             loadingQr: false,
-            checkingOut: false,
             checkoutSheet: false,
             placingOrder: false,
             selectedOrderDialog: false,
@@ -1173,24 +1049,24 @@ export default {
 
         async submitForm() {
             try {
-                this.checkingOut = true;
+                this.placingOrder = true;
 
                 if (!this.$refs.transactionForm.validate()) {
-                    this.checkingOut = false;
+                    this.placingOrder = false;
                     return;
                 }
 
                 if (Number(this.payment_method_id) === 2) {
                     if (!this.eWalletPaid) {
                         this.showError('Please complete e-Wallet payment first');
-                        this.checkingOut = false;
+                        this.placingOrder = false;
                         return;
                     }
                 }
 
                 if (!this.referenceNumber) {
                     this.showError("Error in reference number. Refresh the page!");
-                    this.checkingOut = false;
+                    this.placingOrder = false;
                     return;
                 }
 
@@ -1240,7 +1116,7 @@ export default {
                 this.showError(error);
                 console.error(error);
             } finally {
-                this.checkingOut = false;
+                this.placingOrder = false;
             }
         },
 
