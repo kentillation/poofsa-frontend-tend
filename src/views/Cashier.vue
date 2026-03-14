@@ -265,7 +265,7 @@
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
                             :disabled="subTotal <= 0 || !isOnline">
                             Checkout
-                            <span>&nbsp;&bull;&nbsp;₱{{ this.subtotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.subTotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
@@ -783,15 +783,15 @@ export default {
             return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
         },
 
-        /*subTotal() {
+        subTotal() {
             const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
             return baseTotal;
         },
 
-        totalAmount() {
+        /*totalAmount() {
             const totalAmount = this.totalAmount + this.subTotal;
             return totalAmount;
-        }, */
+        },*/
 
         customerChange() {
             if (this.discountedSubtotal === 0) {
