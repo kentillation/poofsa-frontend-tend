@@ -62,7 +62,7 @@
                 <div v-for="product in filteredProducts" :key="product.id" @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card"
-                        :class="{ active: selectedCard === item.id }"
+                        :class="{ 'active' : selectedCard === item.id }"
                         @click="selectedCard = item.id" >
                         <p class="product-card-text text-truncate">
                             {{ product.product_name }}
@@ -1247,7 +1247,7 @@ export default {
     transition: 0.5s ease;
 }
 
-.image-section .product-card:active .text-truncate, .image-section .product-card:hover strong {
+.image-section .product-card:active .text-truncate, .image-section .product-card:active strong {
     color: #fff !important;
 }
 
