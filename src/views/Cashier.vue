@@ -896,7 +896,6 @@ export default {
             } else {
                 this.selectedProducts[index].quantity++;
             }
-            this.selectedCard = product.product_id;
         },
 
         deductQuantity(product) {
