@@ -312,12 +312,12 @@
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Note</p>
-                                <p>{{ this.order_note }}</p>
+                                <p class="text-truncate">{{ this.order_note }}</p>
                             </div>
                             <v-divider class="my-3"></v-divider>
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Customer name</p>
-                                <p>{{ this.customer_name }}</p>
+                                <p class="text-truncate">{{ this.customer_name }}</p>
                             </div>
                         </div>
 
@@ -1386,7 +1386,7 @@ export default {
     background-color: #fff;
 }
 
-.product-card .text-truncate {
+.text-truncate {
     width: 145px;
     white-space: nowrap;
     overflow: hidden;
