@@ -476,7 +476,7 @@
                                 subTotal <= 0 ||
                                 !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱{{ this.totalAmount.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
 
                     </v-container>
@@ -646,7 +646,7 @@ export default {
                 } else {
                     this.subtotal = Number(this.subTotal);
                 }
-                this.total_amount = this.discountedSubtotal.toFixed(2);
+                // this.total_amount = this.discountedSubtotal.toFixed(2);
             },
             deep: true
         },
@@ -707,14 +707,14 @@ export default {
                 this.customer_type_id = 2;
                 this.customer_type = 'w/ Special needs';
                 this.discount_amount = 12;
-                this.totalAmount = this.subTotal - this.discount_amount;
+                this.discountedSubtotal -= this.discount_amount;
             }
 
             if (Number(newVal) === 3) {
                 this.customer_type_id = 3;
                 this.customer_type = 'w/ Elderly';
                 this.discount_amount = 12;
-                this.totalAmount = this.subTotal - this.discount_amount;
+                this.discountedSubtotal = -= this.discount_amount;
             }
         },
 
