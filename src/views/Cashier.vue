@@ -705,11 +705,13 @@ export default {
             if (Number(newVal) === 2) {
                 this.customer_type_id = 2;
                 this.customer_type = 'w/ Special needs';
+                this.discount_amount = 12;
             }
 
             if (Number(newVal) === 3) {
                 this.customer_type_id = 3;
                 this.customer_type = 'w/ Elderly';
+                this.discount_amount = 12;
             }
         },
 
