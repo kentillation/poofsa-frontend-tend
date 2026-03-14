@@ -555,7 +555,6 @@ export default {
             eWalletRef: '',
             total_quantity: '',
             subtotal: 0,
-            totalAmount: 0,
             total_amount: 0,
             order_type_id: 1,
             order_type: 'Dine-in',
