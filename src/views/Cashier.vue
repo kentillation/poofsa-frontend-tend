@@ -20,9 +20,8 @@
                     variant="outlined">
                 </v-text-field>
 
-                <v-btn color="#fff" class="ms-2 d-flex align-items-center" variant="flat" @click="showCategories"
-                    size="small" icon>
-                    <v-icon size="large">mdi-bell-outline</v-icon>
+                <v-btn class="ms-2" @click="toSettings" size="small" icon>
+                    <v-icon>mdi-account-circle-outline</v-icon>
                 </v-btn>
             </div>
 
