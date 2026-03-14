@@ -253,8 +253,7 @@
             <v-bottom-sheet v-model="placeOrderSheet">
                 <v-card class="pa-2" style="background-color: #e8faff; border-radius: 60px 60px 0 0;">
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
-                        <div class="pa-2 overflow-auto"
-                            style="height: 350px; border: 1px solid #0090b6; border-radius: 10px;">
+                        
                             <!-- Orders -->
                             <p class="my-1">Your order:</p>
                             <div class="mb-7 pa-2 overflow-auto"
@@ -279,7 +278,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        
 
                         <!-- Selected order type -->
                         <p class="mb-3">Order type: {{ }} </p>
