@@ -20,7 +20,7 @@
                     variant="outlined">
                 </v-text-field>
 
-                <v-btn class="ms-2" @click="toSettings" size="small" icon>
+                <v-btn class="ms-2" @click="toSettings" size="small" variant="flat" icon>
                     <v-icon>mdi-account-circle-outline</v-icon>
                 </v-btn>
             </div>
@@ -820,6 +820,10 @@ export default {
     },
 
     methods: {
+
+        toSettings() {
+            this.$route.push('/settings');
+        },
 
         onOffline() {
             this.isOnline = false;
