@@ -554,7 +554,8 @@ export default {
             referenceNumber: '',
             eWalletRef: '',
             total_quantity: '',
-            subtotal: null,
+            subtotal: 0,
+            totalAmount: 0,
             total_amount: 0,
             order_type_id: 1,
             order_type: 'Dine-in',
@@ -788,7 +789,7 @@ export default {
         },
 
         totalAmount() {
-            this.totalAmount += this.subTotal;
+            return this.totalAmount += this.subTotal;
         },
 
         customerChange() {
