@@ -476,7 +476,7 @@
                                 subTotal <= 0 ||
                                 !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱{{ totalAmount.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.totalAmount.toFixed(2) }}</span>
                         </v-btn>
 
                     </v-container>
@@ -788,10 +788,10 @@ export default {
             return baseTotal;
         },
 
-        /*totalAmount() {
+        totalAmount() {
             const totalAmount = this.totalAmount + this.subTotal;
             return totalAmount;
-        },*/
+        },
 
         customerChange() {
             if (this.discountedSubtotal === 0) {
