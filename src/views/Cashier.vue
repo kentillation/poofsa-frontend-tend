@@ -476,7 +476,7 @@
                                 subTotal <= 0 ||
                                 !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ totalAmount.toFixed(2) }}</span>
                         </v-btn>
 
                     </v-container>
@@ -787,6 +787,10 @@ export default {
             return baseTotal;
         },
 
+        totalAmount() {
+            this.totalAmount += this.subTotal;
+        },
+
         customerChange() {
             if (this.discountedSubtotal === 0) {
                 return 0;
@@ -1015,6 +1019,7 @@ export default {
             if (this.selectedProducts[index].quantity === 0) {
                 this.selectedProducts.splice(index, 1);
             }
+            this.totalAmount -= this.subTotal;
             this.customer_cash = 0;
             this.payment_method_id = 1;
             this.eWalletPaid = false;
@@ -1027,7 +1032,9 @@ export default {
             const index = this.selectedProducts.findIndex(p => p.product_id === product.product_id);
             if (this.selectedProducts[index].quantity > -1) {
                 this.selectedProducts[index].quantity++;
+                
             }
+            this.totalAmount += this.subTotal;
             this.customer_cash = 0;
             this.payment_method_id = 1;
             this.eWalletPaid = false;
