@@ -782,11 +782,10 @@ export default {
             return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
         },
 
-        /* subTotal() {
+        subTotal() {
             const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
-            const charge = Number(this.order_type_charge) || 0;
-            return baseTotal + (charge !== 0 ? charge : 0);
-        }, */
+            return baseTotal;
+        },
 
         customerChange() {
             if (this.discountedSubtotal === 0) {
