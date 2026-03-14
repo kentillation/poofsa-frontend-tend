@@ -674,28 +674,34 @@ export default {
             if (Number(newVal) === 1) {
                 this.order_type_charge = 0;
                 this.order_type_id = 1;
+                this.order_type = 'Dine-in';
             }
             if (Number(newVal) === 2) {
                 this.order_type_charge = 0;
                 this.order_type_id = 2;
+                this.order_type = 'Take-out';
             }
             if (Number(newVal) === 3) {
-                this.order_type_charge = 5; // Delivery
+                this.order_type_charge = 5;
                 this.order_type_id = 3;
+                this.order_type = 'Delivery';
             }
         },
 
         customer_type_id(newVal) {
             if (Number(newVal) === 1) {
                 this.customer_type_id = 1;
+                this.customer_type = 'Regular';
             }
 
             if (Number(newVal) === 2) {
                 this.customer_type_id = 2;
+                this.customer_type = 'w/ Special needs';
             }
 
             if (Number(newVal) === 3) {
                 this.customer_type_id = 3;
+                this.customer_type = 'w/ Elderly';
             }
         },
 
@@ -1026,32 +1032,26 @@ export default {
 
         dineIn() {
             this.order_type_id = 1;
-            this.order_type = 'Dine-in';
         },
 
         takeOut() {
             this.order_type_id = 2;
-            this.order_type = 'Take-out';
         },
 
         deliveryOrder() {
             this.order_type_id = 3;
-            this.order_type = 'Delivery';
         },
 
         customerRegular() {
             this.customer_type_id = 1;
-            this.customer_type = 'Regular';
         },
 
         customerPwd() {
             this.customer_type_id = 2;
-            this.customer_type = 'w/ Special needs';
         },
 
         customerSenior() {
             this.customer_type_id = 3;
-            this.customer_type = 'w/ Elder';
         },
 
         cashPayment() {
