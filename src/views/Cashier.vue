@@ -656,7 +656,7 @@ export default {
         },
 
         discountedSubtotal(newValue) {
-            this.ordersStore.crrntTtlOrdrChrg = newValue + this.discount_amount;
+            this.ordersStore.crrntTtlOrdrChrg = newValue;
         },
 
         customer_cash() {
