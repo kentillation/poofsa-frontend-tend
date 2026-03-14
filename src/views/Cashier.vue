@@ -236,7 +236,7 @@
                             <div @click="customerPwd" :class="{ 'selected': this.customer_type_id === 2 }"
                                 class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
                                 <v-icon>mdi-wheelchair</v-icon>
-                                <p style="font-size: 12px;" class="d-flex align-center flex-column">w/ Special needs</p>
+                                <p style="font-size: 12px;" class="d-flex align-center flex-column">w/ Special <br />needs</p>
                             </div>
                             <div @click="customerSenior" :class="{ 'selected': this.customer_type_id === 3 }"
                                 class="customer-type-card pa-2 d-flex align-center justify-center flex-column bg-white">
