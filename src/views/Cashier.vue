@@ -63,8 +63,8 @@
                     @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card"
-                        :class="{ 'active' : selectedCard === product.id }"
-                        @click="selectedCard === product.id>
+                        :class="{ active : selectedCard === product.id }"
+                        @click="selectedCard === product.id">
                         <p class="product-card-text text-truncate">
                             {{ product.product_name }}
                         </p>
