@@ -1462,7 +1462,7 @@ export default {
 }
 
 .customer-type-card {
-    width: 77px;
+    width: 85px;
     height: 77px;
     border-radius: 10px;
 }
