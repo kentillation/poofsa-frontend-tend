@@ -448,7 +448,7 @@
 
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Discount</p>
-                                <p>₱{{ this.discount_amount }}</p>
+                                <p>₱{{ this.order_type_charge }}</p>
                             </div>
 
                             <v-divider class="my-3"></v-divider>
