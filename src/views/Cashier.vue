@@ -63,7 +63,8 @@
                     @click="selectProduct(product)"
                     class="image-section-item">
                     <div class="product-card"
-                        :class="{ active : selectedCard === product.id }">
+                        :class="{ 'active' : selectedCard === product.id }"
+                        @click="selectedCard === product.id>
                         <p class="product-card-text text-truncate">
                             {{ product.product_name }}
                         </p>
@@ -1242,17 +1243,17 @@ export default {
     flex-direction: column;
 }
 
-.image-section .product-card:active {
+.image-section .product-card.active {
     color: #fff !important;
     background-color: #0090b6 !important;
     transition: 0.5s ease;
 }
 
-.image-section .product-card:active .text-truncate, .image-section .product-card:active strong {
+.image-section .product-card.active .text-truncate, .image-section .product-card.active strong {
     color: #fff !important;
 }
 
-.image-section .product-card:active .text-grey {
+.image-section .product-card.active .text-grey {
     color: #c2c2c2 !important;
 }
 
