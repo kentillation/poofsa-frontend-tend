@@ -265,7 +265,7 @@
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
                             :disabled="subTotal <= 0 || !isOnline">
                             Checkout
-                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ subTotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
