@@ -706,12 +706,14 @@ export default {
                 this.customer_type_id = 2;
                 this.customer_type = 'w/ Special needs';
                 this.discount_amount = 12;
+                this.discountedSubtotal -= this.discount_amount;
             }
 
             if (Number(newVal) === 3) {
                 this.customer_type_id = 3;
                 this.customer_type = 'w/ Elderly';
                 this.discount_amount = 12;
+                this.discountedSubtotal -= this.discount_amount;
             }
         },
 
