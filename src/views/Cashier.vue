@@ -789,7 +789,8 @@ export default {
         },
 
         totalAmount() {
-            return this.totalAmount += this.subTotal;
+            const totalAmount = this.totalAmount + this.subTotal;
+            return totalAmount;
         },
 
         customerChange() {
