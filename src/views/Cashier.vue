@@ -1147,7 +1147,8 @@ export default {
                 this.subTotal = 0;
                 this.totalQuantity = 0;
                 this.selectedProducts = [];
-                this.selectedOrderDialog = false;
+                this.checkoutSheet = false;
+                this.placeOrderSheet = false;
 
                 await Promise.all([
                     this.fetchProducts(),
