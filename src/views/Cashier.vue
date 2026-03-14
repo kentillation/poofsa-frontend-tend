@@ -646,7 +646,7 @@ export default {
                 } else {
                     this.subtotal = Number(this.subTotal);
                 }
-                // this.total_amount = this.discountedSubtotal.toFixed(2);
+                this.total_amount = this.discountedSubtotal.toFixed(2);
             },
             deep: true
         },
@@ -828,7 +828,7 @@ export default {
         },
 
         discountedSubtotal() {
-            let subtotal = this.subtotal;
+            let subtotal = this.subTotal;
             if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
                 return subtotal;
             }
