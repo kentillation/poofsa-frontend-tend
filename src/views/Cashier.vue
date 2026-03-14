@@ -443,6 +443,14 @@
                                     <p>₱{{ this.order_type_charge }}</p>
                                 </div>
                             </div>
+                            
+                            <v-divider class="my-3"></v-divider>
+
+                            <div class="d-flex align-center justify-space-between">
+                                <p class="text-grey">Discount</p>
+                                <p>₱{{ this.discount_amount }}</p>
+                            </div>
+
                             <v-divider class="my-3"></v-divider>
 
                             <div class="d-flex align-center justify-space-between">
@@ -697,11 +705,13 @@ export default {
             if (Number(newVal) === 2) {
                 this.customer_type_id = 2;
                 this.customer_type = 'w/ Special needs';
+                // this.discountAmount = 12;
             }
 
             if (Number(newVal) === 3) {
                 this.customer_type_id = 3;
                 this.customer_type = 'w/ Elderly';
+                // this.discountAmount = 12;
             }
         },
 
