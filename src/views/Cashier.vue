@@ -822,7 +822,7 @@ export default {
     methods: {
 
         toSettings() {
-            this.$route.push('/settings');
+            this.$router.push('/settings');
         },
 
         onOffline() {
