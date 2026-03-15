@@ -5,7 +5,7 @@
             :disabled="totalQuantity === 0">
             Order
             <span :class="{ 'd-none': totalQuantity === 0 }"> &bull; ₱{{
-                this.ordersStore.currentTotalOrderCharge.toFixed(2) }}
+                this.ordersStore.currentSubTotal.toFixed(2) }}
             </span>
             <v-badge :content="totalQuantity" color="error" :class="{ 'd-none': totalQuantity === 0 }"
                 class="position-absolute" style="top: 1px; right: 30px; z-index: 1010 !important;"></v-badge>
@@ -263,9 +263,9 @@
                         </div>
 
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
-                            :disabled="subTotal <= 0 || !isOnline">
+                            :disabled="discountedSubtotal <= 0 || !isOnline">
                             Checkout
-                            <span>&nbsp;&bull;&nbsp;₱{{ this.subTotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
@@ -349,7 +349,7 @@
                             <span class="required-asterisk mt-2">*</span><span class="text-grey">Cash render</span>
                             <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
                                 type="number" :disabled="eWalletPaid"
-                                :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
+                                :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.discountedSubtotal || 'Must be greater than or equal to total amount']"
                                 @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
                                 placeholder="Enter cash">
                             </v-text-field>
@@ -426,7 +426,7 @@
                         <div class="mb-5 payment-amounts">
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Subtotal</p>
-                                <p>₱{{ subTotal.toFixed(2) }}</p>
+                                <p>₱{{ discountedSubtotal.toFixed(2) }}</p>
                             </div>
 
                             <v-divider class="my-3"></v-divider>
@@ -471,9 +471,9 @@
                         <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
                             :disabled="!isFormValid || placingOrder ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
-                                Number(customer_cash) < subTotal ||
+                                Number(customer_cash) < discountedSubtotal ||
                                 Number(customer_change) < 0 ||
-                                subTotal <= 0 ||
+                                discountedSubtotal <= 0 ||
                                 !isOnline">
                             Place order
                             <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
@@ -554,7 +554,6 @@ export default {
             referenceNumber: '',
             eWalletRef: '',
             total_quantity: '',
-            subtotal: 0,
             total_amount: 0,
             order_type_id: 1,
             order_type: 'Dine-in',
@@ -642,11 +641,10 @@ export default {
         selectedProducts: {
             handler() {
                 if (this.order_type_charge && Number(this.order_type_charge) !== 0) {
-                    this.subtotal = Number(this.subTotal) + Number(this.order_type_charge);
+                    this.discountedSubtotal += Number(this.order_type_charge);
                 } else {
-                    this.subtotal = Number(this.subTotal);
+                    return this.discountedSubtotal;
                 }
-                // this.total_amount = this.discountedSubtotal.toFixed(2);
             },
             deep: true
         },
@@ -693,7 +691,7 @@ export default {
                 this.order_type_charge = 5;
                 this.order_type_id = 3;
                 this.order_type = 'Delivery';
-                this.totalAmount = this.subTotal + this.order_type_charge;
+                this.totalAmount = this.discountedSubtotal + this.order_type_charge;
             }
         },
 
@@ -714,7 +712,7 @@ export default {
                 this.customer_type_id = 3;
                 this.customer_type = 'w/ Elderly';
                 this.discount_amount = 12;
-                this.discountedSubtotal = -= this.discount_amount;
+                this.discountedSubtotal -= this.discount_amount;
             }
         },
 
@@ -783,13 +781,16 @@ export default {
             return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
         },
 
-        subTotal() {
-            const baseTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
-            return baseTotal;
+        discountedSubtotal() {
+            let baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
+            if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
+                return baseSubTotal;
+            }
+            return baseSubTotal - parseFloat(this.discount_amount);
         },
 
         totalAmount() {
-            const totalAmount = this.totalAmount + this.subTotal;
+            const totalAmount = this.totalAmount + this.discountedSubtotal;
             return totalAmount;
         },
 
@@ -825,14 +826,6 @@ export default {
             return Array.isArray(this.orderDetails)
                 ? this.orderDetails.reduce((sum, item) => sum + (item.base_price * item.quantity || 0), 0)
                 : 0;
-        },
-
-        discountedSubtotal() {
-            let subtotal = this.subTotal;
-            if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
-                return subtotal;
-            }
-            return subtotal - parseFloat(this.discount_amount);
         },
 
     },
@@ -1021,7 +1014,7 @@ export default {
             if (this.selectedProducts[index].quantity === 0) {
                 this.selectedProducts.splice(index, 1);
             }
-            this.totalAmount -= this.subTotal;
+            this.totalAmount -= this.discountedSubtotal;
             this.customer_cash = 0;
             this.payment_method_id = 1;
             this.eWalletPaid = false;
@@ -1036,7 +1029,7 @@ export default {
                 this.selectedProducts[index].quantity++;
                 
             }
-            this.totalAmount += this.subTotal;
+            this.totalAmount += this.discountedSubtotal;
             this.customer_cash = 0;
             this.payment_method_id = 1;
             this.eWalletPaid = false;
@@ -1168,13 +1161,13 @@ export default {
                     return;
                 }
 
-                this.computed_discount = this.subTotal * (this.discount_amount / 100);
+                this.computed_discount = this.discountedSubtotal * (this.discount_amount / 100);
 
                 const formData = new FormData();
                 formData.append("transactions[0][reference_number]", this.referenceNumber ?? this.eWalletRef);
                 formData.append("transactions[0][total_quantity]", this.totalQuantity);
-                formData.append("transactions[0][total_amount]", parseFloat(this.discountedSubtotal) || 0);
-                formData.append("transactions[0][subtotal]", parseFloat(this.subTotal) || 0);
+                formData.append("transactions[0][total_amount]", parseFloat(this.totalAmount) || 0);
+                formData.append("transactions[0][subtotal]", parseFloat(this.discountedSubtotal) || 0);
                 formData.append("transactions[0][order_type_id]", Number(this.order_type_id));
                 formData.append("transactions[0][order_type_charge]", parseFloat(this.order_type_charge) || 0);
                 formData.append("transactions[0][customer_cash]", parseFloat(this.customer_cash) || 0);
@@ -1237,7 +1230,7 @@ export default {
             this.payment_method_id = 1;
             this.customer_name = '-';
             this.order_note = '-';
-            this.subTotal = 0;
+            this.discountedSubtotal = 0;
             this.totalQuantity = 0;
             this.selectedProducts = [];
             this.checkoutSheet = false;

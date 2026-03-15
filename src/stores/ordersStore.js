@@ -8,6 +8,6 @@ export const useOrdersStore = defineStore('orders', {
 
     getters: {
         currentTotalOrderQuantity: (state) => state.crrntTtlOrdrQntty,
-        currentTotalOrderCharge: (state) => state.crrntTtlOrdrChrg,
+        currentSubTotal: (state) => state.crrntTtlOrdrChrg,
     },
 });
