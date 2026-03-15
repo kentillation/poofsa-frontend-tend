@@ -476,7 +476,7 @@
                         <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
                             :disabled="!isFormValid || placingOrder ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
-                                Number(customer_cash) > totalAmount ||
+                                Number(customer_cash) < totalAmount ||
                                 totalAmount <= 0 ||
                                 Number(customer_change) < 0 ||
                                 !isOnline">
