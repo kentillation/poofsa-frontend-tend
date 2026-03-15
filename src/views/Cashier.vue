@@ -351,7 +351,7 @@
                             <span class="required-asterisk mt-2">*</span><span class="text-grey">Cash render</span>
                             <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
                                 type="number" :disabled="eWalletPaid"
-                                :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
+                                :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= totalAmount || 'Must be greater than or equal to total amount']"
                                 @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
                                 placeholder="Enter cash">
                             </v-text-field>
@@ -399,7 +399,7 @@
                                         style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
                                 </div>
                                 <p class="mt-4" style="font-size: 20px;">
-                                    <strong>₱ {{  }}</strong>
+                                    <strong>₱ {{ this.totalAmount }}</strong>
                                 </p>
                                 <v-img :src="eWalletImgSrc" width="220" height="220" class="mx-auto"></v-img>
                             </div>
@@ -464,7 +464,7 @@
 
                             <div class="d-flex align-center justify-space-between">
                                 <p style="font-weight: 500; font-size: 18px;">Total</p>
-                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{  }}
+                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{ this.totalAmount }}
                                 </p>
                             </div>
                         </div>
@@ -477,7 +477,7 @@
                                 Number(customer_change) < 0 ||
                                 !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱{{  }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.totalAmount }}</span>
                         </v-btn>
 
                     </v-container>
@@ -655,20 +655,20 @@ export default {
         },
 
         customer_cash() {
-            const customerCharge = parseFloat(this.customer_cash) - this.subTotal;
+            const customerCharge = parseFloat(this.customer_cash) - this.totalAmount;
             this.customer_change = customerCharge.toFixed(2);
-            if (this.subTotal == 0) {
+            if (this.totalAmount == 0) {
                 this.customer_change = 0;
             }
-            if (this.customer_cash === '') {
+            if (this.customer_cash === null) {
                 this.customer_change = 0;
             }
         },
 
         discount_amount() {
-            this.total_amount = Number(this.subTotal.toFixed(2));
+            const total_amount = parseFloat(this.subTotal) + parseFloat(this.order_type_charge);
             if (this.customer_cash) {
-                const change = parseFloat(this.customer_cash) - parseFloat(this.total_amount);
+                const change = parseFloat(this.customer_cash) - total_amount;
                 this.customer_change = change.toFixed(2);
             }
         },
@@ -729,8 +729,15 @@ export default {
 
         // Declaration of subTotal
         subTotal() {
-            let baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
+            const baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
             return baseSubTotal;
+        },
+
+        // Declaration of totalAmount
+        totalAmount() {
+            const baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
+            const newTotalAmount =+ baseSubTotal;
+            return newTotalAmount;
         },
 
         paymentStatus() {
@@ -782,17 +789,11 @@ export default {
             );
         },
 
-        totalAmount() {
-            const totalAmount = this.totalAmount + this.subTotal;
-            return totalAmount;
-        },
-
         customerChange() {
-            // Change subTotal to totalAmount
-            if (this.subTotal === 0) {
+            if (this.totalAmount === 0) {
                 return 0;
             }
-            const newCustomerChange = this.customer_cash - this.subTotal;
+            const newCustomerChange = this.customer_cash - this.totalAmount;
             return newCustomerChange;
         },
 
@@ -1090,8 +1091,7 @@ export default {
                 this.selectedEwalletOption = 'qrph';
                 this.eWalletRef = await this.generateReferenceNumber();
 
-                let totalAmount = 100; // Sample
-                const amountToPay = totalAmount;
+                const amountToPay = this.totalAmount;
 
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
@@ -1154,9 +1154,8 @@ export default {
                     return;
                 }
 
-                let totalAmount = 100; // Sample
-                this.computed_discount = totalAmount * (this.discount_amount / 100);
-                // this.computed_discount = this.totalAmount * (this.discount_amount / 100);
+                let total_amount = this.totalAmount;
+                this.computed_discount = total_amount * (this.discount_amount / 100);
 
                 const formData = new FormData();
                 formData.append("transactions[0][reference_number]", this.referenceNumber ?? this.eWalletRef);
