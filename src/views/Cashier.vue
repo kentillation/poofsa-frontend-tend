@@ -654,7 +654,8 @@ export default {
         },
 
         discountedSubtotal(newValue) {
-            this.ordersStore.crrntTtlOrdrChrg = newValue;
+            // if there's changes in discountedSubtotal
+            this.ordersStore.crrntSbTtl = newValue;
         },
 
         customer_cash() {
@@ -728,6 +729,19 @@ export default {
     computed: {
         ...mapState(useStocksStore, ['stockNotificationQty']),
 
+        totalQuantity() {
+            return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
+        },
+
+        // Declaration of discountedSubtotal
+        discountedSubtotal() {
+            let baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
+            if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
+                return baseSubTotal;
+            }
+            return baseSubTotal - parseFloat(this.discount_amount);
+        },
+
         paymentStatus() {
             return this.paymentStore.paymentStatus;
         },
@@ -775,18 +789,6 @@ export default {
             return this.products.filter(product =>
                 product.product_name.toLowerCase().includes(this.searchProduct.toLowerCase())
             );
-        },
-
-        totalQuantity() {
-            return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
-        },
-
-        discountedSubtotal() {
-            let baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
-            if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
-                return baseSubTotal;
-            }
-            return baseSubTotal - parseFloat(this.discount_amount);
         },
 
         totalAmount() {
