@@ -5,7 +5,7 @@
             :disabled="totalQuantity === 0">
             Order
             <span :class="{ 'd-none': totalQuantity === 0 }"> &bull; ₱{{
-                this.ordersStore.currentSubTotal.toFixed(2) }}
+                this.subTotal.toFixed(2) }}
             </span>
             <v-badge :content="totalQuantity" color="error" :class="{ 'd-none': totalQuantity === 0 }"
                 class="position-absolute" style="top: 1px; right: 30px; z-index: 1010 !important;"></v-badge>
@@ -263,14 +263,15 @@
                         </div>
 
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
-                            :disabled="discountedSubtotal <= 0 || !isOnline">
+                            :disabled="subTotal <= 0 || !isOnline">
                             Checkout
-                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.subTotal.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
             </v-bottom-sheet>
 
+            <!-- Place order Sheet -->
             <v-bottom-sheet v-model="placeOrderSheet">
                 <v-card class="pa-2" style="background-color: #e8faff; border-radius: 60px 60px 0 0;">
                     <v-container class="overflow-auto pb-10" style="height: 700px;">
@@ -299,6 +300,7 @@
                             </div>
                         </div>
 
+                        <!-- Types -->
                         <div class="mb-5 payment-amounts">
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Order type</p>
@@ -349,7 +351,7 @@
                             <span class="required-asterisk mt-2">*</span><span class="text-grey">Cash render</span>
                             <v-text-field v-model.number="customer_cash" variant="outlined" density="compact"
                                 type="number" :disabled="eWalletPaid"
-                                :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.discountedSubtotal || 'Must be greater than or equal to total amount']"
+                                :rules="[v => !isNaN(parseFloat(v)) || 'Required', v => parseFloat(v) >= this.subTotal || 'Must be greater than or equal to total amount']"
                                 @input="e => customer_cash = e.target.value.replace(/[^0-9.]/g, '')" inputmode="numeric"
                                 placeholder="Enter cash">
                             </v-text-field>
@@ -397,7 +399,7 @@
                                         style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
                                 </div>
                                 <p class="mt-4" style="font-size: 20px;">
-                                    <strong>₱ {{ discountedSubtotal.toFixed(2) }}</strong>
+                                    <strong>₱ {{  }}</strong>
                                 </p>
                                 <v-img :src="eWalletImgSrc" width="220" height="220" class="mx-auto"></v-img>
                             </div>
@@ -426,7 +428,7 @@
                         <div class="mb-5 payment-amounts">
                             <div class="d-flex align-center justify-space-between">
                                 <p class="text-grey">Subtotal</p>
-                                <p>₱{{ discountedSubtotal.toFixed(2) }}</p>
+                                <p>₱{{ this.subTotal.toFixed(2) }}</p>
                             </div>
 
                             <v-divider class="my-3"></v-divider>
@@ -462,21 +464,20 @@
 
                             <div class="d-flex align-center justify-space-between">
                                 <p style="font-weight: 500; font-size: 18px;">Total</p>
-                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{
-                                    discountedSubtotal.toFixed(2) }}
+                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{  }}
                                 </p>
                             </div>
                         </div>
 
+                        <!-- Add in disabled: If cash > total amount -->
+                        <!-- Add in disabled: If total amount <= 0 -->
                         <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
                             :disabled="!isFormValid || placingOrder ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
-                                Number(customer_cash) < discountedSubtotal ||
                                 Number(customer_change) < 0 ||
-                                discountedSubtotal <= 0 ||
                                 !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱{{ discountedSubtotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{  }}</span>
                         </v-btn>
 
                     </v-container>
@@ -641,9 +642,9 @@ export default {
         selectedProducts: {
             handler() {
                 if (this.order_type_charge && Number(this.order_type_charge) !== 0) {
-                    this.discountedSubtotal += Number(this.order_type_charge);
+                    this.subTotal += Number(this.order_type_charge);
                 } else {
-                    return this.discountedSubtotal;
+                    return this.subTotal;
                 }
             },
             deep: true
@@ -653,15 +654,10 @@ export default {
             this.ordersStore.crrntTtlOrdrQntty = newValue;
         },
 
-        discountedSubtotal(newValue) {
-            // if there's changes in discountedSubtotal
-            this.ordersStore.crrntSbTtl = newValue;
-        },
-
         customer_cash() {
-            const customerCharge = parseFloat(this.customer_cash) - this.discountedSubtotal;
+            const customerCharge = parseFloat(this.customer_cash) - this.subTotal;
             this.customer_change = customerCharge.toFixed(2);
-            if (this.discountedSubtotal == 0) {
+            if (this.subTotal == 0) {
                 this.customer_change = 0;
             }
             if (this.customer_cash === '') {
@@ -670,7 +666,7 @@ export default {
         },
 
         discount_amount() {
-            this.total_amount = Number(this.discountedSubtotal.toFixed(2));
+            this.total_amount = Number(this.subTotal.toFixed(2));
             if (this.customer_cash) {
                 const change = parseFloat(this.customer_cash) - parseFloat(this.total_amount);
                 this.customer_change = change.toFixed(2);
@@ -692,7 +688,7 @@ export default {
                 this.order_type_charge = 5;
                 this.order_type_id = 3;
                 this.order_type = 'Delivery';
-                this.totalAmount = this.discountedSubtotal + this.order_type_charge;
+                this.totalAmount = this.subTotal + this.order_type_charge;
             }
         },
 
@@ -706,14 +702,12 @@ export default {
                 this.customer_type_id = 2;
                 this.customer_type = 'w/ Special needs';
                 this.discount_amount = 12;
-                this.discountedSubtotal -= this.discount_amount;
             }
 
             if (Number(newVal) === 3) {
                 this.customer_type_id = 3;
                 this.customer_type = 'w/ Elderly';
                 this.discount_amount = 12;
-                this.discountedSubtotal -= this.discount_amount;
             }
         },
 
@@ -733,13 +727,10 @@ export default {
             return this.selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
         },
 
-        // Declaration of discountedSubtotal
-        discountedSubtotal() {
+        // Declaration of subTotal
+        subTotal() {
             let baseSubTotal = this.selectedProducts.reduce((sum, p) => sum + (p.base_price * p.quantity), 0);
-            if (!this.discount_amount || isNaN(this.discount_amount) || this.discount_amount <= 0) {
-                return baseSubTotal;
-            }
-            return baseSubTotal - parseFloat(this.discount_amount);
+            return baseSubTotal;
         },
 
         paymentStatus() {
@@ -792,15 +783,16 @@ export default {
         },
 
         totalAmount() {
-            const totalAmount = this.totalAmount + this.discountedSubtotal;
+            const totalAmount = this.totalAmount + this.subTotal;
             return totalAmount;
         },
 
         customerChange() {
-            if (this.discountedSubtotal === 0) {
+            // Change subTotal to totalAmount
+            if (this.subTotal === 0) {
                 return 0;
             }
-            const newCustomerChange = this.customer_cash - this.discountedSubtotal;
+            const newCustomerChange = this.customer_cash - this.subTotal;
             return newCustomerChange;
         },
 
@@ -1016,7 +1008,6 @@ export default {
             if (this.selectedProducts[index].quantity === 0) {
                 this.selectedProducts.splice(index, 1);
             }
-            this.totalAmount -= this.discountedSubtotal;
             this.customer_cash = 0;
             this.payment_method_id = 1;
             this.eWalletPaid = false;
@@ -1031,7 +1022,6 @@ export default {
                 this.selectedProducts[index].quantity++;
                 
             }
-            this.totalAmount += this.discountedSubtotal;
             this.customer_cash = 0;
             this.payment_method_id = 1;
             this.eWalletPaid = false;
@@ -1088,10 +1078,10 @@ export default {
                 return;
             }
 
-            if (this.discountedSubtotal === 0) {
-                this.showError("No product selected.");
-                return;
-            }
+            // if (this.subTotal = 0 || this.totalQuantity = 0) {
+            //     this.showError("No product selected.");
+            //     return;
+            // }
 
             try {
                 this.loadingQr = true;
@@ -1100,7 +1090,8 @@ export default {
                 this.selectedEwalletOption = 'qrph';
                 this.eWalletRef = await this.generateReferenceNumber();
 
-                const amountToPay = this.discountedSubtotal;
+                let totalAmount = 100; // Sample
+                const amountToPay = totalAmount;
 
                 await this.paymentStore.generateQRPhCodeStore(
                     amountToPay,
@@ -1163,13 +1154,15 @@ export default {
                     return;
                 }
 
-                this.computed_discount = this.discountedSubtotal * (this.discount_amount / 100);
+                let totalAmount = 100; // Sample
+                this.computed_discount = totalAmount * (this.discount_amount / 100);
+                // this.computed_discount = this.totalAmount * (this.discount_amount / 100);
 
                 const formData = new FormData();
                 formData.append("transactions[0][reference_number]", this.referenceNumber ?? this.eWalletRef);
                 formData.append("transactions[0][total_quantity]", this.totalQuantity);
                 formData.append("transactions[0][total_amount]", parseFloat(this.totalAmount) || 0);
-                formData.append("transactions[0][subtotal]", parseFloat(this.discountedSubtotal) || 0);
+                formData.append("transactions[0][subtotal]", parseFloat(this.subTotal) || 0);
                 formData.append("transactions[0][order_type_id]", Number(this.order_type_id));
                 formData.append("transactions[0][order_type_charge]", parseFloat(this.order_type_charge) || 0);
                 formData.append("transactions[0][customer_cash]", parseFloat(this.customer_cash) || 0);
@@ -1232,7 +1225,7 @@ export default {
             this.payment_method_id = 1;
             this.customer_name = '-';
             this.order_note = '-';
-            this.discountedSubtotal = 0;
+            this.subTotal = 0;
             this.totalQuantity = 0;
             this.selectedProducts = [];
             this.checkoutSheet = false;
