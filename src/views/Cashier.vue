@@ -265,7 +265,7 @@
                         <v-btn @click="checkingOut" class="place-order-btn" color="#0090b6"
                             :disabled="subTotal <= 0 || !isOnline">
                             Checkout
-                            <span>&nbsp;&bull;&nbsp;₱{{ this.subTotal.toFixed(2) }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.totalAmount.toFixed(2) }}</span>
                         </v-btn>
                     </v-container>
                 </v-card>
@@ -399,7 +399,7 @@
                                         style="width: 35px; height: 13px;" alt="Home Credit Logo" loading="lazy">
                                 </div>
                                 <p class="mt-4" style="font-size: 20px;">
-                                    <strong>₱ {{ this.totalAmount }}</strong>
+                                    <strong>₱ {{ this.totalAmount.toFixed(2) }}</strong>
                                 </p>
                                 <v-img :src="eWalletImgSrc" width="220" height="220" class="mx-auto"></v-img>
                             </div>
@@ -464,7 +464,7 @@
 
                             <div class="d-flex align-center justify-space-between">
                                 <p style="font-weight: 500; font-size: 18px;">Total</p>
-                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{ this.totalAmount }}
+                                <p style="font-weight: 500; font-size: 18px; color: #0090b6">₱ {{ this.totalAmount.toFixed(2) }}
                                 </p>
                             </div>
                         </div>
@@ -477,7 +477,7 @@
                                 Number(customer_change) < 0 ||
                                 !isOnline">
                             Place order
-                            <span>&nbsp;&bull;&nbsp;₱{{ this.totalAmount }}</span>
+                            <span>&nbsp;&bull;&nbsp;₱{{ this.totalAmount.toFixed(2) }}</span>
                         </v-btn>
 
                     </v-container>
@@ -564,7 +564,6 @@ export default {
             customer_cash: '',
             customer_change: '0',
             discount_amount: '0',
-            computed_discount: null,
             payment_method_id: 1,
             table_number: null,
             customer_name: '-',
@@ -688,7 +687,6 @@ export default {
                 this.order_type_charge = 5;
                 this.order_type_id = 3;
                 this.order_type = 'Delivery';
-                this.totalAmount = this.subTotal + this.order_type_charge;
             }
         },
 
@@ -815,12 +813,6 @@ export default {
                 item_indicator = 'item';
             }
             return item_indicator;
-        },
-
-        totalOrderAmount() {
-            return Array.isArray(this.orderDetails)
-                ? this.orderDetails.reduce((sum, item) => sum + (item.base_price * item.quantity || 0), 0)
-                : 0;
         },
 
     },
@@ -1154,8 +1146,7 @@ export default {
                     return;
                 }
 
-                let total_amount = this.totalAmount;
-                this.computed_discount = total_amount * (this.discount_amount / 100);
+                // this.computed_discount = this.totalAmount * (this.discount_amount / 100);
 
                 const formData = new FormData();
                 formData.append("transactions[0][reference_number]", this.referenceNumber ?? this.eWalletRef);
@@ -1166,7 +1157,7 @@ export default {
                 formData.append("transactions[0][order_type_charge]", parseFloat(this.order_type_charge) || 0);
                 formData.append("transactions[0][customer_cash]", parseFloat(this.customer_cash) || 0);
                 formData.append("transactions[0][customer_change]", parseFloat(this.customer_change) || 0);
-                formData.append("transactions[0][discount_amount]", this.computed_discount);
+                formData.append("transactions[0][discount_amount]", parseFloat(this.discount_amount) || 0);
                 formData.append("transactions[0][payment_method_id]", Number(this.payment_method_id));
                 formData.append("transactions[0][table_number]", Number(this.table_number));
                 formData.append("transactions[0][customer_name]", this.customer_name);
@@ -1220,7 +1211,6 @@ export default {
             this.customer_cash = '';
             this.customer_change = 0;
             this.discount_amount = 0;
-            this.computed_discount = null;
             this.payment_method_id = 1;
             this.customer_name = '-';
             this.order_note = '-';
