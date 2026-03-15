@@ -183,21 +183,23 @@
                                             </svg>
                                         </div>
                                         <div class="d-flex flex-column w-100 mx-3">
-                                            <p class="text-truncate">{{ selectedProduct.product_name }}</p>
+                                            <p class="text-truncate text-left">{{ selectedProduct.product_name }}</p>
                                             <p class="text-grey my-1" style="font-size: 13px;">{{
                                                 selectedProduct.size_label }}
                                             </p>
                                             <div class="d-flex align-center justify-space-between">
                                                 <p><strong>₱{{ selectedProduct.base_price }}</strong></p>
-                                                <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
-                                                    class="mini-btn ms-3" variant="flat">
-                                                    <v-icon style="font-size: 10px;">mdi-minus</v-icon>
-                                                </v-btn>
-                                                <span class="mx-2">{{ selectedProduct.quantity }}</span>
-                                                <v-btn @click="addQuantity(selectedProduct)" color="#0090b6"
-                                                    class="mini-btn mx-1" variant="flat">
-                                                    <v-icon style="font-size: 10px;">mdi-plus</v-icon>
-                                                </v-btn>
+                                                <div>
+                                                    <v-btn @click="deductQuantity(selectedProduct)" color="#0090b6"
+                                                        class="mini-btn ms-3" variant="flat">
+                                                        <v-icon style="font-size: 10px;">mdi-minus</v-icon>
+                                                    </v-btn>
+                                                    <span class="mx-2">{{ selectedProduct.quantity }}</span>
+                                                    <v-btn @click="addQuantity(selectedProduct)" color="#0090b6"
+                                                        class="mini-btn mx-1" variant="flat">
+                                                        <v-icon style="font-size: 10px;">mdi-plus</v-icon>
+                                                    </v-btn>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -278,7 +280,7 @@
 
                         <!-- Orders -->
                         <p class="my-1 text-grey">Your order:</p>
-                        <div class="mb-7 overflow-auto" style="height: 350px;">
+                        <div class="mb-5 overflow-auto" style="height: 350px;">
                             <div class="selected-products-container">
                                 <v-alert v-if="this.selectedProducts.length === 0" variant="tonal" type="info"
                                     class="my-3">
@@ -287,7 +289,7 @@
                                 <div v-for="selectedProduct in this.selectedProducts" :key="selectedProduct.id">
                                     <div class="selected-products-card">
                                         <div class="d-flex flex-column w-100 px-1">
-                                            <p class="text-truncate">{{ selectedProduct.product_name }}</p>
+                                            <p class="text-left">{{ selectedProduct.product_name }}</p>
                                             <p class="text-grey my-1" style="font-size: 13px;">{{
                                                 selectedProduct.size_label }}</p>
                                             <div class="d-flex align-center justify-space-between">
@@ -325,7 +327,7 @@
 
                         <!-- Payment method -->
                         <p class="mb-1 text-grey">Payment method:</p>
-                        <div class="mb-7 ga-2 d-flex justify-center">
+                        <div class="mb-5 ga-2 d-flex justify-center">
                             <div :class="{ 'selected': this.payment_method_id === 1 }"
                                 class="pa-2 d-flex align-center justify-center flex-column bg-white"
                                 style="width: 160px; height: 80px; border-radius: 10px;">
@@ -474,6 +476,8 @@
                         <v-btn @click="submitForm" :loading="placingOrder" class="place-order-btn" color="#0090b6"
                             :disabled="!isFormValid || placingOrder ||
                                 (payment_method_id === 2 && !eWalletPaid) ||
+                                Number(customer_cash) > totalAmount ||
+                                totalAmount <= 0 ||
                                 Number(customer_change) < 0 ||
                                 !isOnline">
                             Place order
@@ -975,8 +979,8 @@ export default {
             this.products = filtered;
             this.selectedCategory = category.label;
             this.searchProduct = '';
-
             this.loadingCategories = false;
+
         },
 
         selectProduct(product) {
@@ -991,6 +995,12 @@ export default {
                 this.selectedProducts[index].quantity++;
             }
             this.selectedCard = product.product_id;
+            this.customer_cash = 0;
+            this.payment_method_id = 1;
+            this.eWalletPaid = false;
+            this.loadingQr = false;
+            this.eWalletImgSrc = null;
+            this.selectedEwalletOption = '';
         },
 
         deductQuantity(product) {
