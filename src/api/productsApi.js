@@ -1,16 +1,11 @@
 import apiClient from '../axios';
+import { useAuthStore } from '@/stores/auth';
 
 export const PRODUCTS_API = {
     ENDPOINTS: {
-        FETCH_PRODUCTS: '/open/products',
-        FETCH_CATEGORIES: '/open/product-category-option',
+        FETCH_PRODUCTS: 'v1/cashier/products',
+        FETCH_CATEGORIES: 'v1/cashier/product-category-option',
     },
-
-    /**
-     * Products Information
-     * @returns {Promise<Object>} Products data for the branch
-     * @throws {Error} Enhanced error with server response details
-     */
 
     async fetchAllProductsApi() {
         try {
@@ -18,7 +13,17 @@ export const PRODUCTS_API = {
             if (!authToken) {
                 throw new Error('No authentication token found');
             }
+
+            const authStore = useAuthStore();
+            const shop_id = authStore.shopId;
+            const branch_id = authStore.branchId;
+            const params = {
+                shop_id: shop_id,
+                branch_id: branch_id,
+            };
+
             const config = {
+                params: params,
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
@@ -52,7 +57,15 @@ export const PRODUCTS_API = {
             if (!authToken) {
                 throw new Error('No authentication token found');
             }
+
+            const authStore = useAuthStore();
+            const shop_id = authStore.shopId;
+            const params = {
+                shop_id: shop_id,
+            };
+
             const config = {
+                params: params,
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'

@@ -2,19 +2,18 @@ import apiClient from '../axios';
 
 export const TRANSACTION_API = {
     ENDPOINTS: {
-        FETCH_CURRENT_ORDERS: '/cashier/current-orders',
-        FETCH_ORDER_STATUS: '/open/order-status',
-        CHANGE_STATUS: '/cashier/update-order-status',
-        SUBMIT: '/cashier/submit-transaction',
-        FETCH_ORDER_DETAILS: '/open/order-details',
-        FETCH_ORDER_TEMP: '/open/order-details-temp',
-        FETCH_QR_TEMP: '/open/get-qr-temp',
-        FETCH_VOID_ORDERS: '/open/void-orders',
-        SAVE_VOID_ORDER: '/cashier/save-void',
+        SUBMIT_ORDER: 'v1/cashier/submit-transaction',
+        SAVE_VOID_ORDER: 'v1/cashier/save-void',
+        UPDATE_ORDER_STATUS: 'v1/cashier/update-order-status',
+        FETCH_CURRENT_ORDERS: 'v1/cashier/current-orders',
+        FETCH_ORDER_STATUS: 'v1/cashier/order-status',
+        FETCH_ORDER_DETAILS: 'v1/cashier/order-details',
+        FETCH_ORDER_TEMP: 'v1/cashier/order-details-temp',
+        FETCH_QR_CODE: 'v1/cashier/get-qr-code',
+        FETCH_VOID_ORDERS: 'v1/cashier/void-orders',
 
         // FETCH_STATION_STATUS: '/kitchen/station-status',
         // CHANGE_KITCHEN_STATUS: '/kitchen/update-kitchen-product-status',
-        // FETCH_QR: '/open/get-qr',
         // FETCH_KITCHEN_PRODUCT: '/open/kitchen-product-details',
     },
     
@@ -108,7 +107,7 @@ export const TRANSACTION_API = {
                 }
             };
             const response = await apiClient.put(
-                `${this.ENDPOINTS.CHANGE_STATUS}`,
+                `${this.ENDPOINTS.UPDATE_ORDER_STATUS}`,
                 { referenceNumber, orderStatus }, // Send direct payload without transactions wrapper
                 config
             );
@@ -144,7 +143,7 @@ export const TRANSACTION_API = {
                     "Content-Type": "multipart/form-data", // ✅ important
                 },
             };
-            const response = await apiClient.post(this.ENDPOINTS.SUBMIT, formData, config);
+            const response = await apiClient.post(this.ENDPOINTS.SUBMIT_ORDER, formData, config);
             if (!response.data) {
                 throw new Error("Invalid response from server");
             }
@@ -259,7 +258,7 @@ export const TRANSACTION_API = {
                 responseType: 'blob',
             };
             const response = await apiClient.get(
-                `${this.ENDPOINTS.FETCH_QR_TEMP}/${referenceNumber}`,
+                `${this.ENDPOINTS.FETCH_QR_CODE}/${referenceNumber}`,
                 config
             );
             if (!response.data) {
@@ -412,39 +411,6 @@ export const TRANSACTION_API = {
     //             error.response?.data?.message ||
     //             error.message ||
     //             'Failed to update order orderStatus'
-    //         );
-    //         enhancedError.response = error.response;
-    //         enhancedError.status = error.response?.status;
-    //         throw enhancedError;
-    //     }
-    // },
-
-    // async fetchOrderQRcodeApi(referenceNumber) {
-    //     try {
-    //         const authToken = localStorage.getItem('auth_token');
-    //         if (!authToken) {
-    //             throw new Error('No authentication token found');
-    //         }
-    //         const config = {
-    //             headers: {
-    //                 Authorization: `Bearer ${authToken}`,
-    //             },
-    //             responseType: 'blob',
-    //         };
-    //         const response = await apiClient.get(
-    //             `${this.ENDPOINTS.FETCH_QR}/${referenceNumber}`,
-    //             config
-    //         );
-    //         if (!response.data) {
-    //             throw new Error('Invalid response from server');
-    //         }
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('[TRANSACTION_API] Error fetching order status:', error);
-    //         const enhancedError = new Error(
-    //             error.response?.data?.message ||
-    //             error.message ||
-    //             'Failed to fetch order status'
     //         );
     //         enhancedError.response = error.response;
     //         enhancedError.status = error.response?.status;

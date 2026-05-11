@@ -497,7 +497,6 @@
 <script>
 import { mapState } from 'pinia';
 import { useAuthStore } from '@/stores/auth';
-import { useBranchStore } from '@/stores/branchStore';
 import { useProductsStore } from '@/stores/productsStore';
 import { useStocksStore } from '@/stores/stocksStore';
 import { useOrdersStore } from '@/stores/ordersStore';
@@ -585,6 +584,7 @@ export default {
 
             // Orders
             orders: [],
+            order_statuses: [],
             orderDetails: [],
             loadingCurrentOrders: false,
             viewOrderDialog: false,
@@ -610,7 +610,6 @@ export default {
 
     setup() {
         const authStore = useAuthStore();
-        const branchStore = useBranchStore();
         const productsStore = useProductsStore();
         const stocksStore = useStocksStore();
         const ordersStore = useOrdersStore();
@@ -629,7 +628,6 @@ export default {
         const formatCurrentDate = currentDate.replace(/,/g, '');
         return {
             authStore,
-            branchStore,
             productsStore,
             stocksStore,
             ordersStore,
@@ -1131,6 +1129,16 @@ export default {
         closeEwalletDialog() {
             this.eWalletDialog = false;
             this.paymentStore.resetPaymentState();
+        },
+
+        async fetchOrderStatus() {
+            try {
+                await this.transactStore.fetchAllOrderStatusStore();
+                this.order_statuses = this.transactStore.orderStatuses;
+            } catch (error) {
+                console.error('Error fetching order status:', error);
+                this.showError("Error fetching order status!");
+            }
         },
 
         async submitForm() {

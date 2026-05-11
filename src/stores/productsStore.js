@@ -40,7 +40,7 @@ export const useProductsStore = defineStore('products', {
                     throw new Error('PRODUCTS_API service is not properly initialized');
                 }
                 const response = await PRODUCTS_API.fetchAllCategoriesApi();
-                if (response && response.status === true) {
+                if (response && response.success === true) {
                     this.categories = response.data;
                 } else {
                     throw new Error('Failed to fetch categories');

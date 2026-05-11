@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
     const login = async (credentials) => {
         error.value = null;
         try {
-            const response = await apiClient.post('/cashier/login', credentials);
+            const response = await apiClient.post('v1/cashier/login', credentials);
             
             if (response.status === 200) {
                 token.value = response.data.access_token;
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
         // localStorage.clear();
         try {
             if (currentToken) {
-                await apiClient.post('/cashier/logout', null, {
+                await apiClient.post('v1/cashier/logout', null, {
                     headers: {
                         Authorization: `Bearer ${currentToken}`
                     },
