@@ -23,6 +23,11 @@
                 <v-btn class="ms-2" @click="toSettings" size="small" variant="flat" icon>
                     <v-icon>mdi-account-circle-outline</v-icon>
                 </v-btn>
+
+                <v-btn class="ms-2" @click="authStore.logout" size="small" variant="flat" icon>
+                    <v-icon>mdi-door-open</v-icon>
+                </v-btn>
+                
             </div>
 
             <!-- Categories -->
