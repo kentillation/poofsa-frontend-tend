@@ -149,7 +149,7 @@ export const TRANSACTION_API = {
             }
             return response.data;
         } catch (error) {
-            console.error("[TransactionAPI] Error submitting data:", error);
+            console.error("[TRANSACTION_API] Error submitting data:", error);
             const errorMessage =
                 error.response?.data?.message ||
                 error.message ||
@@ -186,7 +186,7 @@ export const TRANSACTION_API = {
     //         }
     //         return response.data;
     //     } catch (error) {
-    //         console.error('[TransactionAPI] Error submitting data:', error);
+    //         console.error('[TRANSACTION_API] Error submitting data:', error);
     //         const errorMessage = error.response?.data?.message ||
     //             error.message ||
     //             'Failed to submit transaction data';
@@ -337,7 +337,7 @@ export const TRANSACTION_API = {
             }
             return response.data;
         } catch (error) {
-            console.error('[TransactionAPI] Error saving data:', error);
+            console.error('[TRANSACTION_API] Error saving data:', error);
             const errorMessage = error.response?.data?.message ||
                 error.message ||
                 'Failed to save void data';
