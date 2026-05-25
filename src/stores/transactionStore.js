@@ -3,6 +3,7 @@ import { TRANSACTION_API } from '@/api/transactionApi';
 
 export const useTransactStore = defineStore('transactionData', {
     state: () => ({
+        crrntTtlOrdrQntty: 0,
         transactionData: null,
         voidOrderData: null,
         currentOrders: [],
@@ -353,5 +354,9 @@ export const useTransactStore = defineStore('transactionData', {
             this.error = null;
             this.success = false;
         }
+    },
+
+    getters: {
+        currentTotalOrderQuantity: (state) => state.crrntTtlOrdrQntty,
     },
 });
