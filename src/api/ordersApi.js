@@ -11,18 +11,7 @@ export const ORDERS_API = {
         FETCH_ORDER_TEMP: 'v1/cashier/order-details-temp',
         FETCH_QR_CODE: 'v1/cashier/get-qr-code',
         FETCH_VOID_ORDERS: 'v1/cashier/void-orders',
-
-        // FETCH_STATION_STATUS: '/kitchen/station-status',
-        // CHANGE_KITCHEN_STATUS: '/kitchen/update-kitchen-product-status',
-        // FETCH_KITCHEN_PRODUCT: '/open/kitchen-product-details',
     },
-    
-    // ==================== WEB SOCKET METHODS ====================
-    // subscribeToStatusUpdates(stationStatusId, callback) {
-    //     echo.private(`update-order-status.${stationStatusId}`)
-    //         .listen('.status.updated', callback) // Match the event class name in Laravel
-    //     return () => echo.leave('update-order-status')
-    // },
 
     async fetchAllCurrentOrdersApi() {
         try {
@@ -312,107 +301,4 @@ export const ORDERS_API = {
         }
     },
 
-    // async fetchAllStationStatusApi() {
-    //     try {
-    //         const authToken = localStorage.getItem('auth_token');
-    //         if (!authToken) {
-    //             throw new Error('No authentication token found');
-    //         }
-    //         const config = {
-    //             headers: {
-    //                 Authorization: `Bearer ${authToken}`,
-    //                 'Content-Type': 'application/json'
-    //             },
-    //         };
-    //         const response = await apiClient.get(
-    //             `${this.ENDPOINTS.FETCH_STATION_STATUS}`,
-    //             config
-    //         );
-    //         if (!response.data) {
-    //             throw new Error('Invalid response from server');
-    //         }
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('[ORDERS_API] Error fetching order status:', error);
-    //         const enhancedError = new Error(
-    //             error.response?.data?.message ||
-    //             error.message ||
-    //             'Failed to fetch order status'
-    //         );
-    //         enhancedError.response = error.response;
-    //         enhancedError.status = error.response?.status;
-    //         throw enhancedError;
-    //     }
-    // },
-
-    // async updateKitchenProductStatusApi(orderId, orderStatus) {
-    //     if (!orderId || !orderStatus) {
-    //         throw new Error('Invalid orderId or orderStatus');
-    //     }
-    //     try {
-    //         const authToken = localStorage.getItem('auth_token');
-    //         if (!authToken) {
-    //             throw new Error('No authentication token found');
-    //         }
-    //         const config = {
-    //             headers: {
-    //                 Authorization: `Bearer ${authToken}`,
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         };
-    //         const response = await apiClient.put(
-    //             `${this.ENDPOINTS.CHANGE_KITCHEN_STATUS}`,
-    //             { orderId, orderStatus },
-    //             config
-    //         );
-    //         if (!response.data) {
-    //             throw new Error('Invalid response from server');
-    //         }
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('[ORDERS_API] Error updating order orderStatus:', error);
-    //         const enhancedError = new Error(
-    //             error.response?.data?.message ||
-    //             error.message ||
-    //             'Failed to update order orderStatus'
-    //         );
-    //         enhancedError.response = error.response;
-    //         enhancedError.status = error.response?.status;
-    //         throw enhancedError;
-    //     }
-    // },
-    
-    // async fetchKitchenProductDetailsApi(orderId) {
-    //     try {
-    //         const authToken = localStorage.getItem('auth_token');
-    //         if (!authToken) {
-    //             throw new Error('No authentication token found');
-    //         }
-    //         const config = {
-    //             headers: {
-    //                 Authorization: `Bearer ${authToken}`,
-    //                 'Content-Type': 'application/json'
-    //             },
-    //         };
-    //         const response = await apiClient.get(
-    //             `${this.ENDPOINTS.FETCH_KITCHEN_PRODUCT}/${orderId}`,
-    //             config
-    //         );
-    //         if (!response.data) {
-    //             throw new Error('Invalid response from server');
-    //         }
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('[ORDERS_API] Error fetching kitchen product status:', error);
-    //         const enhancedError = new Error(
-    //             error.response?.data?.message ||
-    //             error.message ||
-    //             'Failed to fetch kitchen product status'
-    //         );
-    //         enhancedError.response = error.response;
-    //         enhancedError.status = error.response?.status;
-    //         throw enhancedError;
-    //     }
-    // },
-    
 };
