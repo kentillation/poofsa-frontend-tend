@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import NotFound from '@/views/NotFound.vue';
 import LoginPage from '@/views/Login.vue';
-import Register from '@/views/Register.vue';
 import Cashier from '@/views/Cashier.vue';
 import PaymentPage from '@/views/PaymentPage.vue';
 import Orders from '@/views/Orders.vue';
@@ -17,7 +16,6 @@ import { useAuthStore } from '@/stores/auth';
 const routes = [
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
     { path: '/', name: 'LoginPage', component: LoginPage, meta: { requiresAuth: false } },
-    { path: '/register', name: 'Register', component: Register },
     { path: '/cashier', name: 'Cashier', component: Cashier, meta: { requiresAuth: true } },
     { path: '/payment', name: 'PaymentPage', component: PaymentPage, meta: { requiresAuth: true } },
     { path: '/orders', name: 'Orders', component: Orders, meta: { requiresAuth: true } },
