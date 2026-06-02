@@ -220,8 +220,6 @@
 
         </v-form>
 
-        <Snackbar ref="snackbarRef" />
-        <Alert ref="alertRef" />
     </v-container>
 </template>
 
@@ -230,17 +228,13 @@ import { useAuthStore } from '@/stores/auth';
 import { usePaymentStore } from '@/stores/paymentStore';
 import { useEWalletImageStore } from '@/stores/eWalletImageStore';
 import { useTransactStore } from '@/stores/transactionStore';
+import { useToast } from 'vue-toastification'
 import echo from '@/resources/js/echo';
-import Snackbar from '@/components/Snackbar.vue';
-import Alert from '@/components/Alert.vue';
 
 export default {
     name: 'SimplePayment',
 
-    components: {
-        Snackbar,
-        Alert,
-    },
+    components: { },
 
     data() {
         return {
@@ -273,11 +267,13 @@ export default {
     },
 
     setup() {
+        const toast = useToast();
         const authStore = useAuthStore();
         const paymentStore = usePaymentStore();
         const ewalletImageStore = useEWalletImageStore();
         const transactStore = useTransactStore();
         return {
+            toast,
             authStore,
             paymentStore,
             ewalletImageStore,
@@ -322,15 +318,15 @@ export default {
                 if (newStatus === 'succeeded') {
                     this.eWalletPaid = true;
                     this.paymentCompleted = true;
-                    this.showTopAlertSuccess('Payment received successfully!');
+                    this.toast.success('Payment received successfully!');
                 } else if (newStatus === 'failed') {
                     this.eWalletPaid = false;
                     this.paymentCompleted = false;
-                    this.showTopAlertError('Payment failed. Please try again.');
+                    this.toast.error('Payment failed. Please try again.');
                 } else if (newStatus === 'cancelled') {
                     this.eWalletPaid = false;
                     this.paymentCompleted = false;
-                    this.showTopAlertError('Payment was cancelled.');
+                    this.toast.error('Payment was cancelled.');
                 }
             },
             deep: true
@@ -355,26 +351,6 @@ export default {
             return this.paymentStore.paymentStatus;
         },
 
-        paymentStatusType() {
-            const status = this.paymentStatus;
-            if (status === 'awaiting_next_action') return 'info';
-            if (status === 'succeeded') return 'success';
-            if (status === 'failed') return 'error';
-            if (status === 'cancelled') return 'warning';
-            return 'info';
-        },
-
-        paymentStatusText() {
-            const status = this.paymentStatus;
-            const texts = {
-                'awaiting_next_action': 'Waiting for payment confirmation...',
-                'succeeded': 'Payment successful! Ready to complete transaction.',
-                'failed': 'Payment failed. Please try again.',
-                'cancelled': 'Payment cancelled. Generate new QR code.',
-                'error': 'Error checking payment status.'
-            };
-            return texts[status] || 'Processing payment...';
-        },
     },
 
     async mounted() {
@@ -407,26 +383,26 @@ export default {
                     console.log('Real-time payment received:', data);
                     this.eWalletPaid = true;
                     this.paymentCompleted = true;
-                    this.showTopAlertSuccess('Payment confirmed in real-time!');
+                    this.toast.success('Payment confirmed in real-time!');
                 })
                 .listen('.payment.failed', (data) => {
                     console.log('Real-time payment failed:', data);
                     this.eWalletPaid = false;
                     this.paymentCompleted = false;
-                    this.showTopAlertError('Payment failed. Please try again.');
+                    this.toast.error('Payment failed. Please try again.');
                 });
         },
 
         onOffline() {
             this.isOnline = false;
             if (!this.eWalletPaid && this.eWalletImgSrc && !this.paymentCompleted) {
-                this.showTopAlertError("Internet connection disconnected. Payment status may be delayed.");
+                this.toast.error("Internet connection disconnected. Payment status may be delayed.");
             }
         },
 
         onOnline() {
             this.isOnline = true;
-            this.showTopAlertSuccess("Internet connection restored.");
+            this.toast.success("Internet connection restored.");
         },
 
         async generateReferenceNumber() {
@@ -481,17 +457,17 @@ export default {
             this.resetPaymentState();
 
             if (!this.isOnline) {
-                this.showError("No internet connection. Unable to generate QR.");
+                this.toast.error("No internet connection. Unable to generate QR.");
                 return;
             }
 
             if (this.eWalletPaid || this.paymentCompleted) {
-                this.showError("Payment already completed.");
+                this.toast.error("Payment already completed.");
                 return;
             }
 
             if (this.amountToPay <= 0) {
-                this.showError("Please enter a valid amount.");
+                this.toast.error("Please enter a valid amount.");
                 return;
             }
 
@@ -522,7 +498,7 @@ export default {
                 this.startPaymentStatusPolling();
 
             } catch (err) {
-                this.showError("Failed to generate QR: " + (err.message || 'Unknown error'));
+                this.toast.error("Failed to generate QR: " + (err.message || 'Unknown error'));
                 this.resetPaymentState();
             } finally {
                 this.loadingQr = false;
@@ -562,13 +538,13 @@ export default {
 
                 // Check if payment is completed for e-wallet transactions
                 if (this.payment_method_id === 2 && !this.paymentCompleted) {
-                    this.showError('Please complete e-Wallet payment first');
+                    this.toast.error('Please complete e-Wallet payment first');
                     this.placingOrder = false;
                     return;
                 }
 
                 if (!this.referenceNumber && !this.eWalletRef) {
-                    this.showError("Error in reference number. Refresh the page!");
+                    this.toast.error("Error in reference number. Refresh the page!");
                     this.placingOrder = false;
                     return;
                 }
@@ -600,7 +576,7 @@ export default {
                     clearInterval(this.pollingInterval);
                 }
 
-                this.showSuccess("Transaction completed successfully!");
+                this.toast.success("Transaction completed successfully!");
                 this.scrollToTop();
 
                 // Reset for next transaction after short delay
@@ -609,7 +585,7 @@ export default {
                 }, 3000);
 
             } catch (error) {
-                this.showError(error.message || "Transaction failed!");
+                this.toast.error(error.message || "Transaction failed!");
                 console.error(error);
             } finally {
                 this.placingOrder = false;
@@ -649,29 +625,6 @@ export default {
             this.generateReferenceNumber();
         },
 
-        showTopAlertError(message) {
-            if (this.$refs.alertRef) {
-                this.$refs.alertRef.showSnackbarAlert(message, "error");
-            }
-        },
-
-        showTopAlertSuccess(message) {
-            if (this.$refs.alertRef) {
-                this.$refs.alertRef.showSnackbarAlert(message, "success");
-            }
-        },
-
-        showError(message) {
-            if (this.$refs.snackbarRef) {
-                this.$refs.snackbarRef.showSnackbar(message, "error");
-            }
-        },
-
-        showSuccess(message) {
-            if (this.$refs.snackbarRef) {
-                this.$refs.snackbarRef.showSnackbar(message, "success");
-            }
-        },
     }
 };
 </script>
