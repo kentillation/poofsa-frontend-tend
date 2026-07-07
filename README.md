@@ -1,4 +1,4 @@
-# Poofsa
+# Poofsa (Cashier)
 
 An end-to-end retail and operations management platform designed to centralize POS, inventory, order fulfillment, and multi-branch management. By providing real-time analytics, inventory synchronization, and centralized operational oversight, the system enhances efficiency, scalability, and decision-making across business locations.
 
