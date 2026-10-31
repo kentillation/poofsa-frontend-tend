@@ -768,7 +768,7 @@ export default {
         paymentStatusText() {
             const status = this.paymentStatus;
             const texts = {
-                'awaiting_next_action': 'Waiting for payment',
+                'awaiting_next_action': 'Waiting for payment...',
                 'succeeded': 'Payment successful',
                 'failed': 'Payment failed',
                 'cancelled': 'Payment cancelled',
