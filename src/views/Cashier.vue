@@ -413,11 +413,11 @@
 
                             <!-- Show payment status -->
                             <div class="payment-status w-10">
-                                <v-alert v-if="eWalletImgSrc" :type="this.eWalletPaid = false ? 'warning' : 'success'" variant="tonal"
+                                <v-alert v-if="eWalletImgSrc" :type="eWalletPaid ? 'success' : 'warning'" variant="tonal"
                                     style="border-radius: 15px;" class="mt-1 px-3">
                                     <div class="d-flex align-center justify-space-between">
-                                        <span>{{ this.eWalletPaid = false ? 'Waiting for payment...' : 'Payment successfully paid' }}</span>
-                                        <v-progress-circular v-if="this.eWalletPaid = false" size="20" width="2"
+                                        <span>{{ eWalletPaid ? 'Payment successfully paid' : 'Waiting for payment...' }}</span>
+                                        <v-progress-circular v-if="!eWalletPaid" size="20" width="2"
                                             indeterminate></v-progress-circular>
                                         <v-icon v-else color="success">mdi-check-circle</v-icon>
                                     </div>
