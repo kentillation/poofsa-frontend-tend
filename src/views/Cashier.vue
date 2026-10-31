@@ -832,13 +832,13 @@ export default {
             this.fetchCategories(),
         ]);
 
-        window.addEventListener('online', this.onOnline),
-            window.addEventListener('offline', this.onOffline),
-            echo.private(`payments.${this.referenceNumber}`)
-                .listen('.payment.paid', () => {
-                    this.eWalletPaid = true;
-                    this.submitForm();
-                })
+        window.addEventListener('online', this.onOnline);
+        window.addEventListener('offline', this.onOffline);
+        echo.private(`payments.${this.referenceNumber}`)
+            .listen('.payment.paid', () => {
+                this.eWalletPaid = true;
+                this.submitForm();
+            });
     },
 
     beforeUnmount() {
