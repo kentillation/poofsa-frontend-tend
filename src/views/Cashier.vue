@@ -846,7 +846,7 @@ export default {
         const channel = echo.private(channelName);
         
         channel.subscribed(() => { 
-            alert('SUBSCRIPTION SUCCESSFUL!');
+            console.log('SUBSCRIPTION SUCCESSFUL!');
         });
 
         channel.listen('.payment.paid', (event) => {
