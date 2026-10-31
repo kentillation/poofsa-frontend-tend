@@ -843,9 +843,10 @@ export default {
         // Testing
         const channelName = `payments.${this.referenceNumber}`;
         const channel = echo.private(channelName);
-        channel.subscribed(() => { 
-            alert('SUBSCRIPTION SUCCESSFUL!');
+        channel.listen('.payment.succeeded', (event) => {
+            alert( `Payment success with reference: ${event.referenceNumber}`);
         });
+
         
     },
     beforeUnmount() {
