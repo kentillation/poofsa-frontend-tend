@@ -834,13 +834,14 @@ export default {
 
         window.addEventListener('online', this.onOnline);
         window.addEventListener('offline', this.onOffline);
+        
         echo.private(`payments.${this.referenceNumber}`)
             .listen('.payment.succeeded', () => {
                 this.eWalletPaid = true;
                 this.submitForm();
             });
         
-        // Testing
+        
         const channelName = `payments.${this.referenceNumber}`;
         const channel = echo.private(channelName);
         
@@ -848,9 +849,9 @@ export default {
             alert('SUBSCRIPTION SUCCESSFUL!');
         });
 
-        /*channel.subscribed('.payment.succeeded', (event) => {
-            alert( `Payment success with reference: ${event.referenceNumber}`);
-        }); */
+        channel.listen('.payment.paid', (event) => {
+            console.log(event.referenceNumber);
+        });
 
         
     },
