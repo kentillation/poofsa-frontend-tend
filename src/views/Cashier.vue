@@ -842,7 +842,7 @@ export default {
             });
         
         
-        const channelName = `payments.${this.referenceNumber}`;
+        const channelName = `private-payments.${this.referenceNumber}`;
         const channel = echo.private(channelName);
         channel.subscribed(() => {
             console.log('Successfully subscribed:', channelName);
