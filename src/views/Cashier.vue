@@ -844,13 +844,13 @@ export default {
         
         const channelName = `payments.${this.referenceNumber}`;
         const channel = echo.private(channelName);
-        
-        channel.subscribed(() => { 
-            console.log('SUBSCRIPTION SUCCESSFUL!');
+        channel.subscribed(() => {
+            console.log('Successfully subscribed:', channelName);
         });
-
+        
         channel.listen('.payment.paid', (event) => {
-            console.log(event.referenceNumber);
+            console.log('PAYMENT EVENT RECEIVED:', event);
+            alert(JSON.stringify(event));
         });
 
         
