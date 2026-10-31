@@ -839,8 +839,15 @@ export default {
                 this.eWalletPaid = true;
                 this.submitForm();
             });
+        
+        // Testing
+        const channelName = `payments.${this.referenceNumber}`;
+        const channel = echo.private(channelName);
+        channel.subscribed(() => { 
+            alert('SUBSCRIPTION SUCCESSFUL!');
+        });
+        
     },
-
     beforeUnmount() {
         if (this.paymentStore) {
             this.paymentStore.resetPaymentState();
