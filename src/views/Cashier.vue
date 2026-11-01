@@ -836,23 +836,10 @@ export default {
         window.addEventListener('offline', this.onOffline);
         
         echo.private(`payments.${this.referenceNumber}`)
-            .listen('.payment.succeeded', () => {
+            .listen('.payment.paid', () => {
                 this.eWalletPaid = true;
                 this.submitForm();
             });
-        
-        
-        const channelName = `payments.${this.referenceNumber}`;
-        const channel = echo.private(channelName);
-        channel.subscribed(() => {
-            console.log('Successfully subscribed:', channelName);
-        });
-        
-        channel.listen('.payment.paid', (event) => {
-            console.log('PAYMENT EVENT RECEIVED:', event);
-            alert(JSON.stringify(event));
-        });
-
         
     },
     beforeUnmount() {
